@@ -4,39 +4,34 @@ from pathlib import Path
 from backend.app.core.domain_loader import load_domain
 
 
-def test_airline_support_domain_loads(monkeypatch) -> None:
-    monkeypatch.setenv("DEMO_USER_ID", "AIRCUST_001")
-    monkeypatch.setenv("DEMO_USER_NAME", "Mara Beck")
-    monkeypatch.setenv("DEMO_USER_EMAIL", "mara.beck@example.com")
-    monkeypatch.setenv("DEMO_USER_TRAVEL_ID", "PROFILE-001")
-    monkeypatch.setenv("DEMO_USER_MASKED_LOYALTY_NUMBER", "MM••••9532")
-    monkeypatch.setenv("DEMO_USER_LOYALTY_TIER", "Gold")
-    monkeypatch.setenv("DEMO_USER_PREFERRED_LANGUAGE", "EN")
-    monkeypatch.setenv(
-        "DEMO_USER_CONSENTS",
-        "Operational travel alerts enabled; marketing emails disabled.",
-    )
-
+def test_airline_support_domain_loads() -> None:
     domain = load_domain("airline-support")
     assert domain.manifest.id == "airline-support"
     assert Path(domain.manifest.branding.logo_path).exists()
     assert domain.manifest.branding.app_name == "Aurora Air"
     assert domain.manifest.branding.hero_title == "Aurora Air"
     assert [card.title for card in domain.manifest.branding.starter_prompts] == [
-        "Flight status",
+        "Flight ZX018",
         "Delays and cancellations",
         "Rebooking",
-        "Profile",
+        "After-cancellation help",
     ]
 
     tool_names = {tool.name for tool in domain.get_internal_tool_definitions(runtime_config={})}
-    assert tool_names == {"get_current_user_profile", "get_current_time", "dataset_overview"}
+    assert tool_names == {
+        "get_current_user_profile",
+        "get_current_service_tier_context",
+        "get_current_time",
+        "dataset_overview",
+    }
 
     prompt = domain.build_system_prompt(mcp_tools=[], runtime_config={})
     assert 'single **"value"** parameter' in prompt
     assert "Flagship disruption path" in prompt
     assert "Post-rebooking serviceability path" in prompt
+    assert "Shared flight-number status path" in prompt
     assert "Traveller profile backup path" in prompt
+    assert "Tier-aware self-service path" in prompt
     assert "get_current_user_profile first" in prompt.lower()
     rag_prompt = domain.manifest.rag.answer_system_prompt
     assert "summarizing the most relevant guidance" in rag_prompt.lower()
@@ -44,15 +39,24 @@ def test_airline_support_domain_loads(monkeypatch) -> None:
 
     identity = domain.execute_internal_tool("get_current_user_profile", {}, settings=None)
     assert identity["customer_id"] == "AIRCUST_001"
-    assert identity["travel_id"] == "PROFILE-001"
-    assert "Operational travel alerts" in identity["consents"]
+    assert identity["profile_reference"] == "PROFILE-001"
+    assert identity["status_tier"] == "Senator"
+    assert identity["cache_group_id"] == "senator_en"
+    assert identity["service_permissions"]["operational_alerts"] is True
+
+    tier_context = domain.execute_internal_tool("get_current_service_tier_context", {}, settings=None)
+    assert tier_context["status_tier"] == "Senator"
+    assert tier_context["cache_group_id"] == "senator_en"
+    assert "customer_id" not in tier_context
+    assert "email" not in tier_context
 
 
 def test_airline_support_data_generator_writes_expected_files(tmp_path: Path) -> None:
     domain = load_domain("airline-support")
     result = domain.generate_demo_data(output_dir=tmp_path, update_env_file=False)
     assert result.env_updates["DEMO_USER_ID"] == "AIRCUST_001"
-    assert result.env_updates["DEMO_USER_TRAVEL_ID"] == "PROFILE-001"
+    assert result.env_updates["DEMO_USER_NAME"] == "Mara Beck"
+    assert result.env_updates["DEMO_USER_EMAIL"] == "mara.beck@example.com"
     assert result.summary["bookings"] >= 2
     for spec in domain.get_entity_specs():
         assert (tmp_path / spec.file_name).exists()
@@ -108,6 +112,7 @@ def test_airline_support_data_generator_writes_expected_files(tmp_path: Path) ->
     assert any(row["segment_role"] == "updated" for row in segment_rows)
     assert any(row["category"] == "disruptions" for row in policy_rows)
     assert any("automatically rebooked" in row["content"].lower() for row in policy_rows)
+    assert any(row["category"] == "status_benefits" for row in policy_rows)
     assert operational_disruption_rows[0]["operating_flight_id"] == "OF_001"
     assert "disruption_reason_code" in operational_disruption_rows[0]
     assert "operational_reason" not in operational_disruption_rows[0]

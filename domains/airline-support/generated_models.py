@@ -1,4 +1,4 @@
-"""Generated Context Surface models for the Airline Support domain."""
+"""Generated Context Surface models for the Aurora Air domain."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from context_surfaces.context_model import ContextField, ContextModel, ContextRe
 
 
 class CustomerProfile(ContextModel):
-    """CustomerProfile entity for the Airline Support domain."""
+    """CustomerProfile entity for the Aurora Air domain."""
 
     __redis_key_template__ = "airline_support_customer_profile:{customer_id}"
 
@@ -15,8 +15,8 @@ class CustomerProfile(ContextModel):
         is_key_component=True,
     )
 
-    travel_id: str = ContextField(
-        description="Traveller profile identifier",
+    profile_reference: str = ContextField(
+        description="Traveller profile reference",
         index="tag",
         no_stem=True,
     )
@@ -27,14 +27,32 @@ class CustomerProfile(ContextModel):
         weight=2.0,
     )
 
-    masked_loyalty_number: str = ContextField(
-        description="Masked loyalty number",
+    ticket_name_masked: str = ContextField(
+        description="Masked name as shown on the ticket",
+    )
+
+    loyalty_member_id_masked: str = ContextField(
+        description="Masked loyalty member identifier",
         index="tag",
         no_stem=True,
     )
 
-    loyalty_tier: str = ContextField(
-        description="Current loyalty tier",
+    salutation: str = ContextField(
+        description="Passenger salutation",
+        index="tag",
+    )
+
+    birth_date: str = ContextField(
+        description="Passenger birth date",
+    )
+
+    gender: str = ContextField(
+        description="Passenger gender",
+        index="tag",
+    )
+
+    status_tier: str = ContextField(
+        description="Current passenger status tier",
         index="tag",
     )
 
@@ -43,16 +61,30 @@ class CustomerProfile(ContextModel):
         index="tag",
     )
 
+    customer_program: str = ContextField(
+        description="Passenger loyalty program",
+        index="tag",
+    )
+
+    customer_usage: str = ContextField(
+        description="Passenger usage classification",
+        index="tag",
+    )
+
+    enrollment_carrier: str = ContextField(
+        description="Carrier tied to enrollment",
+        index="tag",
+    )
+
+    service_permissions: dict[str, bool] = ContextField(
+        description="Service-permission flags available to the passenger",
+    )
+
     email: str = ContextField(
         description="Read-only email on file",
         index="text",
         weight=1.4,
         no_stem=True,
-    )
-
-    consents: str = ContextField(
-        description="Summary of communication and service consents",
-        index="text",
     )
 
     bookings: list[Booking] = ContextRelationship(
@@ -67,7 +99,7 @@ class CustomerProfile(ContextModel):
 
 
 class Booking(ContextModel):
-    """Booking entity for the Airline Support domain."""
+    """Booking entity for the Aurora Air domain."""
 
     __redis_key_template__ = "airline_support_booking:{booking_id}"
 
@@ -129,7 +161,7 @@ class Booking(ContextModel):
 
 
 class ItinerarySegment(ContextModel):
-    """ItinerarySegment entity for the Airline Support domain."""
+    """ItinerarySegment entity for the Aurora Air domain."""
 
     __redis_key_template__ = "airline_support_itinerary_segment:{segment_id}"
 
@@ -209,7 +241,7 @@ class ItinerarySegment(ContextModel):
 
 
 class OperatingFlight(ContextModel):
-    """OperatingFlight entity for the Airline Support domain."""
+    """OperatingFlight entity for the Aurora Air domain."""
 
     __redis_key_template__ = "airline_support_operating_flight:{operating_flight_id}"
 
@@ -275,7 +307,7 @@ class OperatingFlight(ContextModel):
 
 
 class OperationalDisruption(ContextModel):
-    """OperationalDisruption entity for the Airline Support domain."""
+    """OperationalDisruption entity for the Aurora Air domain."""
 
     __redis_key_template__ = "airline_support_operational_disruption:{operational_disruption_id}"
 
@@ -350,7 +382,7 @@ class OperationalDisruption(ContextModel):
 
 
 class ReaccommodationRecord(ContextModel):
-    """ReaccommodationRecord entity for the Airline Support domain."""
+    """ReaccommodationRecord entity for the Aurora Air domain."""
 
     __redis_key_template__ = "airline_support_reaccommodation_record:{reaccommodation_record_id}"
 
@@ -415,7 +447,7 @@ class ReaccommodationRecord(ContextModel):
 
 
 class SupportCase(ContextModel):
-    """SupportCase entity for the Airline Support domain."""
+    """SupportCase entity for the Aurora Air domain."""
 
     __redis_key_template__ = "airline_support_support_case:{support_case_id}"
 
@@ -470,7 +502,7 @@ class SupportCase(ContextModel):
 
 
 class TravelPolicyDoc(ContextModel):
-    """TravelPolicyDoc entity for the Airline Support domain."""
+    """TravelPolicyDoc entity for the Aurora Air domain."""
 
     __redis_key_template__ = "airline_support_travel_policy_doc:{doc_id}"
 

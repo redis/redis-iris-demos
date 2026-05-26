@@ -27,6 +27,8 @@ def create_redis_client(settings: Settings) -> redis.Redis:
         decode_responses=True,
         socket_connect_timeout=10,
         socket_timeout=10,
+        max_connections=settings.redis_max_connections,
+        health_check_interval=30,
     )
 
 
@@ -41,4 +43,6 @@ def create_async_redis_client(settings: Settings) -> redis_asyncio.Redis:
         decode_responses=True,
         socket_connect_timeout=10,
         socket_timeout=10,
+        max_connections=settings.redis_max_connections,
+        health_check_interval=30,
     )

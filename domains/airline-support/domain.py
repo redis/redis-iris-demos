@@ -2,23 +2,26 @@ from __future__ import annotations
 
 import importlib.util
 import json
-import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Sequence
 
 from backend.app.core.domain_contract import (
     BrandingConfig,
+    DemoUserOption,
     DomainManifest,
     GeneratedDataset,
     IdentityConfig,
     InternalToolDefinition,
+    InternalToolAccessControl,
     NamespaceConfig,
     PromptCard,
     RagConfig,
+    SemanticCacheConfig,
     ThemeConfig,
 )
 from backend.app.core.domain_schema import EntitySpec, validate_entity_specs
+from backend.app.request_context import get_request_context
 from backend.app.redis_connection import create_redis_client
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -39,10 +42,26 @@ _prompt = _load_local_module("prompt", "prompt.py")
 _schema = _load_local_module("schema", "schema.py")
 
 DEMO_PROFILE = _data_generator.DEMO_PROFILE
+CUSTOMER_PROFILES = _data_generator.CUSTOMER_PROFILES
 DATASET_SUMMARY = _data_generator.DATASET_SUMMARY
 generate_demo_data = _data_generator.generate_demo_data
 build_system_prompt = _prompt.build_system_prompt
 ENTITY_SPECS = _schema.ENTITY_SPECS
+CACHE_SAFE_SERVICE_PERMISSION_FIELDS = (
+    "operational_alerts",
+    "self_service_rebooking",
+    "priority_service_routing",
+)
+
+
+def _cache_safe_service_permissions(profile: dict[str, Any]) -> dict[str, bool]:
+    permissions = profile.get("service_permissions")
+    if not isinstance(permissions, dict):
+        permissions = DEMO_PROFILE["service_permissions"]
+    return {
+        field: bool(permissions.get(field, False))
+        for field in CACHE_SAFE_SERVICE_PERMISSION_FIELDS
+    }
 
 
 class AirlineSupportDomain:
@@ -64,8 +83,8 @@ class AirlineSupportDomain:
             starter_prompts=[
                 PromptCard(
                     eyebrow="Flight Status",
-                    title="Flight status",
-                    prompt="Flight status",
+                    title="Flight ZX018",
+                    prompt="What is the status of ZX018 today?",
                 ),
                 PromptCard(
                     eyebrow="Disruption Help",
@@ -78,9 +97,9 @@ class AirlineSupportDomain:
                     prompt="What are my rebooking options?",
                 ),
                 PromptCard(
-                    eyebrow="Account",
-                    title="Profile",
-                    prompt="What does my travel profile say about my status?",
+                    eyebrow="Status Benefits",
+                    title="After-cancellation help",
+                    prompt="What help do I usually get after a cancellation?",
                 ),
             ],
             theme=ThemeConfig(
@@ -134,9 +153,15 @@ class AirlineSupportDomain:
             default_name=DEMO_PROFILE["display_name"],
             default_email=DEMO_PROFILE["email"],
             description=(
-                "Returns the signed-in traveller profile for account support, including customer ID, "
-                "profile ID, loyalty tier, language, and read-only contact details."
+                "Returns the signed-in traveller context for self-service support, including customer ID, "
+                "profile reference, status tier, language, read-only contact details, and service-permission flags."
             ),
+        ),
+        semantic_cache=SemanticCacheConfig(
+            enabled=True,
+            cache_name="airline_support_semantic_cache",
+            distance_threshold=0.12,
+            ttl_seconds=1800,
         ),
     )
 
@@ -146,6 +171,25 @@ class AirlineSupportDomain:
     def get_runtime_config(self, *, settings: Any) -> dict[str, Any]:
         del settings
         return {}
+
+    def get_demo_users(self) -> list[DemoUserOption]:
+        return [
+            DemoUserOption(
+                id=str(profile["customer_id"]),
+                label=str(profile["display_name"]),
+                subtitle=f"{profile['status_tier']} • {profile['preferred_language']}",
+                cache_group_id=str(profile["cache_group_id"]),
+            )
+            for profile in CUSTOMER_PROFILES
+        ]
+
+    def resolve_demo_user(self, demo_user_id: str | None) -> dict[str, Any] | None:
+        if not demo_user_id:
+            return dict(DEMO_PROFILE)
+        for profile in CUSTOMER_PROFILES:
+            if profile["customer_id"] == demo_user_id:
+                return dict(profile)
+        return None
 
     def build_system_prompt(
         self,
@@ -158,6 +202,25 @@ class AirlineSupportDomain:
     def build_answer_verifier_prompt(self, *, runtime_config: dict[str, Any] | None = None) -> str:
         del runtime_config
         return ""
+
+    def classify_mcp_semantic_cache_access(self, tool_name: str) -> str:
+        if tool_name.startswith("search_travelpolicydoc_by_text"):
+            return "public"
+        if tool_name.startswith("filter_operatingflight_by_flight_number"):
+            return "public"
+        if tool_name.startswith("filter_customerprofile_by_") or tool_name.startswith("search_customerprofile_by_"):
+            return "non-cacheable"
+        if (
+            tool_name.startswith("filter_booking_by_")
+            or tool_name.startswith("search_booking_by_")
+            or tool_name.startswith("filter_itinerarysegment_by_")
+            or tool_name.startswith("filter_operationaldisruption_by_")
+            or tool_name.startswith("filter_reaccommodationrecord_by_")
+            or tool_name.startswith("filter_supportcase_by_")
+            or tool_name.startswith("filter_operatingflight_by_operating_flight_id")
+        ):
+            return "non-cacheable"
+        return "ignored"
 
     def describe_tool_trace_step(
         self,
@@ -177,6 +240,8 @@ class AirlineSupportDomain:
 
         if tool_name == self.manifest.identity.tool_name:
             return "Identify the signed-in traveller before looking up bookings, operational disruptions, or profile details."
+        if tool_name == "get_current_service_tier_context":
+            return "Read the traveller's cache-safe tier and service-permission context for cohort-level benefit guidance."
         if tool_name == "get_current_time":
             return "Anchor the answer against the current UTC time before comparing trip dates or next steps."
         if tool_name == "dataset_overview":
@@ -211,6 +276,21 @@ class AirlineSupportDomain:
             InternalToolDefinition(
                 name=self.manifest.identity.tool_name,
                 description=self.manifest.identity.description,
+                access_control=InternalToolAccessControl(
+                    access_control_enabled=True,
+                    access_class_override="non-cacheable",
+                ),
+            ),
+            InternalToolDefinition(
+                name="get_current_service_tier_context",
+                description=(
+                    "Returns cache-safe cohort context for the signed-in traveller, including status tier, "
+                    "preferred language, service permissions, and cache group. Use this for tier-level benefit questions."
+                ),
+                access_control=InternalToolAccessControl(
+                    access_control_enabled=True,
+                    access_class_override="group",
+                ),
             ),
             InternalToolDefinition(
                 name="get_current_time",
@@ -232,25 +312,46 @@ class AirlineSupportDomain:
         del arguments
         if tool_name == self.manifest.identity.tool_name:
             identity = self.manifest.identity
+            request_context = get_request_context()
+            profile = request_context.demo_user or DEMO_PROFILE
             return {
-                identity.id_field: os.getenv(identity.id_env_var, identity.default_id),
-                "display_name": os.getenv(identity.name_env_var, identity.default_name),
-                "email": os.getenv(identity.email_env_var, identity.default_email),
-                "travel_id": os.getenv("DEMO_USER_TRAVEL_ID", DEMO_PROFILE["travel_id"]),
-                "masked_loyalty_number": os.getenv(
-                    "DEMO_USER_MASKED_LOYALTY_NUMBER", DEMO_PROFILE["masked_loyalty_number"]
+                identity.id_field: str(profile.get(identity.id_field, identity.default_id)),
+                "display_name": str(profile.get("display_name", identity.default_name)),
+                "email": str(profile.get("email", identity.default_email)),
+                "profile_reference": str(profile.get("profile_reference", DEMO_PROFILE["profile_reference"])),
+                "ticket_name_masked": str(profile.get("ticket_name_masked", DEMO_PROFILE["ticket_name_masked"])),
+                "loyalty_member_id_masked": str(
+                    profile.get("loyalty_member_id_masked", DEMO_PROFILE["loyalty_member_id_masked"])
                 ),
-                "loyalty_tier": os.getenv("DEMO_USER_LOYALTY_TIER", DEMO_PROFILE["loyalty_tier"]),
-                "preferred_language": os.getenv(
-                    "DEMO_USER_PREFERRED_LANGUAGE", DEMO_PROFILE["preferred_language"]
+                "salutation": str(profile.get("salutation", DEMO_PROFILE["salutation"])),
+                "birth_date": str(profile.get("birth_date", DEMO_PROFILE["birth_date"])),
+                "gender": str(profile.get("gender", DEMO_PROFILE["gender"])),
+                "status_tier": str(profile.get("status_tier", DEMO_PROFILE["status_tier"])),
+                "preferred_language": str(profile.get("preferred_language", DEMO_PROFILE["preferred_language"])),
+                "customer_program": str(profile.get("customer_program", DEMO_PROFILE["customer_program"])),
+                "customer_usage": str(profile.get("customer_usage", DEMO_PROFILE["customer_usage"])),
+                "enrollment_carrier": str(
+                    profile.get("enrollment_carrier", DEMO_PROFILE["enrollment_carrier"])
                 ),
-                "consents": os.getenv("DEMO_USER_CONSENTS", DEMO_PROFILE["consents"]),
+                "service_permissions": profile.get("service_permissions", DEMO_PROFILE["service_permissions"]),
+                "cache_group_id": str(profile.get("cache_group_id", DEMO_PROFILE["cache_group_id"])),
+            }
+        if tool_name == "get_current_service_tier_context":
+            request_context = get_request_context()
+            profile = request_context.demo_user or DEMO_PROFILE
+            return {
+                "status_tier": str(profile.get("status_tier", DEMO_PROFILE["status_tier"])),
+                "preferred_language": str(profile.get("preferred_language", DEMO_PROFILE["preferred_language"])),
+                "customer_program": str(profile.get("customer_program", DEMO_PROFILE["customer_program"])),
+                "service_permissions": _cache_safe_service_permissions(profile),
+                "cache_group_id": str(profile.get("cache_group_id", DEMO_PROFILE["cache_group_id"])),
             }
         if tool_name == "get_current_time":
             now = datetime.now(timezone.utc)
             return {"current_time": now.isoformat(), "timezone": "UTC"}
         if tool_name == "dataset_overview":
             if settings is not None:
+                client = None
                 try:
                     client = create_redis_client(settings)
                     raw = client.execute_command("JSON.GET", self.manifest.namespace.dataset_meta_key, "$")
@@ -259,6 +360,12 @@ class AirlineSupportDomain:
                         return data[0] if isinstance(data, list) else data
                 except Exception:
                     pass
+                finally:
+                    if client is not None:
+                        try:
+                            client.close()
+                        except Exception:
+                            pass
             return dict(DATASET_SUMMARY)
         return {"error": f"Unknown tool: {tool_name}"}
 
@@ -274,6 +381,7 @@ class AirlineSupportDomain:
             "travel_policy_docs": len(records.get("TravelPolicyDoc", [])),
         }
         if settings is not None:
+            client = None
             try:
                 client = create_redis_client(settings)
                 client.execute_command(
@@ -284,6 +392,12 @@ class AirlineSupportDomain:
                 )
             except Exception:
                 pass
+            finally:
+                if client is not None:
+                    try:
+                        client.close()
+                    except Exception:
+                        pass
         return summary
 
     def generate_demo_data(

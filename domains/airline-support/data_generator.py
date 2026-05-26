@@ -37,12 +37,15 @@ def fake_embedding(text: str) -> list[float]:
 def embed(texts: list[str]) -> list[list[float]]:
     if not os.getenv("OPENAI_API_KEY"):
         return [fake_embedding(text) for text in texts]
-    client = openai.OpenAI()
-    response = client.embeddings.create(
-        input=texts,
-        model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
-    )
-    return [item.embedding for item in response.data]
+    try:
+        client = openai.OpenAI()
+        response = client.embeddings.create(
+            input=texts,
+            model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"),
+        )
+        return [item.embedding for item in response.data]
+    except Exception:
+        return [fake_embedding(text) for text in texts]
 
 
 def write_jsonl(output_dir: Path, file_name: str, rows: list[dict[str, object]]) -> None:
@@ -68,26 +71,94 @@ def update_env(key: str, value: str) -> None:
 
 DEMO_PROFILE = {
     "customer_id": "AIRCUST_001",
-    "travel_id": "PROFILE-001",
+    "profile_reference": "PROFILE-001",
     "display_name": "Mara Beck",
-    "masked_loyalty_number": "MM••••9532",
-    "loyalty_tier": "Gold",
+    "ticket_name_masked": "Bxxxxxxxxxxxxxxxxxxx",
+    "loyalty_member_id_masked": "AM••••9532",
+    "salutation": "Ms.",
+    "birth_date": "1936-01-01",
+    "gender": "F",
+    "status_tier": "Senator",
     "preferred_language": "EN",
+    "customer_program": "AuroraMiles",
+    "customer_usage": "private",
+    "enrollment_carrier": "Aurora Air",
+    "service_permissions": {
+        "operational_alerts": True,
+        "self_service_rebooking": True,
+        "priority_service_routing": True,
+    },
+    "cache_group_id": "senator_en",
     "email": "mara.beck@example.com",
-    "consents": "Operational travel alerts enabled; marketing emails disabled.",
 }
 
 CUSTOMER_PROFILES = [
     DEMO_PROFILE,
     {
         "customer_id": "AIRCUST_002",
-        "travel_id": "PROFILE-002",
+        "profile_reference": "PROFILE-002",
+        "display_name": "Lena Hartmann",
+        "ticket_name_masked": "Hxxxxxxxxxxxxxxxxx",
+        "loyalty_member_id_masked": "AM••••2104",
+        "salutation": "Ms.",
+        "birth_date": "1988-06-14",
+        "gender": "F",
+        "status_tier": "Senator",
+        "preferred_language": "EN",
+        "customer_program": "AuroraMiles",
+        "customer_usage": "private",
+        "enrollment_carrier": "Aurora Air",
+        "service_permissions": {
+            "operational_alerts": True,
+            "self_service_rebooking": True,
+            "priority_service_routing": True,
+        },
+        "cache_group_id": "senator_en",
+        "email": "lena.hartmann@example.com",
+    },
+    {
+        "customer_id": "AIRCUST_003",
+        "profile_reference": "PROFILE-003",
         "display_name": "Jonas Klein",
-        "masked_loyalty_number": "MM••••2104",
-        "loyalty_tier": "Silver",
-        "preferred_language": "DE",
+        "ticket_name_masked": "Kxxxxxxxxxxxxxxx",
+        "loyalty_member_id_masked": "AM••••8841",
+        "salutation": "Mr.",
+        "birth_date": "1979-02-28",
+        "gender": "M",
+        "status_tier": "Frequent",
+        "preferred_language": "EN",
+        "customer_program": "AuroraMiles",
+        "customer_usage": "private",
+        "enrollment_carrier": "Aurora Air",
+        "service_permissions": {
+            "operational_alerts": True,
+            "self_service_rebooking": True,
+            "priority_service_routing": False,
+        },
+        "cache_group_id": "frequent_en",
         "email": "jonas.klein@example.com",
-        "consents": "Operational travel alerts enabled; marketing emails enabled.",
+    },
+    {
+        "customer_id": "AIRCUST_004",
+        "profile_reference": "PROFILE-004",
+        "display_name": "Sophie Laurent",
+        "ticket_name_masked": "Lxxxxxxxxxxxxxxxx",
+        "loyalty_member_id_masked": "AM••••6617",
+        "salutation": "Ms.",
+        "birth_date": "1991-11-09",
+        "gender": "F",
+        "status_tier": "Ambassador",
+        "preferred_language": "EN",
+        "customer_program": "AuroraMiles",
+        "customer_usage": "private",
+        "enrollment_carrier": "Aurora Air",
+        "service_permissions": {
+            "operational_alerts": True,
+            "self_service_rebooking": True,
+            "priority_service_routing": True,
+        },
+        "cache_group_id": "ambassador_en",
+        "email": "sophie.laurent@example.com",
     },
 ]
 
@@ -127,7 +198,7 @@ BOOKINGS = [
         "booking_id": "BOOK_003",
         "customer_id": "AIRCUST_002",
         "booking_locator": "ZX55DV",
-        "passenger_display_name": "Jonas Klein",
+        "passenger_display_name": "Lena Hartmann",
         "trip_status": "confirmed",
         "created_at": ts(BASE_NOW - timedelta(days=12)),
         "fare_family": "Economy Classic",
@@ -405,6 +476,27 @@ POLICY_DOCS_TEXT = [
             "If gate details are not yet assigned, the assistant should say so and refer the traveller to terminal screens or service desks."
         ),
     },
+    {
+        "doc_id": "POL_010",
+        "category": "status_benefits",
+        "title": "Tier-aware disruption support",
+        "content": (
+            "Aurora Air tailors disruption help by status tier. Traveller members receive standard self-service rebooking guidance "
+            "and app notifications. Frequent members receive the same guidance plus quicker queue placement for digital servicing. "
+            "Senator members receive priority airport and contact-center assistance, faster reaccommodation review, and proactive alerts. "
+            "Ambassador members receive the highest-priority servicing path, dedicated premium disruption handling, and white-glove airport support."
+        ),
+    },
+    {
+        "doc_id": "POL_011",
+        "category": "status_benefits",
+        "title": "Tier-aware baggage and airport assistance",
+        "content": (
+            "Baggage and airport-help guidance can vary by cabin and status tier. Frequent members may receive streamlined service routing. "
+            "Senator members typically receive stronger baggage tracing support and priority airport desks. Ambassador members receive the most "
+            "expedited premium support. The assistant should state these as program-level benefits unless a live booking record adds trip-specific detail."
+        ),
+    },
 ]
 
 DATASET_SUMMARY = {
@@ -450,11 +542,6 @@ def generate_demo_data(
         "DEMO_USER_ID": DEMO_PROFILE["customer_id"],
         "DEMO_USER_NAME": DEMO_PROFILE["display_name"],
         "DEMO_USER_EMAIL": DEMO_PROFILE["email"],
-        "DEMO_USER_TRAVEL_ID": DEMO_PROFILE["travel_id"],
-        "DEMO_USER_MASKED_LOYALTY_NUMBER": DEMO_PROFILE["masked_loyalty_number"],
-        "DEMO_USER_LOYALTY_TIER": DEMO_PROFILE["loyalty_tier"],
-        "DEMO_USER_PREFERRED_LANGUAGE": DEMO_PROFILE["preferred_language"],
-        "DEMO_USER_CONSENTS": DEMO_PROFILE["consents"],
     }
     if update_env_file:
         for key, value in env_updates.items():

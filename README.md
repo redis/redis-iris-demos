@@ -21,9 +21,9 @@ The repo currently includes built-in demo domains for:
 
 - `reddash` — food-delivery support
 - `electrohub` — electronics retail and order support
+- `airline-support` — passenger support across disruptions, reassignment, traveller profile lookup, and scoped semantic caching
 - `finance-researcher` — ShiftIQ watchlist research across filings, metrics, prices, and live updates
 - `healthcare` — RedHealthConnect patient success portal (appointments, referrals, providers)
-- `airline-support` — synthetic airline support across disruptions, reassignment, and traveller profile lookup
 
 **Two modes, same UI:**
 
@@ -126,15 +126,17 @@ Open http://localhost:3040 and try:
 - In `electrohub`:
   - *"Show me my recent ElectroHub orders."*
   - *"Can I pick that up at my local store?"*
+- In `airline-support`:
+  - *"My flight was disrupted. What happened?"*
+  - *"Can I still check in for the new flight?"*
+  - *"What help do I usually get after a cancellation?"*
+  - *"What is the status of ZX018 today?"*
 - In `finance-researcher` / ShiftIQ:
   - *"Walk me through Oracle's latest quarter using both the filing and the structured metrics."*
   - *"What's new in my watchlist this week?"*
 - In `healthcare`:
   - *"Do I have any upcoming appointments?"*
   - *"Find me a cardiologist accepting new patients?"*
-- In `airline-support`:
-  - *"My flight was disrupted. What happened?"*
-  - *"Can I still check in for the new flight?"*
 
 ---
 
@@ -214,9 +216,9 @@ See:
 
 - [`domains/reddash/docs/demo_paths.md`](domains/reddash/docs/demo_paths.md)
 - [`domains/electrohub/docs/demo_paths.md`](domains/electrohub/docs/demo_paths.md)
+- [`domains/airline-support/docs/demo_paths.md`](domains/airline-support/docs/demo_paths.md)
 - [`domains/finance-researcher/docs/demo_paths.md`](domains/finance-researcher/docs/demo_paths.md)
 - [`domains/healthcare/docs/demo_paths.md`](domains/healthcare/docs/demo_paths.md)
-- [`domains/airline-support/docs/demo_paths.md`](domains/airline-support/docs/demo_paths.md)
 
 Reddash includes four scripted conversation flows:
 
@@ -227,18 +229,19 @@ Reddash includes four scripted conversation flows:
 
 > **Tip:** After each path, toggle to Simple RAG mode and ask the same question to see the contrast.
 
+Airline support includes flagship and semantic-cache paths for:
+
+1. **Disruption recovery** — explain a cancelled flight, the updated itinerary, and next steps
+2. **Post-rebooking serviceability** — answer check-in, baggage, and terminal questions against the reassigned trip
+3. **Traveller profile snapshot** — backup-only path for read-only identity and profile grounding
+4. **Scoped semantic caching** — demonstrate public flight-status reuse, cohort-scoped passenger service guidance, and personalized support that intentionally stays out of the cache
+
 ShiftIQ includes flagship paths for:
 
 1. **Cross-company narrative comparison** — compare the latest filings and research chunks across peers
 2. **Metric-plus-document reasoning** — explain a quarter using both structured metrics and source documents
 3. **Peer trend analysis** — compare price and fundamentals trends, including RedisTimeSeries-backed queries
 4. **Live watchlist updates** — explain what changed this week using normalized coverage events and Redis Streams
-
-Airline support includes flagship paths for:
-
-1. **Disruption recovery** — explain a cancelled flight, the updated itinerary, and next steps
-2. **Post-rebooking serviceability** — answer check-in, baggage, and terminal questions against the reassigned trip
-3. **Traveller profile snapshot** — backup-only path for read-only identity and profile grounding
 
 ## Presentations
 
@@ -290,9 +293,9 @@ context-engine-demos/
 ├── domains/
 │   ├── reddash/             # Delivery-support reference domain
 │   ├── electrohub/          # Electronics retail reference domain
+│   ├── airline-support/     # Passenger support + semantic cache reference domain
 │   ├── finance-researcher/  # ShiftIQ watchlist research domain
-│   ├── healthcare/          # Patient success portal domain
-│   └── airline-support/     # Airline disruption and trip support domain
+│   └── healthcare/          # Patient success portal domain
 │       ├── domain.py        # DOMAIN export implementing the contract
 │       ├── schema.py        # Entity definitions
 │       ├── prompt.py        # Domain prompt/playbooks

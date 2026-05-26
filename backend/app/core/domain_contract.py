@@ -87,6 +87,26 @@ class IdentityConfig(BaseModel):
     description: str
 
 
+class SemanticCacheConfig(BaseModel):
+    enabled: bool = False
+    cache_name: str = ""
+    distance_threshold: float = 0.12
+    ttl_seconds: int = 1800
+
+
+class InternalToolAccessControl(BaseModel):
+    access_control_enabled: bool = False
+    touched_entity_classes: list[str] = Field(default_factory=list)
+    access_class_override: str | None = None
+
+
+class DemoUserOption(BaseModel):
+    id: str
+    label: str
+    subtitle: str | None = None
+    cache_group_id: str | None = None
+
+
 class DomainManifest(BaseModel):
     id: str
     version: str = "1"
@@ -98,12 +118,14 @@ class DomainManifest(BaseModel):
     namespace: NamespaceConfig
     rag: RagConfig
     identity: IdentityConfig
+    semantic_cache: SemanticCacheConfig = Field(default_factory=SemanticCacheConfig)
 
 
 class InternalToolDefinition(BaseModel):
     name: str
     description: str
     input_schema: dict[str, Any] = Field(default_factory=lambda: {"type": "object", "properties": {}, "required": []})
+    access_control: InternalToolAccessControl = Field(default_factory=InternalToolAccessControl)
 
 
 class GeneratedDataset(BaseModel):

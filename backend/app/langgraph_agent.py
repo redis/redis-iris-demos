@@ -362,6 +362,10 @@ async def create_checkpointer(settings: Settings) -> AsyncRedisSaver:
     domain = get_active_domain(settings)
     checkpointer = AsyncRedisSaver(
         redis_url=redis_url,
+        connection_args={
+            "max_connections": settings.redis_max_connections,
+            "health_check_interval": 30,
+        },
         checkpoint_prefix=domain.manifest.namespace.checkpoint_prefix,
         checkpoint_write_prefix=domain.manifest.namespace.checkpoint_write_prefix,
     )

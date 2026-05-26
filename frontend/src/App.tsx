@@ -7,7 +7,7 @@ type ChatRole = "user" | "assistant";
 type ToolEvent = {
   runId: string;
   toolName: string;
-  toolKind: "internal_function" | "mcp_tool";
+  toolKind: "internal_function" | "mcp_tool" | "cache";
   status: "call" | "result";
   payload: Record<string, unknown>;
   durationMs?: number;
@@ -56,6 +56,7 @@ type HealthState = {
 type AgentMode = "context_surfaces" | "simple_rag";
 
 type PromptCard = { eyebrow: string; title: string; prompt: string };
+type DemoUserOption = { id: string; label: string; subtitle?: string | null; cache_group_id?: string | null };
 
 type DomainConfig = {
   id: string;
@@ -75,6 +76,9 @@ type DomainConfig = {
     live_updates_title?: string;
   };
   logo_src: string;
+  semantic_cache_enabled?: boolean;
+  demo_users?: DemoUserOption[];
+  default_demo_user_id?: string | null;
 } | null;
 
 function isLightColor(value?: string) {
@@ -130,7 +134,9 @@ type TimeSeriesChartPayload = {
 const modeStorageKey = "demo-domain-mode";
 
 function toolKindLabel(kind: ToolEvent["toolKind"]) {
-  return kind === "mcp_tool" ? "Context Surface" : "Internal";
+  if (kind === "mcp_tool") return "Context Surface";
+  if (kind === "cache") return "Semantic Cache";
+  return "Internal";
 }
 
 function formatTotalElapsedMs(ms: number) {
@@ -686,7 +692,9 @@ export default function App() {
   const [liveFeedTicker, setLiveFeedTicker] = useState<{ streamId: string; headline: string; timestamp: string } | null>(null);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [streamAnnouncement, setStreamAnnouncement] = useState("");
   const [threadId, setThreadId] = useState(() => crypto.randomUUID());
+  const [selectedDemoUserId, setSelectedDemoUserId] = useState<string>("");
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const liveFeedHydratedRef = useRef(false);
   const liveFeedTickerTimeoutRef = useRef<number | null>(null);
@@ -702,7 +710,10 @@ export default function App() {
   useEffect(() => {
     void fetch("/api/domain-config")
       .then((r) => r.json())
-      .then((p: DomainConfig) => setDomain(p))
+      .then((p: DomainConfig) => {
+        setDomain(p);
+        setSelectedDemoUserId(p?.default_demo_user_id ?? p?.demo_users?.[0]?.id ?? "");
+      })
       .catch(() => setDomain(null));
   }, []);
 
@@ -787,6 +798,11 @@ export default function App() {
     document.title = domain?.app_name ?? "Domain Demo";
   }, [domain]);
 
+  function resetConversation() {
+    setMessages([]);
+    setThreadId(crypto.randomUUID());
+  }
+
   async function submitPrompt(prompt: string, event?: FormEvent) {
     event?.preventDefault();
     const trimmed = prompt.trim();
@@ -800,6 +816,7 @@ export default function App() {
     setMessages([...nextMessages, assistantMsg]);
     setInput("");
     setIsLoading(true);
+    setStreamAnnouncement("Response in progress.");
 
     try {
       const response = await fetch("/api/chat/stream", {
@@ -809,8 +826,25 @@ export default function App() {
           messages: nextMessages.map(({ role, content }) => ({ role, content })),
           mode,
           thread_id: threadId,
+          demo_user_id: selectedDemoUserId || null,
         }),
       });
+
+      if (!response.ok) {
+        let errorMessage = `Request failed with status ${response.status}`;
+        try {
+          const payload = await response.json();
+          if (payload && typeof payload.detail === "string") errorMessage = payload.detail;
+        } catch {
+          // Keep the HTTP status fallback if the server does not return JSON.
+        }
+        setMessages((cur) =>
+          cur.map((m) => m.id === assistantId ? { ...m, content: errorMessage } : m),
+        );
+        setIsLoading(false);
+        setStreamAnnouncement(`Request failed: ${errorMessage}`);
+        return;
+      }
 
       if (!response.body) { setIsLoading(false); return; }
       const reader = response.body.getReader();
@@ -875,16 +909,22 @@ export default function App() {
           );
         }
       }
+      setStreamAnnouncement("Response complete.");
     } catch (err) {
       setMessages((cur) =>
         cur.map((m) => m.id === assistantId ? { ...m, content: m.content || "Connection error. Please try again." } : m),
       );
+      setStreamAnnouncement("Connection error. Please try again.");
     }
     setIsLoading(false);
   }
 
   async function handleSubmit(event?: FormEvent) { await submitPrompt(input, event); }
-  function handleQuickStart(prompt: string) { setInput(prompt); void submitPrompt(prompt); }
+  function handleQuickStart(prompt: string) {
+    if (isLoading) return;
+    setInput(prompt);
+    void submitPrompt(prompt);
+  }
   function handleComposerKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
     if (event.key !== "Enter" || event.shiftKey) return;
     event.preventDefault();
@@ -893,6 +933,7 @@ export default function App() {
 
   return (
     <div className="shell">
+      <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">{streamAnnouncement}</div>
       <main className="main">
         <header className="topbar">
           <div className="topbar-left">
@@ -904,9 +945,34 @@ export default function App() {
               </div>
             </div>
           </div>
-          <div className="mode-toggle">
-            <button className={`mode-btn ${mode === "context_surfaces" ? "active" : ""}`} onClick={() => { setMode("context_surfaces"); setMessages([]); setThreadId(crypto.randomUUID()); }} type="button">Context Surfaces</button>
-            <button className={`mode-btn ${mode === "simple_rag" ? "active" : ""}`} onClick={() => { setMode("simple_rag"); setMessages([]); setThreadId(crypto.randomUUID()); }} type="button">Simple RAG</button>
+          <div className="topbar-controls">
+            {mode === "context_surfaces" && domain?.demo_users && domain.demo_users.length > 0 && (
+              <label className="demo-user-picker">
+                <span className="demo-user-label">Passenger</span>
+                <span className="demo-user-select-shell">
+                  <span className="demo-user-select-accent" aria-hidden="true" />
+                  <select
+                    value={selectedDemoUserId}
+                    disabled={isLoading}
+                    onChange={(event) => {
+                      setSelectedDemoUserId(event.target.value);
+                      resetConversation();
+                    }}
+                  >
+                    {domain.demo_users.map((user) => (
+                      <option key={user.id} value={user.id}>
+                        {user.subtitle ? `${user.label} • ${user.subtitle}` : user.label}
+                      </option>
+                    ))}
+                  </select>
+                  <span className="demo-user-select-arrow" aria-hidden="true">⌄</span>
+                </span>
+              </label>
+            )}
+            <div className="mode-toggle">
+              <button disabled={isLoading} aria-pressed={mode === "context_surfaces"} className={`mode-btn ${mode === "context_surfaces" ? "active" : ""}`} onClick={() => { setMode("context_surfaces"); resetConversation(); }} type="button">Context Surfaces</button>
+              <button disabled={isLoading} aria-pressed={mode === "simple_rag"} className={`mode-btn ${mode === "simple_rag" ? "active" : ""}`} onClick={() => { setMode("simple_rag"); resetConversation(); }} type="button">Simple RAG</button>
+            </div>
           </div>
         </header>
 
@@ -1154,9 +1220,11 @@ export default function App() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleComposerKeyDown}
               placeholder={domain?.placeholder_text ?? "Ask a question..."}
+              readOnly={isLoading}
+              aria-busy={isLoading}
             />
             <div className="composer-footer">
-              <div className="composer-hint">Press Enter to send</div>
+              <div className="composer-hint">{isLoading ? "Response in progress" : "Press Enter to send"}</div>
               <button className="send-button" type="submit" disabled={isLoading}>Send</button>
             </div>
           </form>
@@ -1166,7 +1234,7 @@ export default function App() {
               <div className="quick-starts-label">Try asking</div>
               <div className="quick-starts-row">
                 {(domain?.starter_prompts ?? []).map((p) => (
-                  <button key={p.title} className="quick-start-chip" onClick={() => handleQuickStart(p.prompt)} type="button">{p.title}</button>
+                  <button key={p.title} className="quick-start-chip" onClick={() => handleQuickStart(p.prompt)} type="button" disabled={isLoading}>{p.title}</button>
                 ))}
               </div>
             </div>

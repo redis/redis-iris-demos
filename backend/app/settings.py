@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     openai_api_key: str = Field(default="")
     openai_chat_model: str = Field(default="gpt-4o")
     openai_embedding_model: str = Field(default="text-embedding-3-small")
+    semantic_cache_embedding_model: str = Field(default="sentence-transformers/all-MiniLM-L6-v2")
     openai_reasoning_effort: str = Field(default="medium")
     openai_lightweight_model: str = Field(default="")
     openai_lightweight_reasoning_effort: str = Field(default="low")
@@ -32,6 +33,7 @@ class Settings(BaseSettings):
     redis_password: str = Field(default="")
     redis_db: int = Field(default=0)
     redis_ssl: bool = Field(default=False)
+    redis_max_connections: int = Field(default=4)
 
     ctx_admin_key: str = Field(default="")
     mcp_agent_key: str = Field(default="")
