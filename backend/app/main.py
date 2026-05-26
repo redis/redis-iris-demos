@@ -421,20 +421,6 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
                 cache_result_payload = {
                     "result": "miss",
                 }
-            else:
-                cache_run_id = f"cache-skip-{uuid4()}"
-                yield format_sse_event(
-                    "tool-call",
-                    toolName="Semantic cache skip",
-                    toolKind="cache",
-                    runId=cache_run_id,
-                    payload=cache_request_payload,
-                    ts=timer.elapsed_ms(),
-                )
-                cache_result_payload = {
-                    "result": "skip",
-                    "reason": cache_reason or "cache lookup was not used",
-                }
             yield format_sse_event(
                 "tool-result",
                 toolName="Semantic cache skip" if cache_outcome == "skip" else "Semantic cache miss",

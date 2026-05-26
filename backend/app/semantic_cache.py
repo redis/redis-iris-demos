@@ -196,13 +196,6 @@ class SemanticCacheService:
             self._cache.disconnect()
         except Exception:
             log.exception("Unable to disconnect semantic cache cleanly")
-        vectorizer = getattr(self._cache, "_vectorizer", None)
-        client = getattr(vectorizer, "_client", None)
-        if client is not None:
-            try:
-                del client
-            except Exception:
-                log.exception("Unable to release semantic cache vectorizer client")
         self._cache = None
 
     async def aclose(self) -> None:
@@ -214,13 +207,6 @@ class SemanticCacheService:
             log.exception("Unable to disconnect semantic cache async client cleanly")
             self.close()
             return
-        vectorizer = getattr(self._cache, "_vectorizer", None)
-        client = getattr(vectorizer, "_client", None)
-        if client is not None:
-            try:
-                del client
-            except Exception:
-                log.exception("Unable to release semantic cache vectorizer client")
         self._cache = None
 
     def _get_cache(self) -> SemanticCache:
