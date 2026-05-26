@@ -186,7 +186,7 @@ def _effective_thread_id(request: ChatRequest, demo_user: dict[str, Any] | None)
 
 
 def _semantic_cache_lookup_block_reason(question: str) -> str | None:
-    normalized = question.lower()
+    normalized = question.lower().replace("’", "'")
     user_specific_phrases = (
         "my flight",
         "my trip",
@@ -224,7 +224,7 @@ def _semantic_cache_lookup_block_reason(question: str) -> str | None:
         "support case",
         "ticket",
     )
-    personal_terms = (" my ", " me ", " i ", " i'm ", " i’m ")
+    personal_terms = (" my ", " me ", " i ", " i'm ")
     padded = f" {normalized} "
     if any(term in normalized for term in account_terms) and any(term in padded for term in personal_terms):
         return "prompt requires live user-specific context"

@@ -181,6 +181,8 @@ def test_chat_request_rejects_unknown_demo_user(monkeypatch: pytest.MonkeyPatch)
     [
         ("What help do I usually get after a cancellation?", False),
         ("My flight was disrupted. What happened?", True),
+        ("I'm disrupted, what happened?", True),
+        ("I’m disrupted, what happened?", True),
         ("What are my rebooking options?", True),
         ("Do I have a support case?", True),
         ("Was I rebooked?", True),
