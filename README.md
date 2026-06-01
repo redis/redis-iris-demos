@@ -23,7 +23,7 @@ Every domain runs Context Retriever, Agent Memory, LangCache, and Semantic Routi
 
 | Domain | App | Industry | Screenshot |
 |--------|-----|----------|------------|
-| `reddash` | Reddash | Food delivery | <img src="docs/screenshots/Demo_Redis_Eats.png" width="300" /> |
+| `reddash` | Redis Eats | Food delivery | <img src="docs/screenshots/Demo_Redis_Eats.png" width="300" /> |
 | `electrohub` | ElectroHub | Electronics retail | <img src="docs/screenshots/Demo_ElectroHub.png" width="300" /> |
 | `finance-researcher` | ShiftIQ | Financial research | <img src="docs/screenshots/Demo_ShiftIQ.png" width="300" /> |
 | `healthcare` | RedHealthConnect | Healthcare | <img src="docs/screenshots/Demo_RedHealthConnect.png" width="300" /> |

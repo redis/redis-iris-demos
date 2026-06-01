@@ -38,7 +38,7 @@ class HealthcareDomain:
         branding=BrandingConfig(
             app_name="RedHealthConnect",
             subtitle="Patient Success Portal",
-            hero_title="How can we help you today?",
+            hero_title="Healthcare Made Easy",
             placeholder_text="Ask about appointments, referrals, providers…",
             logo_path="domains/healthcare/assets/logo.svg",
             demo_steps=[
@@ -88,7 +88,7 @@ class HealthcareDomain:
                 soft="#b8d4e0",
                 accent="#4cc2ff",
                 user="#132840",
-                landing_bg="#EDF6FA",
+                landing_bg="#F5F8FB",
             ),
         ),
         namespace=NamespaceConfig(

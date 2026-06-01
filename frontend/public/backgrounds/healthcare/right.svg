@@ -1,189 +1,198 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 632 817">
-  <defs>
-    <style>
-      .h1{fill:#4cc2ff}
-      .h2{fill:#2A96D4}
-      .h3{fill:#8DD6FF}
-      .h4{fill:#C8EBFF}
-      .h5{fill:#1A6A99}
-      .hw{fill:#fff}
-    </style>
-  </defs>
 
-  <!-- Medical cross/shield - large, top right, partially cut off -->
-  <g transform="translate(480, -20)">
-    <!-- Shield shape -->
-    <path class="h2" d="M0,0 L80,0 Q160,0 160,60 L160,120 Q160,200 80,240 L80,240 Q0,200 0,120 Z" opacity="0.9"/>
-    <path class="h5" d="M16,16 L80,16 Q144,16 144,60 L144,116 Q144,184 80,220 L80,220 Q16,184 16,116 Z"/>
-    <!-- White cross on shield -->
-    <rect class="hw" x="64" y="60" width="32" height="100" rx="8"/>
-    <rect class="hw" x="46" y="88" width="68" height="32" rx="8"/>
+  <!-- =====================================================
+       RedHealthConnect — Right Edge Background
+       Healthcare portal UI elements (calendar, provider, referrals)
+       Elements confined to right ~38% of viewBox (x > 392)
+       ===================================================== -->
+
+  <!-- ============================================================
+       TOP-RIGHT: CALENDAR / SCHEDULE VIEW (y: 20-260)
+       ============================================================ -->
+  <g>
+    <!-- Card background -->
+    <rect x="445" y="20" width="210" height="230" rx="12" ry="12"
+          fill="#d4eaf4" opacity="0.50"
+          stroke="#4cc2ff" stroke-width="1" stroke-opacity="0.20"/>
+
+    <!-- Month/year header line -->
+    <rect x="465" y="36" width="70" height="5" rx="2" fill="#7a9aad" opacity="0.35"/>
+
+    <!-- Navigation arrows (small triangles) -->
+    <path d="M555,38 L561,34 L561,42 Z" fill="#7a9aad" opacity="0.25"/>
+    <path d="M575,38 L569,34 L569,42 Z" fill="#7a9aad" opacity="0.25"/>
+
+    <!-- Divider below month -->
+    <line x1="445" y1="52" x2="655" y2="52" stroke="#4cc2ff" stroke-width="0.6" stroke-opacity="0.15"/>
+
+    <!-- Day-of-week labels (7 tiny lines) -->
+    <rect x="460" y="60" width="14" height="3" rx="1.5" fill="#7a9aad" opacity="0.25"/>
+    <rect x="486" y="60" width="14" height="3" rx="1.5" fill="#7a9aad" opacity="0.25"/>
+    <rect x="512" y="60" width="14" height="3" rx="1.5" fill="#7a9aad" opacity="0.25"/>
+    <rect x="538" y="60" width="14" height="3" rx="1.5" fill="#7a9aad" opacity="0.25"/>
+    <rect x="564" y="60" width="14" height="3" rx="1.5" fill="#7a9aad" opacity="0.25"/>
+    <rect x="590" y="60" width="14" height="3" rx="1.5" fill="#7a9aad" opacity="0.25"/>
+    <rect x="616" y="60" width="14" height="3" rx="1.5" fill="#7a9aad" opacity="0.25"/>
+
+    <!-- Calendar grid: 7 cols x 5 rows of day cells -->
+    <!-- Row 1 -->
+    <rect x="458" y="74" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="484" y="74" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="510" y="74" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="536" y="74" width="22" height="22" rx="4" fill="#4cc2ff" opacity="0.25"/><!-- appointment day -->
+    <rect x="562" y="74" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="588" y="74" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="614" y="74" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+
+    <!-- Row 2 -->
+    <rect x="458" y="100" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="484" y="100" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="510" y="100" width="22" height="22" rx="4" fill="#4cc2ff" opacity="0.25"/><!-- appointment day -->
+    <rect x="536" y="100" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="562" y="100" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="588" y="100" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="614" y="100" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+
+    <!-- Row 3 -->
+    <rect x="458" y="126" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="484" y="126" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="510" y="126" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="536" y="126" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="562" y="126" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="588" y="126" width="22" height="22" rx="4" fill="#4cc2ff" opacity="0.25"/><!-- appointment day -->
+    <rect x="614" y="126" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+
+    <!-- Row 4 -->
+    <rect x="458" y="152" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="484" y="152" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="510" y="152" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="536" y="152" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="562" y="152" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="588" y="152" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="614" y="152" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+
+    <!-- Row 5 (partial) -->
+    <rect x="458" y="178" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="484" y="178" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+    <rect x="510" y="178" width="22" height="22" rx="4" fill="#bdd8e8" opacity="0.30"/>
+
+    <!-- Small dots on appointment days to mark them -->
+    <circle cx="547" cy="91" r="2.5" fill="#4cc2ff" opacity="0.45"/>
+    <circle cx="521" cy="117" r="2.5" fill="#4cc2ff" opacity="0.45"/>
+    <circle cx="599" cy="143" r="2.5" fill="#4cc2ff" opacity="0.45"/>
+
+    <!-- Upcoming event preview lines at bottom of card -->
+    <line x1="458" y1="212" x2="640" y2="212" stroke="#4cc2ff" stroke-width="0.5" stroke-opacity="0.15"/>
+    <circle cx="470" cy="228" r="6" fill="#bdd8e8" opacity="0.40"/>
+    <rect x="482" y="224" width="80" height="4" rx="2" fill="#7a9aad" opacity="0.28"/>
+    <rect x="482" y="232" width="55" height="3" rx="2" fill="#7a9aad" opacity="0.20"/>
   </g>
 
-  <!-- Test tube / vial - tilted -->
-  <g transform="translate(420, 200) rotate(25)">
-    <rect class="h3" x="0" y="0" width="36" height="130" rx="18"/>
-    <rect class="h1" x="0" y="60" width="36" height="70" rx="18"/>
-    <rect class="h3" x="0" y="60" width="36" height="12"/>
-    <!-- Tube rim -->
-    <rect class="hw" x="-4" y="-4" width="44" height="14" rx="7"/>
-    <!-- Liquid line -->
-    <ellipse class="h3" cx="18" cy="64" rx="14" ry="4" opacity="0.6"/>
-    <!-- Bubbles -->
-    <circle class="hw" cx="14" cy="90" r="4" opacity="0.5"/>
-    <circle class="hw" cx="22" cy="105" r="3" opacity="0.4"/>
-    <circle class="hw" cx="10" cy="115" r="2" opacity="0.3"/>
-  </g>
 
-  <!-- Second smaller test tube -->
-  <g transform="translate(560, 300) rotate(-15)">
-    <rect class="h4" x="0" y="0" width="28" height="100" rx="14"/>
-    <rect class="h2" x="0" y="45" width="28" height="55" rx="14"/>
-    <rect class="h4" x="0" y="45" width="28" height="10"/>
-    <rect class="hw" x="-3" y="-3" width="34" height="12" rx="6"/>
-  </g>
+  <!-- ============================================================
+       MID-RIGHT: PROVIDER PROFILE CARD (y: 300-520)
+       ============================================================ -->
+  <g>
+    <!-- Card background -->
+    <rect x="475" y="300" width="180" height="200" rx="10" ry="10"
+          fill="#d4eaf4" opacity="0.45"
+          stroke="#4cc2ff" stroke-width="0.8" stroke-opacity="0.18"/>
 
-  <!-- Thermometer - large -->
-  <g transform="translate(200, 350) rotate(20)">
-    <!-- Stem -->
-    <rect class="h4" x="0" y="0" width="24" height="140" rx="12"/>
-    <!-- Mercury line -->
-    <rect class="h1" x="8" y="30" width="8" height="110" rx="4"/>
-    <!-- Bulb at bottom -->
-    <circle class="h1" cx="12" cy="140" r="20"/>
-    <circle class="h2" cx="12" cy="140" r="14"/>
-    <!-- Scale marks -->
-    <rect class="h3" x="-4" y="40" width="10" height="3" rx="1.5"/>
-    <rect class="h3" x="-4" y="55" width="10" height="3" rx="1.5"/>
-    <rect class="h3" x="-4" y="70" width="10" height="3" rx="1.5"/>
-    <rect class="h3" x="-4" y="85" width="10" height="3" rx="1.5"/>
-    <rect class="h3" x="-4" y="100" width="10" height="3" rx="1.5"/>
-    <!-- Top cap -->
-    <rect class="hw" x="2" y="-6" width="20" height="10" rx="5"/>
-  </g>
+    <!-- Doctor photo circle -->
+    <circle cx="565" cy="345" r="25" fill="#bdd8e8" opacity="0.50"/>
+    <!-- Inner circle detail -->
+    <circle cx="565" cy="340" r="10" fill="#d4eaf4" opacity="0.55"/>
+    <!-- Shoulders/body hint below circle -->
+    <path d="M545,365 Q565,375 585,365" fill="none" stroke="#bdd8e8" stroke-width="2" stroke-opacity="0.35"/>
 
-  <!-- Bandage cross - center right -->
-  <g transform="translate(500, 520)">
-    <!-- Vertical band -->
-    <rect class="h1" x="-18" y="-55" width="36" height="110" rx="10"/>
-    <!-- Horizontal band -->
-    <rect class="h3" x="-55" y="-18" width="110" height="36" rx="10"/>
-    <!-- Overlap center -->
-    <rect class="h2" x="-18" y="-18" width="36" height="36" rx="10"/>
-    <!-- Band holes on vertical -->
-    <circle class="hw" cx="-5" cy="-32" r="3" opacity="0.5"/>
-    <circle class="hw" cx="5" cy="-32" r="3" opacity="0.5"/>
-    <circle class="hw" cx="-5" cy="32" r="3" opacity="0.5"/>
-    <circle class="hw" cx="5" cy="32" r="3" opacity="0.5"/>
-    <!-- Band holes on horizontal -->
-    <circle class="hw" cx="-32" cy="-5" r="3" opacity="0.5"/>
-    <circle class="hw" cx="-32" cy="5" r="3" opacity="0.5"/>
-    <circle class="hw" cx="32" cy="-5" r="3" opacity="0.5"/>
-    <circle class="hw" cx="32" cy="5" r="3" opacity="0.5"/>
-    <!-- Center pad dots -->
-    <circle class="h5" cx="-5" cy="-5" r="2.5"/>
-    <circle class="h5" cx="5" cy="-5" r="2.5"/>
-    <circle class="h5" cx="-5" cy="5" r="2.5"/>
-    <circle class="h5" cx="5" cy="5" r="2.5"/>
-  </g>
+    <!-- Doctor name line -->
+    <rect x="520" y="382" width="90" height="5" rx="2" fill="#7a9aad" opacity="0.35"/>
 
-  <!-- Appointment card with clock -->
-  <g transform="translate(300, 640)">
-    <!-- Card body -->
-    <rect class="hw" x="0" y="0" width="200" height="130" rx="16"/>
-    <rect class="h4" x="0" y="0" width="200" height="130" rx="16" opacity="0.6"/>
-    <!-- Card content lines -->
-    <rect class="h3" x="80" y="24" width="96" height="10" rx="5"/>
-    <rect class="h3" x="80" y="44" width="70" height="8" rx="4"/>
-    <rect class="h4" x="80" y="62" width="96" height="8" rx="4"/>
-    <rect class="h3" x="80" y="80" width="50" height="8" rx="4"/>
+    <!-- Specialty line -->
+    <rect x="530" y="394" width="70" height="3.5" rx="2" fill="#7a9aad" opacity="0.25"/>
+
+    <!-- Star rating row (5 small circles for stars) -->
+    <circle cx="530" cy="414" r="4" fill="#bdd8e8" opacity="0.50"/>
+    <circle cx="542" cy="414" r="4" fill="#bdd8e8" opacity="0.50"/>
+    <circle cx="554" cy="414" r="4" fill="#bdd8e8" opacity="0.50"/>
+    <circle cx="566" cy="414" r="4" fill="#bdd8e8" opacity="0.50"/>
+    <circle cx="578" cy="414" r="4" fill="#bdd8e8" opacity="0.35"/>
+
     <!-- Divider -->
-    <line x1="70" y1="16" x2="70" y2="114" stroke="#C8EBFF" stroke-width="2"/>
-    <!-- Clock icon area -->
-    <circle class="h1" cx="38" cy="50" r="26"/>
-    <circle class="hw" cx="38" cy="50" r="20"/>
-    <!-- Clock hands -->
-    <line x1="38" y1="50" x2="38" y2="36" stroke="#2A96D4" stroke-width="3" stroke-linecap="round"/>
-    <line x1="38" y1="50" x2="48" y2="54" stroke="#2A96D4" stroke-width="2.5" stroke-linecap="round"/>
-    <circle class="h2" cx="38" cy="50" r="3"/>
-    <!-- Clock hour marks -->
-    <circle class="h3" cx="38" cy="32" r="1.5"/>
-    <circle class="h3" cx="54" cy="50" r="1.5"/>
-    <circle class="h3" cx="38" cy="68" r="1.5"/>
-    <circle class="h3" cx="22" cy="50" r="1.5"/>
-    <!-- Small calendar icon on card -->
-    <rect class="h2" x="90" y="96" width="28" height="22" rx="5"/>
-    <rect class="h5" x="90" y="96" width="28" height="10" rx="5"/>
-    <circle class="hw" cx="100" cy="112" r="2"/>
-    <circle class="hw" cx="110" cy="112" r="2"/>
+    <line x1="490" y1="430" x2="640" y2="430" stroke="#4cc2ff" stroke-width="0.5" stroke-opacity="0.15"/>
+
+    <!-- "Next available" label line -->
+    <rect x="495" y="442" width="78" height="3.5" rx="2" fill="#7a9aad" opacity="0.25"/>
+    <!-- Date/time value line -->
+    <rect x="495" y="452" width="55" height="4" rx="2" fill="#7a9aad" opacity="0.35"/>
+
+    <!-- "Accepts new patients" label -->
+    <circle cx="500" cy="473" r="3.5" fill="#34a853" opacity="0.20"/>
+    <rect x="510" y="470" width="85" height="3.5" rx="2" fill="#7a9aad" opacity="0.22"/>
+
+    <!-- "Book Appointment" button -->
+    <rect x="505" y="486" width="120" height="22" rx="7" fill="#4cc2ff" opacity="0.18"/>
+    <rect x="530" y="495" width="70" height="4" rx="2" fill="#7a9aad" opacity="0.30"/>
   </g>
 
-  <!-- Heart shapes scattered -->
-  <g transform="translate(150, 130) scale(1.2)">
-    <path class="h1" d="M0,-12 C0,-22 -18,-22 -18,-8 C-18,6 0,20 0,20 C0,20 18,6 18,-8 C18,-22 0,-22 0,-12Z" opacity="0.5"/>
-  </g>
-  <g transform="translate(580, 460) scale(0.7)">
-    <path class="h2" d="M0,-12 C0,-22 -18,-22 -18,-8 C-18,6 0,20 0,20 C0,20 18,6 18,-8 C18,-22 0,-22 0,-12Z" opacity="0.45"/>
-  </g>
-  <g transform="translate(340, 80) scale(0.5)">
-    <path class="h3" d="M0,-12 C0,-22 -18,-22 -18,-8 C-18,6 0,20 0,20 C0,20 18,6 18,-8 C18,-22 0,-22 0,-12Z" opacity="0.5"/>
-  </g>
-  <g transform="translate(100, 560) scale(0.9)">
-    <path class="h4" d="M0,-12 C0,-22 -18,-22 -18,-8 C-18,6 0,20 0,20 C0,20 18,6 18,-8 C18,-22 0,-22 0,-12Z" opacity="0.4"/>
-  </g>
-  <g transform="translate(620, 700) scale(1.0)">
-    <path class="h1" d="M0,-12 C0,-22 -18,-22 -18,-8 C-18,6 0,20 0,20 C0,20 18,6 18,-8 C18,-22 0,-22 0,-12Z" opacity="0.35"/>
+
+  <!-- ============================================================
+       BOTTOM-RIGHT: REFERRAL / WAITLIST STATUS PANEL (y: 560-800)
+       ============================================================ -->
+  <g transform="rotate(5, 560, 680)">
+    <!-- Card background -->
+    <rect x="465" y="560" width="190" height="210" rx="12" ry="12"
+          fill="#d4eaf4" opacity="0.50"
+          stroke="#4cc2ff" stroke-width="0.8" stroke-opacity="0.20"/>
+
+    <!-- Header: "Referrals" -->
+    <rect x="485" y="578" width="65" height="5" rx="2" fill="#7a9aad" opacity="0.38"/>
+
+    <!-- Divider below header -->
+    <line x1="465" y1="596" x2="655" y2="596" stroke="#4cc2ff" stroke-width="0.6" stroke-opacity="0.15"/>
+
+    <!-- === Referral Row 1 (Approved) === -->
+    <g>
+      <!-- Status dot: green (approved) -->
+      <circle cx="485" cy="616" r="4.5" fill="#34a853" opacity="0.20"/>
+      <!-- Referral type line -->
+      <rect x="497" y="610" width="85" height="4" rx="2" fill="#7a9aad" opacity="0.30"/>
+      <!-- Status text line -->
+      <rect x="497" y="620" width="55" height="3" rx="2" fill="#7a9aad" opacity="0.20"/>
+    </g>
+
+    <!-- Divider -->
+    <line x1="480" y1="636" x2="640" y2="636" stroke="#4cc2ff" stroke-width="0.4" stroke-opacity="0.12"/>
+
+    <!-- === Referral Row 2 (Pending) === -->
+    <g>
+      <!-- Status dot: yellow/amber (pending) -->
+      <circle cx="485" cy="656" r="4.5" fill="#f5a623" opacity="0.22"/>
+      <!-- Referral type line -->
+      <rect x="497" y="650" width="78" height="4" rx="2" fill="#7a9aad" opacity="0.30"/>
+      <!-- Status text line -->
+      <rect x="497" y="660" width="48" height="3" rx="2" fill="#7a9aad" opacity="0.20"/>
+    </g>
+
+    <!-- Divider -->
+    <line x1="480" y1="676" x2="640" y2="676" stroke="#4cc2ff" stroke-width="0.4" stroke-opacity="0.12"/>
+
+    <!-- === Referral Row 3 (Approved) === -->
+    <g>
+      <circle cx="485" cy="696" r="4.5" fill="#34a853" opacity="0.20"/>
+      <rect x="497" y="690" width="90" height="4" rx="2" fill="#7a9aad" opacity="0.30"/>
+      <rect x="497" y="700" width="60" height="3" rx="2" fill="#7a9aad" opacity="0.20"/>
+    </g>
+
+    <!-- Progress bar section -->
+    <rect x="485" y="725" width="60" height="3.5" rx="2" fill="#7a9aad" opacity="0.22"/>
+    <!-- Progress bar background -->
+    <rect x="485" y="738" width="140" height="8" rx="4" fill="#bdd8e8" opacity="0.35"/>
+    <!-- Progress bar fill -->
+    <rect x="485" y="738" width="95" height="8" rx="4" fill="#4cc2ff" opacity="0.25"/>
+
+    <!-- Summary line at bottom -->
+    <rect x="485" y="758" width="105" height="3" rx="1.5" fill="#7a9aad" opacity="0.18"/>
   </g>
 
-  <!-- Large decorative circle, partially off right edge -->
-  <circle class="h4" cx="680" cy="450" r="140" opacity="0.3"/>
-
-  <!-- Smaller decorative circles -->
-  <circle class="h3" cx="120" cy="250" r="10" opacity="0.35"/>
-  <circle class="h1" cx="300" cy="550" r="14" opacity="0.25"/>
-  <circle class="h4" cx="180" cy="750" r="20" opacity="0.35"/>
-  <circle class="h2" cx="600" cy="150" r="8" opacity="0.3"/>
-
-  <!-- Medical plus crosses scattered -->
-  <g transform="translate(130, 420)" opacity="0.3">
-    <rect class="h2" x="-4" y="-12" width="8" height="24" rx="4"/>
-    <rect class="h2" x="-12" y="-4" width="24" height="8" rx="4"/>
-  </g>
-  <g transform="translate(350, 270)" opacity="0.25">
-    <rect class="h1" x="-3" y="-9" width="6" height="18" rx="3"/>
-    <rect class="h1" x="-9" y="-3" width="18" height="6" rx="3"/>
-  </g>
-  <g transform="translate(600, 620)" opacity="0.3">
-    <rect class="h3" x="-5" y="-15" width="10" height="30" rx="5"/>
-    <rect class="h3" x="-15" y="-5" width="30" height="10" rx="5"/>
-  </g>
-
-  <!-- Dot pattern decorative -->
-  <g opacity="0.18">
-    <circle class="h2" cx="80" cy="680" r="3"/>
-    <circle class="h2" cx="100" cy="680" r="3"/>
-    <circle class="h2" cx="120" cy="680" r="3"/>
-    <circle class="h2" cx="80" cy="700" r="3"/>
-    <circle class="h2" cx="100" cy="700" r="3"/>
-    <circle class="h2" cx="120" cy="700" r="3"/>
-    <circle class="h2" cx="80" cy="720" r="3"/>
-    <circle class="h2" cx="100" cy="720" r="3"/>
-    <circle class="h2" cx="120" cy="720" r="3"/>
-  </g>
-
-  <!-- Wavy line decoration -->
-  <path d="M632,200 Q580,220 560,200 Q540,180 500,200 Q460,220 440,200" fill="none" stroke="#C8EBFF" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
-
-  <!-- Small bandage strip -->
-  <g transform="translate(250, 470) rotate(-20)">
-    <rect class="h4" x="0" y="0" width="60" height="22" rx="11"/>
-    <rect class="hw" x="18" y="4" width="24" height="14" rx="4" opacity="0.5"/>
-    <circle class="h3" cx="26" cy="11" r="2" opacity="0.6"/>
-    <circle class="h3" cx="34" cy="11" r="2" opacity="0.6"/>
-  </g>
-
-  <!-- Pulse line near bottom -->
-  <g transform="translate(300, 790)">
-    <polyline points="332,0 280,0 260,-25 250,30 238,-18 228,10 218,0 100,0" fill="none" stroke="#4cc2ff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity="0.3"/>
-  </g>
 </svg>

@@ -121,7 +121,7 @@ class RadishBankDomain:
         branding=BrandingConfig(
             app_name="Radish Bank",
             subtitle="Customer Care",
-            hero_title="Welcome to Radish Bank — how can we help today?",
+            hero_title="Banking Support Made Easy?",
             placeholder_text="Ask about accounts, cards, FDs, insurance, branches, or fee waivers…",
             logo_path="domains/radish-bank/assets/logo.svg",
             demo_steps=[
@@ -171,7 +171,7 @@ class RadishBankDomain:
                 soft="#cfe8dc",
                 accent="#2ecc71",
                 user="#0d1f18",
-                landing_bg="#E8F8EE",
+                landing_bg="#F4F7F5",
             ),
         ),
         namespace=NamespaceConfig(
