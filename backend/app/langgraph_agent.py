@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import warnings
 from typing import Any, Callable, Optional
 
@@ -31,6 +32,10 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, Tool
 
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 log = logging.getLogger(__name__)
+
+_REDIS_KEY_PREFIX_RE = re.compile(
+    r"^(?:reddash|electrohub|healthcare|radish_bank|finance_researcher)_\w+:(.+)$"
+)
 
 
 def _build_prompt_factory(system_prompt: str) -> Callable[[dict], list]:
@@ -345,6 +350,10 @@ def _make_mcp_tool(
     async def fn(**kwargs: Any) -> str:
         # Strip None values — MCP server rejects null for optional numeric params
         clean_args = {k: v for k, v in kwargs.items() if v is not None}
+        # Strip Redis key prefixes the LLM sometimes adds (e.g. "reddash_order:ORD_001" → "ORD_001")
+        for k, v in clean_args.items():
+            if isinstance(v, str) and (m := _REDIS_KEY_PREFIX_RE.search(v)):
+                clean_args[k] = m.group(1)
         try:
             result = await cs_service.call_tool(name, clean_args)
             return json.dumps(result or {}, default=str)

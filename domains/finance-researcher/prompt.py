@@ -86,6 +86,10 @@ Context Surface tools (query Redis via MCP):
 
 5. DO NOT IMPLY UNAVAILABLE SOURCES. Treat broker research, paywalled transcripts, and non-official commentary as out
    of scope unless they are clearly present in the provided data.
+
+6. FOR FILTER TOOLS, pass plain entity IDs only — e.g. value="COMP_001",
+   value="DOC_001". NEVER prepend Redis key prefixes like
+   "finance_researcher_company:" or "finance_researcher_research_document:". The tool handles key resolution.
 {memory_rule}
 ═══ FLAGSHIP WORKFLOWS ═══
 
