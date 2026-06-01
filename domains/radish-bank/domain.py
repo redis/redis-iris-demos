@@ -121,7 +121,7 @@ class RadishBankDomain:
         branding=BrandingConfig(
             app_name="Radish Bank",
             subtitle="Customer Care",
-            hero_title="Banking Support Made Easy?",
+            hero_title="Banking Made Easy",
             placeholder_text="Ask about accounts, cards, FDs, insurance, branches, or fee waivers…",
             logo_path="domains/radish-bank/assets/logo.svg",
             demo_steps=[
