@@ -394,7 +394,7 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
         if not guard_result.get("allowed", True):
             app_name = domain.manifest.branding.app_name
             subtitle = domain.manifest.branding.subtitle.lower()
-            blocked_message = (
+            blocked_message = guard_result.get("block_message") or (
                 f"I'm your {app_name} {subtitle} assistant — "
                 "I can only help with topics related to this service. "
                 "What can I help you with today?"
@@ -761,7 +761,7 @@ async def rag_event_stream(question: str) -> AsyncIterator[str]:
         if not guard_result.get("allowed", True):
             app_name = domain.manifest.branding.app_name
             subtitle = domain.manifest.branding.subtitle.lower()
-            blocked_message = (
+            blocked_message = guard_result.get("block_message") or (
                 f"I'm your {app_name} {subtitle} assistant — "
                 "I can only help with topics related to this service. "
                 "What can I help you with today?"
