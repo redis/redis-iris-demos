@@ -24,11 +24,11 @@ Every domain runs Context Retriever, Agent Memory, LangCache, and Semantic Routi
 | Industry | App | Screenshot |
 |----------|-----|------------|
 | Food delivery | Redis Eats | <img src="docs/screenshots/Demo_Redis_Eats.png" width="300" /> |
-| Electronics retail | ElectroHub | <img src="docs/screenshots/Demo_ElectroHub.png" width="300" /> |
+| Electronics Retail | ElectroHub | <img src="docs/screenshots/Demo_ElectroHub.png" width="300" /> |
 | Financial research | ShiftIQ | <img src="docs/screenshots/Demo_ShiftIQ.png" width="300" /> |
 | Healthcare | RedHealthConnect | <img src="docs/screenshots/Demo_RedHealthConnect.png" width="300" /> |
 | Retail banking | Radish Bank | <img src="docs/screenshots/Demo_Radish_Bank.png" width="300" /> |
-| Wireless telecom | R-Mobile | — |
+| Telcp | R-Mobile | <img src="docs/screenshots/Demo_R-Mobile.png" width="300" /> |
 
 ## Legacy
 
