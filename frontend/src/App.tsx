@@ -49,21 +49,37 @@ export default function App() {
   const hasMessages = messages.length > 0;
 
   useEffect(() => {
-    void fetch(apiUrl("/api/health"))
-      .then((r) => r.json())
-      .then((p: HealthState) => setHealth(p))
-      .catch(() =>
-        setHealth({ ok: false, domain: "unknown", mcp_enabled: false, internal_tools: [] })
-      );
+    let cancelled = false;
+    const fetchHealth = () => {
+      void fetch(apiUrl("/api/health"))
+        .then((r) => r.json())
+        .then((p: HealthState) => { if (!cancelled) setHealth(p); })
+        .catch(() => {
+          if (!cancelled) setTimeout(fetchHealth, 2000);
+        });
+    };
+    fetchHealth();
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
-    void fetch(apiUrl("/api/domain-config"))
-      .then((r) => r.json())
-      .then((p: DomainConfig) => setDomain(p))
-      .catch(() => setDomain(null));
-    void loadMemoryDashboard();
-    void loadTools();
+    let cancelled = false;
+    const fetchDomainConfig = () => {
+      void fetch(apiUrl("/api/domain-config"))
+        .then((r) => r.json())
+        .then((p: DomainConfig) => {
+          if (!cancelled) {
+            setDomain(p);
+            void loadMemoryDashboard();
+            void loadTools();
+          }
+        })
+        .catch(() => {
+          if (!cancelled) setTimeout(fetchDomainConfig, 2000);
+        });
+    };
+    fetchDomainConfig();
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
