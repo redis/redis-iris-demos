@@ -30,7 +30,7 @@ def build_system_prompt(*, mcp_tools: Sequence[dict[str, Any]], memory_enabled: 
         memory_block = """
 Memory tools (durable customer context):
   • search_customer_memory — searches long-term memory for durable customer preferences, past issues, and facts from previous sessions.
-  • remember_customer_detail — stores a durable customer preference or fact. Use this only when the user explicitly asks you to remember something or clearly states a lasting preference.
+  • remember_customer_detail — stores a durable customer preference or fact. Use when the customer shares a preference, personal detail, or asks you to remember something.
 """.rstrip()
         memory_rules = """
 6. USE MEMORY PROACTIVELY.
