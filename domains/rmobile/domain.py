@@ -47,13 +47,13 @@ class RMobileDomain:
                 "Why is my bill higher than last month?",
                 "I always want paperless billing and autopay on",
                 "Click Memory",
-                "How can I lower my monthly bill?",
+                "What add-ons or plans would you recommend for me?",
             ],
             starter_prompts=[
                 PromptCard(eyebrow="Context", title="Why is my bill so high?", prompt="Why is my bill higher than last month?"),
                 PromptCard(eyebrow="Context", title="Device upgrade eligibility", prompt="Am I eligible to upgrade my phone?"),
                 PromptCard(eyebrow="Memory", title="Save preferences", prompt="I always want paperless billing and autopay on"),
-                PromptCard(eyebrow="Memory", title="Bill advice", prompt="How can I lower my monthly bill?"),
+                PromptCard(eyebrow="Memory", title="Recommendations for me", prompt="What add-ons or plans would you recommend for me?"),
                 PromptCard(eyebrow="Cached", title="Trade-in policy", prompt="What is your device trade-in policy?"),
             ],
             theme=ThemeConfig(
@@ -166,8 +166,8 @@ class RMobileDomain:
             ],
         ),
         seed_memories=[
+            SeedMemory(text="Travels to Canada frequently for work", topics=["international", "travel"]),
             SeedMemory(text="Prefers to manage everything through the app", topics=["account", "preferences"]),
-            SeedMemory(text="Likes to keep monthly bill under $160", topics=["billing", "preferences"]),
         ],
         seed_langcache=[
             SeedLangCacheEntry(
