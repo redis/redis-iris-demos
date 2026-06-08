@@ -100,13 +100,31 @@ make dev
 
 ## Creating a New Domain
 
-```bash
-make create-domain DOMAIN=my-industry
-```
+Adding a new vertical (e.g., telecom, travel, insurance). Every domain follows the same structure, so the process is repeatable.
 
-This scaffolds the required files under `domains/my-industry/`. See the [domain-pack-authoring skill](.codex/skills/domain-pack-authoring/SKILL.md) for the full contract, checklist, and Iris-specific requirements (guardrail routes, seed memories, LangCache entries, landing page backgrounds).
+### What you need to create
+
+| File | What goes in it |
+|------|----------------|
+| `domains/<id>/schema.py` | Redis data entities (customers, orders, products, etc.) |
+| `domains/<id>/domain.py` | Manifest: branding, theme, guardrail routes, seed memories, seed cache |
+| `domains/<id>/prompt.py` | Agent system prompt with tool hints and workflows |
+| `domains/<id>/data_generator.py` | Synthetic demo data (realistic names, amounts, scenarios) |
+| `domains/<id>/assets/logo.svg` | Domain logo (renders at 28x28 in the topbar) |
+| `domains/<id>/docs/demo_paths.md` | 2-4 scripted demo conversation paths |
+| `frontend/public/backgrounds/<id>/left.svg` | Landing page left illustration (~590x817, <35KB) |
+| `frontend/public/backgrounds/<id>/right.svg` | Landing page right illustration (~632x817, <35KB) |
 
 Each domain implements the `DomainPack` protocol defined in `backend/app/core/domain_contract.py`.
+
+### Using AI to create a domain
+
+The fastest way to create a new vertical is with an AI coding assistant. Detailed authoring skills are available for both:
+
+- **Claude Code**: `.claude/skills/domain-pack-authoring.md`
+- **Codex**: `.codex/skills/domain-pack-authoring/SKILL.md`
+
+Just ask: *"Create a new domain for [your vertical]"* — the skill guides the agent through the full process: entity design, branding, realistic guardrail routes, seed data, prompts, and demo scenarios.
 
 ## Project Structure
 

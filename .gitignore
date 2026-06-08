@@ -43,5 +43,8 @@ Thumbs.db
 # Playwright MCP debug artifacts
 .playwright-mcp/
 
+# PSPortal setup (local env snapshots & seed outputs)
+psportal-setup/
+
 # Vercel deployment
 .vercel
