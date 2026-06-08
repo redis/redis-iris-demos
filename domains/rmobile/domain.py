@@ -23,152 +23,122 @@ from backend.app.core.domain_contract import (
 )
 from backend.app.core.domain_schema import EntitySpec, validate_entity_specs
 from backend.app.redis_connection import create_redis_client
-from domains.reddash.data_generator import generate_demo_data
-from domains.reddash.prompt import build_system_prompt
-from domains.reddash.schema import ENTITY_SPECS
+from domains.rmobile.data_generator import generate_demo_data
+from domains.rmobile.prompt import build_system_prompt
+from domains.rmobile.schema import ENTITY_SPECS
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
-class ReddashDomain:
+class RMobileDomain:
     manifest = DomainManifest(
-        id="reddash",
-        description="Food-delivery support demo comparing Context Surfaces vs simple RAG.",
-        generated_models_module="domains.reddash.generated_models",
-        generated_models_path="domains/reddash/generated_models.py",
-        output_dir="output/reddash",
+        id="rmobile",
+        description="Wireless carrier account-support demo for R-Mobile, modeled after T-Mobile / AT&T / Verizon.",
+        generated_models_module="domains.rmobile.generated_models",
+        generated_models_path="domains/rmobile/generated_models.py",
+        output_dir="output/rmobile",
         branding=BrandingConfig(
-            app_name="Reddash",
-            subtitle="Delivery Support",
-            hero_title="How can we help?",
-            placeholder_text="Ask about your order, delivery status, or policies...",
-            logo_path="domains/reddash/assets/logo.svg",
+            app_name="R-Mobile",
+            subtitle="Account Support",
+            hero_title="How can we help you today?",
+            placeholder_text="Ask about your bill, plans, devices, or coverage...",
+            logo_path="domains/rmobile/assets/logo.svg",
             demo_steps=[
-                "Why is my order running late?",
-                "Please remember that I prefer contactless delivery and spicy food for future orders.",
+                "Why is my bill higher than last month?",
+                "I always want paperless billing and autopay on",
                 "Click Memory",
-                "Given what you know about me, look at my recent orders and tell me what I should reorder tonight and how it should be delivered.",
+                "How can I lower my monthly bill?",
             ],
             starter_prompts=[
-                PromptCard(eyebrow="Context", title="Why is my order running late?", prompt="Why is my order running late?"),
-                PromptCard(eyebrow="Context", title="Recent orders", prompt="Show me my order history"),
-                PromptCard(eyebrow="Memory", title="Save delivery preferences", prompt="Always deliver to the side door"),
-                PromptCard(eyebrow="Memory", title="Food recommendations", prompt="What should I order?"),
-                PromptCard(eyebrow="Cached", title="Refund policy", prompt="Provide me the refund policy rules for late deliveries"),
+                PromptCard(eyebrow="Context", title="Why is my bill so high?", prompt="Why is my bill higher than last month?"),
+                PromptCard(eyebrow="Context", title="Device upgrade eligibility", prompt="Am I eligible to upgrade my phone?"),
+                PromptCard(eyebrow="Memory", title="Save preferences", prompt="I always want paperless billing and autopay on"),
+                PromptCard(eyebrow="Memory", title="Bill advice", prompt="How can I lower my monthly bill?"),
+                PromptCard(eyebrow="Cached", title="Trade-in policy", prompt="What is your device trade-in policy?"),
             ],
             theme=ThemeConfig(
-                bg="#0d0f14",
-                bg_accent_a="rgba(255, 68, 56, 0.12)",
-                bg_accent_b="rgba(255, 140, 66, 0.1)",
-                panel="rgba(20, 23, 32, 0.88)",
-                panel_strong="rgba(24, 28, 40, 0.96)",
-                panel_elevated="rgba(30, 35, 50, 0.92)",
-                line="rgba(255, 120, 90, 0.1)",
-                line_strong="rgba(255, 120, 90, 0.18)",
-                text="#f2f0ed",
-                muted="#9a9490",
-                soft="#d4cfc8",
-                accent="#ff4438",
-                user="#2a2420",
-                landing_bg="#FFF3D9",
+                bg="#0d0a12",
+                bg_accent_a="rgba(226, 0, 116, 0.12)",
+                bg_accent_b="rgba(180, 0, 90, 0.08)",
+                panel="rgba(18, 14, 24, 0.90)",
+                panel_strong="rgba(22, 16, 32, 0.96)",
+                panel_elevated="rgba(28, 20, 40, 0.92)",
+                line="rgba(226, 0, 116, 0.10)",
+                line_strong="rgba(226, 0, 116, 0.20)",
+                text="#f2eef5",
+                muted="#9a8fa3",
+                soft="#d4ccdb",
+                accent="#e20074",
+                user="#1e1428",
+                landing_bg="#F5F5F5",
             ),
         ),
         namespace=NamespaceConfig(
-            redis_prefix="reddash",
-            dataset_meta_key="reddash:meta:dataset",
-            checkpoint_prefix="reddash:checkpoint",
-            checkpoint_write_prefix="reddash:checkpoint_write",
-            redis_instance_name="Reddash Redis Cloud",
-            surface_name="Reddash Delivery Surface",
-            agent_name="Reddash Delivery Agent",
+            redis_prefix="rmobile",
+            dataset_meta_key="rmobile:meta:dataset",
+            checkpoint_prefix="rmobile:checkpoint",
+            checkpoint_write_prefix="rmobile:checkpoint_write",
+            redis_instance_name="R-Mobile Redis Cloud",
+            surface_name="R-Mobile Account Surface",
+            agent_name="R-Mobile Support Agent",
         ),
         rag=RagConfig(
-            tool_name="vector_search_policies",
-            status_text="Searching policies via vector similarity…",
-            generating_text="Generating answer…",
-            index_name_contains="policy",
+            tool_name="vector_search_policy_docs",
+            status_text="Searching R-Mobile policy documents…",
+            generating_text="Generating answer from policies…",
+            index_name_contains="policydoc",
             vector_field="content_embedding",
-            return_fields=["title", "category", "content", "policy_id"],
+            return_fields=["title", "category", "content", "doc_id"],
             num_results=3,
             answer_system_prompt=(
-                "You are the Reddash delivery-support assistant. "
-                "Answer using only the policy documents below. If the policies do not cover the "
-                "question, say so. Be concise and helpful."
+                "You are R-Mobile's policy and account-support assistant. "
+                "Answer using only the retrieved policy documents. If they do not cover "
+                "the question, say so briefly. Be concise and helpful."
             ),
         ),
         identity=IdentityConfig(
             default_id="CUST_DEMO_001",
-            default_name="Alex Rivera",
-            default_email="alex.rivera@example.com",
+            default_name="Jamie Torres",
+            default_email="jamie.torres@example.com",
             description=(
                 "Returns the signed-in customer's ID, name, and email. "
-                "Call this whenever the user asks about their orders, account, or history."
+                "Call this whenever the user asks about their account, bills, lines, or devices."
             ),
         ),
         guardrail=GuardrailConfig(
-            router_name="reddash-guardrails",
-            allowed_route_name="food_delivery",
+            router_name="rmobile-guardrails",
+            allowed_route_name="wireless_support",
             routes=[
                 GuardrailRouteConfig(
-                    name="food_delivery",
+                    name="wireless_support",
                     references=[
-                        "Where is my order?",
-                        "What's the status of my delivery?",
-                        "My order is late",
-                        "Why is my order running late?",
-                        "When will my food arrive?",
-                        "What's the ETA on my delivery?",
-                        "Track my order",
-                        "My order hasn't arrived yet",
-                        "The delivery driver hasn't shown up",
-                        "Show me my past orders",
-                        "Show me my order history",
-                        "I want to reorder my last meal",
-                        "Can I cancel my order?",
-                        "I need to change my order",
-                        "What did I order last time?",
-                        "What restaurants are nearby?",
-                        "Recommend something spicy",
-                        "What's good for lunch?",
-                        "Do you have vegetarian options?",
-                        "What should I order tonight?",
-                        "I'm looking for Italian food",
-                        "I want a refund",
-                        "I was charged twice",
-                        "My food was cold when it arrived",
-                        "The order was wrong",
-                        "How do I get my money back?",
-                        "I have a billing question",
-                        "Apply my credit to this order",
-                        "What's your refund policy?",
-                        "What's your cancellation policy?",
-                        "How long does delivery usually take?",
-                        "Update my delivery address",
-                        "What's my account info?",
-                        "How do I change my payment method?",
-                        "Do I have a membership?",
-                        "Remember that I'm allergic to peanuts",
-                        "What do you know about me?",
-                        "I prefer contactless delivery",
-                        "Save my preference for spicy food",
-                        "What are my dietary preferences?",
-                        "Always deliver to the side door",
+                        "Why is my bill so high this month?",
+                        "What's this charge on my bill?",
+                        "Set up autopay",
+                        "I need a payment extension",
+                        "I want to dispute a charge",
+                        "How do I upgrade my phone?",
+                        "I want to trade in my phone",
+                        "Do I have device insurance?",
+                        "How do I unlock my phone?",
+                        "What plans do you offer?",
+                        "I want to change my plan",
+                        "I want to add someone to my plan",
+                        "How much data have I used?",
+                        "Do you have international plans?",
+                        "How much is roaming in Mexico?",
+                        "I have no signal at home",
+                        "Is there an outage in my area?",
+                        "My calls keep dropping",
+                        "Update my billing address",
+                        "I want to cancel my service",
+                        "Remember that I travel internationally often",
+                        "What do you know about my preferences?",
                         "Yes",
-                        "No",
-                        "Yes please",
                         "No thanks",
-                        "Tell me more",
-                        "Go ahead",
-                        "That sounds good",
                         "Sure",
                         "Thanks",
-                        "Thank you",
                         "Hello",
-                        "Hi there",
-                        "Can you help me?",
-                        "I have a question",
-                        "What else can you do?",
-                        "That's all, thanks",
                         "OK",
                     ],
                     distance_threshold=0.7,
@@ -180,43 +150,39 @@ class ReddashDomain:
                         "Write me a Python script",
                         "Help me with my homework",
                         "Tell me a joke",
-                        "What's 2 + 2?",
                         "Who won the Super Bowl?",
                         "Explain quantum physics",
                         "Write a poem about love",
-                        "What's the latest news?",
                         "Who is the president?",
                         "Translate this to Spanish",
                         "Help me debug my code",
                         "What's the meaning of life?",
-                        "Play a game with me",
-                        "Tell me about World War 2",
-                        "What's the stock market doing?",
-                        "How do I fix my car?",
-                        "What's the capital of France?",
-                        "Solve this math equation",
-                        "Generate an image of a cat",
+                        "Can you help me fix my WiFi router?",
+                        "Compare T-Mobile vs Verizon for me",
+                        "What phone should I buy from Best Buy?",
                     ],
                     distance_threshold=0.5,
                 ),
             ],
         ),
         seed_memories=[
-            SeedMemory(text="Prefers contactless delivery", topics=["delivery", "preferences"]),
-            SeedMemory(text="Likes spicy food", topics=["food", "preferences"]),
+            SeedMemory(text="Prefers to manage everything through the app", topics=["account", "preferences"]),
+            SeedMemory(text="Likes to keep monthly bill under $160", topics=["billing", "preferences"]),
         ],
         seed_langcache=[
             SeedLangCacheEntry(
-                prompt="What's your refund policy for late deliveries?",
+                prompt="What is your device trade-in policy?",
                 response=(
-                    "Our refund policy for late deliveries is based on how late the order arrives:\n\n"
-                    "- **15+ minutes late**: 20% credit on your next order\n"
-                    "- **30+ minutes late**: Full delivery fee refund\n"
-                    "- **45+ minutes late**: Full order refund\n\n"
-                    "Credits are applied automatically to your account within 24 hours. "
-                    "If you believe your order qualifies, please share your order number and we'll look into it right away."
+                    "Our trade-in program lets you trade in your current device toward a new one. "
+                    "Here's how it works:\n\n"
+                    "- **Eligible devices** are assessed based on condition — screen, buttons, and power must all be functional\n"
+                    "- **Trade-in value** is applied as **monthly bill credits over 24 months**, not a one-time discount\n"
+                    "- **If you cancel** your line before 24 months, the remaining credits are forfeited\n"
+                    "- **Mail-in or in-store**: You have 30 days after activation to return your trade-in device\n\n"
+                    "For example, a recent iPhone in good condition can qualify for up to **$800 in credits** "
+                    "toward a new device. Want me to check what your current device is worth?"
                 ),
-                attributes={"domain": "reddash"},
+                attributes={"domain": "rmobile"},
             ),
         ],
     )
@@ -244,8 +210,8 @@ class ReddashDomain:
     def build_answer_verifier_prompt(self, *, runtime_config: dict[str, Any] | None = None) -> str:
         del runtime_config
         return (
-            "When the user refers to 'that order', 'that charge', or similar follow-ups, resolve the reference to the exact "
-            "order, payment, or ticket from the prior turn. Do not mention refunds, credits, or policy outcomes unless the "
+            "When the user refers to 'that charge', 'that line', 'my bill', or similar follow-ups, resolve the reference to the exact "
+            "bill, charge, line, or device from the prior turn. Do not mention credits, refunds, or policy outcomes unless the "
             "tool results or cited policy support them."
         )
 
@@ -259,22 +225,30 @@ class ReddashDomain:
         del runtime_config
         detail = ""
         if isinstance(payload, dict):
-            for key in ("query", "text", "order_id", "customer_id", "payment_id", "ticket_id"):
+            for key in ("query", "text", "customer_id", "bill_id", "line_id", "device_id", "ticket_id"):
                 value = payload.get(key)
                 if value:
                     detail = str(value)
                     break
 
         if tool_name == self.manifest.identity.tool_name:
-            return "Identify the signed-in customer before checking account or order data."
+            return "Identify the signed-in customer before checking account data."
         if tool_name == "get_current_time":
-            return "Compare the current time against order and delivery timestamps."
-        if tool_name.startswith("search_policy_by_text"):
-            return f"Search delivery policy guidance: {detail or 'policy search'}."
-        if tool_name.startswith("filter_driver_by_"):
-            return "Check the live driver assignment and status for the relevant order."
-        if tool_name.startswith("filter_payment_by_"):
-            return "Inspect the payment record before answering charges, credits, or refunds."
+            return "Compare the current time against bill due dates and device eligibility."
+        if tool_name.startswith("search_policydoc"):
+            return f"Search R-Mobile policy guidance: {detail or 'policy search'}."
+        if tool_name.startswith("filter_bill"):
+            return "Look up billing history and charges for the account."
+        if tool_name.startswith("filter_billcharge"):
+            return "Inspect the line-item charges on a bill."
+        if tool_name.startswith("filter_line"):
+            return "Check the phone lines, plans, and usage on the account."
+        if tool_name.startswith("filter_device"):
+            return "Check device details, installment balances, and upgrade eligibility."
+        if tool_name.startswith("filter_supportticket"):
+            return "Review past support tickets for the account."
+        if tool_name.startswith("search_plan") or tool_name.startswith("filter_plan"):
+            return "Look up available wireless plans."
         if tool_name == "search_customer_memory":
             return "Search durable customer memory for preferences, past issues, or stored context."
         if tool_name == "remember_customer_detail":
@@ -295,12 +269,12 @@ class ReddashDomain:
                 name="get_current_time",
                 description=(
                     "Returns the current date and time in UTC (ISO 8601). "
-                    "Use this to compare against order timestamps and determine if a delivery is late."
+                    "Use this to compare against bill due dates, device upgrade eligibility, and ticket timestamps."
                 ),
             ),
             InternalToolDefinition(
                 name="dataset_overview",
-                description="Returns a summary of the current Reddash dataset: counts of customers, restaurants, orders, and policies.",
+                description="Returns a summary of the current R-Mobile dataset: counts of customers, lines, plans, devices, bills, and policies.",
             ),
         ]
         if (runtime_config or {}).get("memory_enabled"):
@@ -339,7 +313,7 @@ class ReddashDomain:
                                 "topics": {
                                     "type": "array",
                                     "items": {"type": "string"},
-                                    "description": "Optional topic tags like delivery, food, preferences, refund.",
+                                    "description": "Optional topic tags like billing, plans, devices, international.",
                                 },
                             },
                             "required": ["text"],
@@ -360,7 +334,7 @@ class ReddashDomain:
                 "email": os.getenv(identity.email_env_var, identity.default_email),
             }
         if tool_name == "get_current_time":
-            return {"current_time": "2026-05-21T22:10:00+00:00", "timezone": "UTC"}
+            return {"current_time": datetime.now(timezone.utc).isoformat(), "timezone": "UTC"}
         if tool_name == "dataset_overview":
             client = create_redis_client(settings)
             raw = client.execute_command("JSON.GET", self.manifest.namespace.dataset_meta_key, "$")
@@ -431,14 +405,13 @@ class ReddashDomain:
     def write_dataset_meta(self, *, settings: Any, records: dict[str, list[dict[str, Any]]]) -> dict[str, Any]:
         summary = {
             "customers": len(records.get("Customer", [])),
-            "restaurants": len(records.get("Restaurant", [])),
-            "drivers": len(records.get("Driver", [])),
-            "orders": len(records.get("Order", [])),
-            "order_items": len(records.get("OrderItem", [])),
-            "delivery_events": len(records.get("DeliveryEvent", [])),
-            "payments": len(records.get("Payment", [])),
+            "lines": len(records.get("Line", [])),
+            "plans": len(records.get("Plan", [])),
+            "devices": len(records.get("Device", [])),
+            "bills": len(records.get("Bill", [])),
+            "bill_charges": len(records.get("BillCharge", [])),
             "support_tickets": len(records.get("SupportTicket", [])),
-            "policies": len(records.get("Policy", [])),
+            "policy_docs": len(records.get("PolicyDoc", [])),
         }
         client = create_redis_client(settings)
         client.execute_command(
@@ -467,4 +440,4 @@ class ReddashDomain:
         return errors
 
 
-DOMAIN = ReddashDomain()
+DOMAIN = RMobileDomain()

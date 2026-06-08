@@ -441,11 +441,14 @@ class ElectrohubDomain:
             if not query:
                 return {"error": "query is required"}
             limit = arguments.get("limit")
-            memories = await memory_service.asearch_long_term_memory(
-                text=query,
-                owner_id=owner_id,
-                limit=int(limit) if limit is not None else None,
-            )
+            try:
+                memories = await memory_service.asearch_long_term_memory(
+                    text=query,
+                    owner_id=owner_id,
+                    limit=int(limit) if limit is not None else None,
+                )
+            except Exception as exc:
+                return {"error": f"Memory search unavailable: {exc}", "memories": [], "memory_count": 0}
             return {
                 "owner_id": owner_id,
                 "query": query,
