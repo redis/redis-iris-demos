@@ -301,7 +301,7 @@ BILL_CHARGES = [
     {"charge_id": "CHG_011", "bill_id": "BILL_001", "line_id": None, "category": "taxes_fees", "description": "State and local taxes (CO)", "amount": 5.26, "is_recurring": "true"},
     {"charge_id": "CHG_012", "bill_id": "BILL_001", "line_id": None, "category": "taxes_fees", "description": "911 surcharge", "amount": 1.99, "is_recurring": "true"},
     # ONE-TIME charges (the surprise)
-    {"charge_id": "CHG_013", "bill_id": "BILL_001", "line_id": "LINE_001", "category": "international", "description": "International roaming — data usage in Canada (0.4 GB)", "amount": 29.00, "is_recurring": "false"},
+    {"charge_id": "CHG_013", "bill_id": "BILL_001", "line_id": "LINE_001", "category": "international", "description": "International roaming — overage data in Canada (exceeded 5 GB included)", "amount": 29.00, "is_recurring": "false"},
     {"charge_id": "CHG_014", "bill_id": "BILL_001", "line_id": "LINE_001", "category": "one_time", "description": "Device Protection 360 claim deductible — screen repair", "amount": 5.00, "is_recurring": "false"},
 
     # ── BILL_002 (April, paid, $153.22) ──

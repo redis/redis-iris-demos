@@ -97,6 +97,7 @@ class RMobileDomain:
             ),
         ),
         identity=IdentityConfig(
+            id_field="customer_id",
             default_id="CUST_DEMO_001",
             default_name="Jamie Torres",
             default_email="jamie.torres@example.com",
