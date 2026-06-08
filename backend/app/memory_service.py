@@ -138,8 +138,6 @@ class MemoryService:
     ) -> list[dict[str, Any]]:
         connection = self.connection(owner_id=owner_id)
         payload: dict[str, Any] = {
-            "text": text,
-            "similarityThreshold": similarity_threshold or connection.similarity_threshold,
             "filterOp": "all",
             "limit": limit or connection.limit,
             "filter": self._build_search_filter(connection, session_id),
@@ -166,8 +164,6 @@ class MemoryService:
     ) -> list[dict[str, Any]]:
         connection = self.connection(owner_id=owner_id)
         payload: dict[str, Any] = {
-            "text": text,
-            "similarityThreshold": similarity_threshold or connection.similarity_threshold,
             "filterOp": "all",
             "limit": limit or connection.limit,
             "filter": self._build_search_filter(connection, session_id),
