@@ -1,0 +1,136 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 590 817">
+
+  <!-- ============================================= -->
+  <!-- TOP-LEFT: Device Card (y: 30-240)             -->
+  <!-- ============================================= -->
+
+  <g transform="rotate(-5, 100, 130)">
+    <rect x="-16" y="54" width="220" height="150" rx="14" fill="#b0adb5" opacity="0.10"/>
+  </g>
+
+  <g transform="rotate(-5, 100, 130)">
+    <rect x="-20" y="50" width="220" height="150" rx="14" fill="#e8e6eb" opacity="0.55"/>
+    <rect x="-20" y="50" width="220" height="150" rx="14" fill="none" stroke="#c5c2ca" stroke-width="1.2" opacity="0.25"/>
+    <rect x="-20" y="50" width="220" height="5" rx="14" fill="#e20074" opacity="0.12"/>
+
+    <rect x="0" y="75" width="70" height="3" rx="1.5" fill="#b0adb5" opacity="0.40"/>
+    <rect x="0" y="95" width="130" height="5.5" rx="2.5" fill="#b0adb5" opacity="0.45"/>
+
+    <!-- Installment progress bar -->
+    <rect x="0" y="118" width="160" height="6" rx="3" fill="#d8d6dc" opacity="0.55"/>
+    <rect x="0" y="118" width="140" height="6" rx="3" fill="#e20074" opacity="0.14"/>
+
+    <rect x="0" y="132" width="90" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.30"/>
+    <rect x="0" y="142" width="65" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.22"/>
+
+    <circle cx="180" cy="78" r="4" fill="#e20074" opacity="0.18"/>
+  </g>
+
+  <!-- Secondary card peeking -->
+  <g transform="rotate(-12, 40, 40)">
+    <rect x="-60" y="-10" width="140" height="80" rx="10" fill="#dddbe0" opacity="0.40"/>
+    <rect x="-60" y="-10" width="140" height="80" rx="10" fill="none" stroke="#c5c2ca" stroke-width="0.8" opacity="0.18"/>
+    <rect x="-40" y="15" width="60" height="3" rx="1.5" fill="#b0adb5" opacity="0.30"/>
+    <rect x="-40" y="28" width="85" height="5" rx="2.5" fill="#b0adb5" opacity="0.35"/>
+  </g>
+
+
+  <!-- ============================================= -->
+  <!-- MID-LEFT: Phone Lines List (y: 300-560)       -->
+  <!-- ============================================= -->
+
+  <rect x="5" y="300" width="215" height="250" rx="12" fill="#e8e6eb" opacity="0.40"/>
+  <rect x="5" y="300" width="215" height="250" rx="12" fill="none" stroke="#c5c2ca" stroke-width="0.8" opacity="0.18"/>
+
+  <rect x="18" y="316" width="65" height="3.5" rx="1.75" fill="#b0adb5" opacity="0.40"/>
+  <line x1="18" y1="332" x2="205" y2="332" stroke="#c5c2ca" stroke-width="0.6" opacity="0.15"/>
+
+  <!-- Line Row 1 -->
+  <circle cx="30" cy="354" r="8" fill="#dddbe0" opacity="0.55"/>
+  <circle cx="30" cy="354" r="8" fill="none" stroke="#c5c2ca" stroke-width="0.6" opacity="0.20"/>
+  <rect x="46" y="349" width="80" height="3" rx="1.5" fill="#b0adb5" opacity="0.38"/>
+  <rect x="46" y="357" width="55" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.25"/>
+  <rect x="160" y="350" width="45" height="3.5" rx="1.75" fill="#b0adb5" opacity="0.32"/>
+
+  <!-- Line Row 2 -->
+  <circle cx="30" cy="399" r="8" fill="#e8e6eb" opacity="0.60"/>
+  <circle cx="30" cy="399" r="8" fill="none" stroke="#c5c2ca" stroke-width="0.6" opacity="0.20"/>
+  <rect x="46" y="394" width="75" height="3" rx="1.5" fill="#b0adb5" opacity="0.35"/>
+  <rect x="46" y="402" width="48" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.22"/>
+  <rect x="165" y="395" width="38" height="3.5" rx="1.75" fill="#b0adb5" opacity="0.30"/>
+
+  <!-- Line Row 3 -->
+  <circle cx="30" cy="444" r="8" fill="#dddbe0" opacity="0.50"/>
+  <circle cx="30" cy="444" r="8" fill="none" stroke="#c5c2ca" stroke-width="0.6" opacity="0.20"/>
+  <rect x="46" y="439" width="68" height="3" rx="1.5" fill="#b0adb5" opacity="0.32"/>
+  <rect x="46" y="447" width="42" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.22"/>
+  <rect x="155" y="440" width="50" height="3.5" rx="1.75" fill="#e20074" opacity="0.12"/>
+
+  <!-- Dividers -->
+  <line x1="18" y1="377" x2="205" y2="377" stroke="#c5c2ca" stroke-width="0.4" opacity="0.12"/>
+  <line x1="18" y1="422" x2="205" y2="422" stroke="#c5c2ca" stroke-width="0.4" opacity="0.12"/>
+  <line x1="18" y1="467" x2="205" y2="467" stroke="#c5c2ca" stroke-width="0.4" opacity="0.12"/>
+
+  <!-- Data usage bar -->
+  <rect x="18" y="485" width="80" height="3" rx="1.5" fill="#b0adb5" opacity="0.28"/>
+  <rect x="18" y="498" width="180" height="8" rx="4" fill="#d8d6dc" opacity="0.45"/>
+  <rect x="18" y="498" width="120" height="8" rx="4" fill="#e20074" opacity="0.10"/>
+  <rect x="18" y="515" width="55" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.20"/>
+
+  <!-- Partial 4th row fading -->
+  <circle cx="30" cy="540" r="8" fill="#dddbe0" opacity="0.25"/>
+  <rect x="46" y="535" width="60" height="3" rx="1.5" fill="#b0adb5" opacity="0.18"/>
+
+
+  <!-- ============================================= -->
+  <!-- BOTTOM-LEFT: SIM Card (y: 600-790)            -->
+  <!-- ============================================= -->
+
+  <g transform="rotate(12, 80, 700)">
+    <rect x="-26" y="640" width="200" height="126" rx="12" fill="#b0adb5" opacity="0.08"/>
+  </g>
+
+  <g transform="rotate(12, 80, 700)">
+    <rect x="-30" y="636" width="200" height="126" rx="12" fill="#e8e6eb" opacity="0.50"/>
+    <rect x="-30" y="636" width="200" height="126" rx="12" fill="none" stroke="#c5c2ca" stroke-width="1" opacity="0.20"/>
+
+    <path d="M-30 720 Q70 680 170 740" fill="none" stroke="#d8d6dc" stroke-width="20" opacity="0.22"/>
+
+    <!-- SIM chip -->
+    <rect x="-2" y="660" width="24" height="18" rx="3" fill="#d4af37" opacity="0.16"/>
+    <rect x="2" y="664" width="16" height="10" rx="1.5" fill="#d4af37" opacity="0.10"/>
+    <line x1="5" y1="669" x2="15" y2="669" stroke="#d4af37" stroke-width="0.5" opacity="0.16"/>
+    <line x1="10" y1="665" x2="10" y2="673" stroke="#d4af37" stroke-width="0.5" opacity="0.16"/>
+
+    <rect x="-2" y="695" width="95" height="4.5" rx="2" fill="#b0adb5" opacity="0.35"/>
+    <rect x="-2" y="712" width="30" height="3.5" rx="1.75" fill="#b0adb5" opacity="0.30"/>
+    <rect x="38" y="712" width="30" height="3.5" rx="1.75" fill="#b0adb5" opacity="0.28"/>
+    <rect x="78" y="712" width="30" height="3.5" rx="1.75" fill="#b0adb5" opacity="0.26"/>
+
+    <!-- eSIM badge -->
+    <rect x="130" y="656" width="28" height="14" rx="4" fill="#e20074" opacity="0.10"/>
+    <rect x="136" y="661" width="16" height="3" rx="1.5" fill="#b0adb5" opacity="0.28"/>
+
+    <rect x="-2" y="730" width="32" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.22"/>
+  </g>
+
+  <!-- Decorative dots -->
+  <circle cx="10" cy="590" r="2" fill="#c5c2ca" opacity="0.15"/>
+  <circle cx="50" cy="580" r="1.5" fill="#d8d6dc" opacity="0.20"/>
+  <circle cx="30" cy="800" r="2.5" fill="#c5c2ca" opacity="0.12"/>
+
+  <!-- Quick action buttons -->
+  <g transform="translate(10, 255)">
+    <rect x="0" y="0" width="40" height="40" rx="10" fill="#dddbe0" opacity="0.38"/>
+    <rect x="12" y="14" width="16" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.30"/>
+    <rect x="14" y="20" width="12" height="2" rx="1" fill="#b0adb5" opacity="0.22"/>
+
+    <rect x="52" y="0" width="40" height="40" rx="10" fill="#e8e6eb" opacity="0.42"/>
+    <rect x="64" y="14" width="16" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.30"/>
+    <rect x="66" y="20" width="12" height="2" rx="1" fill="#b0adb5" opacity="0.22"/>
+
+    <rect x="104" y="0" width="40" height="40" rx="10" fill="#dddbe0" opacity="0.32"/>
+    <rect x="116" y="14" width="16" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.25"/>
+    <rect x="118" y="20" width="12" height="2" rx="1" fill="#b0adb5" opacity="0.18"/>
+  </g>
+</svg>

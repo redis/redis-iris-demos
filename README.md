@@ -21,13 +21,14 @@ Every domain runs Context Retriever, Agent Memory, LangCache, and Semantic Routi
 
 ## Domains
 
-| Domain | App | Industry | Screenshot |
-|--------|-----|----------|------------|
-| `reddash` | Redis Eats | Food delivery | <img src="docs/screenshots/Demo_Redis_Eats.png" width="300" /> |
-| `electrohub` | ElectroHub | Electronics retail | <img src="docs/screenshots/Demo_ElectroHub.png" width="300" /> |
-| `finance-researcher` | ShiftIQ | Financial research | <img src="docs/screenshots/Demo_ShiftIQ.png" width="300" /> |
-| `healthcare` | RedHealthConnect | Healthcare | <img src="docs/screenshots/Demo_RedHealthConnect.png" width="300" /> |
-| `radish-bank` | Radish Bank | Retail banking | <img src="docs/screenshots/Demo_Radish_Bank.png" width="300" /> |
+| Industry | App | Screenshot |
+|----------|-----|------------|
+| Food delivery | Redis Eats | <img src="docs/screenshots/Demo_Redis_Eats.png" width="300" /> |
+| Electronics Retail | ElectroHub | <img src="docs/screenshots/Demo_ElectroHub.png" width="300" /> |
+| Financial research | ShiftIQ | <img src="docs/screenshots/Demo_ShiftIQ.png" width="300" /> |
+| Healthcare | RedHealthConnect | <img src="docs/screenshots/Demo_RedHealthConnect.png" width="300" /> |
+| Retail banking | Radish Bank | <img src="docs/screenshots/Demo_Radish_Bank.png" width="300" /> |
+| Telcp | R-Mobile | <img src="docs/screenshots/Demo_R-Mobile.png" width="300" /> |
 
 ## Legacy
 
@@ -148,6 +149,7 @@ domains/
   finance-researcher/        # Financial research
   healthcare/                # Patient portal
   radish-bank/               # Retail banking
+  rmobile/                   # Wireless telecom
 
 frontend/
   src/
