@@ -93,6 +93,7 @@ class GuardrailRouteConfig(BaseModel):
     name: str
     references: list[str]
     distance_threshold: float = 0.7
+    block_message: str | None = None
 
 
 class GuardrailConfig(BaseModel):
