@@ -1,0 +1,37 @@
+<svg width="632" height="817" viewBox="0 0 632 817" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="632" height="817" fill="#EEF8F2"/>
+  <circle cx="520" cy="150" r="104" fill="#00C78C" fill-opacity="0.12"/>
+  <circle cx="390" cy="660" r="156" fill="#F8D24C" fill-opacity="0.12"/>
+  <path d="M632 248C542 198 432 198 306 246C182 294 82 288 0 242V817H632V248Z" fill="#DDF1E8"/>
+  <g opacity="0.94">
+    <rect x="298" y="172" width="250" height="332" rx="24" fill="#10251F"/>
+    <rect x="322" y="204" width="202" height="42" rx="10" fill="#00C78C"/>
+    <rect x="322" y="274" width="202" height="48" rx="10" fill="#F7FCF9"/>
+    <rect x="344" y="291" width="76" height="8" rx="4" fill="#10251F" fill-opacity="0.75"/>
+    <rect x="452" y="287" width="46" height="18" rx="9" fill="#F8D24C"/>
+    <rect x="322" y="344" width="202" height="48" rx="10" fill="#F7FCF9"/>
+    <rect x="344" y="361" width="96" height="8" rx="4" fill="#10251F" fill-opacity="0.75"/>
+    <rect x="452" y="357" width="46" height="18" rx="9" fill="#F8D24C"/>
+    <rect x="322" y="414" width="202" height="48" rx="10" fill="#F7FCF9"/>
+    <rect x="344" y="431" width="86" height="8" rx="4" fill="#10251F" fill-opacity="0.75"/>
+    <rect x="452" y="427" width="46" height="18" rx="9" fill="#F8D24C"/>
+  </g>
+  <g opacity="0.85">
+    <path d="M102 414C102 344 158 288 228 288C298 288 354 344 354 414C354 484 298 540 228 540C158 540 102 484 102 414Z" fill="#F7FCF9"/>
+    <path d="M128 414C128 358 172 314 228 314C284 314 328 358 328 414C328 470 284 514 228 514C172 514 128 470 128 414Z" stroke="#10251F" stroke-width="12"/>
+    <path d="M228 314V514M128 414H328" stroke="#00C78C" stroke-width="8" stroke-linecap="round"/>
+    <path d="M168 354C202 372 254 372 288 354M168 474C202 456 254 456 288 474" stroke="#10251F" stroke-width="8" stroke-linecap="round"/>
+  </g>
+  <g opacity="0.72">
+    <path d="M392 572H554V676H392V572Z" fill="#10251F"/>
+    <path d="M414 602H532M414 628H500M414 654H520" stroke="#00C78C" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="530" cy="602" r="11" fill="#F8D24C"/>
+  </g>
+  <rect width="178" height="817" fill="url(#fadeRight)"/>
+  <defs>
+    <linearGradient id="fadeRight" x1="178" y1="408.5" x2="0" y2="408.5" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EEF8F2" stop-opacity="0"/>
+      <stop offset="1" stop-color="#EEF8F2"/>
+    </linearGradient>
+  </defs>
+</svg>
