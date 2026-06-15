@@ -159,6 +159,32 @@ def _logo_src(path: Path) -> str:
     return f"data:{mime_type};base64,{encoded}"
 
 
+def _langcache_attribute_scopes(current_user_id: str) -> list[dict[str, str]]:
+    public_scope = {"domain": domain.manifest.id, "access_class": "public"}
+    legacy_scopes = []
+    if not any("access_class" in entry.attributes for entry in domain.manifest.seed_langcache):
+        legacy_scopes.append({"domain": domain.manifest.id})
+
+    resolve_demo_user = getattr(domain, "resolve_demo_user", None)
+    if not callable(resolve_demo_user):
+        return [public_scope, *legacy_scopes]
+
+    profile = resolve_demo_user(current_user_id) or {}
+    cache_group_id = str(profile.get("cache_group_id", "")).strip()
+    if not cache_group_id:
+        return [public_scope, *legacy_scopes]
+
+    return [
+        {
+            "domain": domain.manifest.id,
+            "access_class": "group",
+            "cache_group_id": cache_group_id,
+        },
+        public_scope,
+        *legacy_scopes,
+    ]
+
+
 _INTERNAL_NAMES = {t.name for t in internal_tools.definitions}
 
 
@@ -412,16 +438,23 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
 
     # ── Phase 0: Semantic cache check ──
     if langcache_service.is_configured():
-        yield sse(
-            "tool-call",
-            toolName="semantic_cache_search",
-            toolKind="langcache",
-            payload={"query": latest_message.strip()},
-            ts=timer.elapsed_ms(),
-        )
-        cache_start = perf_counter()
-        cache_result = await langcache_service.search(latest_message.strip())
-        cache_ms = max(round((perf_counter() - cache_start) * 1000), 1)
+        cache_result = None
+        cache_scope = None
+        cache_ms = 0
+        for candidate_scope in _langcache_attribute_scopes(current_user_id):
+            yield sse(
+                "tool-call",
+                toolName="semantic_cache_search",
+                toolKind="langcache",
+                payload={"query": latest_message.strip(), "attributes": candidate_scope},
+                ts=timer.elapsed_ms(),
+            )
+            cache_start = perf_counter()
+            cache_result = await langcache_service.search(latest_message.strip(), attributes=candidate_scope)
+            cache_ms = max(round((perf_counter() - cache_start) * 1000), 1)
+            cache_scope = candidate_scope
+            if cache_result:
+                break
 
         if cache_result:
             yield sse(
@@ -432,6 +465,7 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
                     "hit": True,
                     "similarity": cache_result.get("similarity", 0),
                     "cached_prompt": cache_result.get("prompt", ""),
+                    "attributes": cache_scope,
                 },
                 durationMs=cache_ms,
                 ts=timer.elapsed_ms(),
@@ -446,7 +480,7 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
                 "tool-result",
                 toolName="semantic_cache_search",
                 toolKind="langcache",
-                payload={"hit": False},
+                payload={"hit": False, "attributes": cache_scope},
                 durationMs=cache_ms,
                 ts=timer.elapsed_ms(),
             )
@@ -586,7 +620,6 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
     agent_start = perf_counter()
     llm_total_ms = 0
     tool_total_ms = 0
-    checkpoint_errors = 0
 
     try:
         async for event in agent.astream_events(
