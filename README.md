@@ -78,10 +78,10 @@ make dev
 
 ### Switching domains
 
+Pass the target domain to `make setup`; it updates `DEMO_DOMAIN` in `.env` and reloads the demo data for that domain.
 
 ```bash
- # Update the DEMO_DOMAIN in .env
-make setup      
+make setup DOMAIN=sports-betting
 make dev
 ```
 
