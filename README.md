@@ -29,6 +29,7 @@ Every domain runs Context Retriever, Agent Memory, LangCache, and Semantic Routi
 | Healthcare | RedHealthConnect | <img src="docs/screenshots/Demo_RedHealthConnect.png" width="300" /> |
 | Retail banking | Radish Bank | <img src="docs/screenshots/Demo_Radish_Bank.png" width="300" /> |
 | Telcp | R-Mobile | <img src="docs/screenshots/Demo_R-Mobile.png" width="300" /> |
+| Sports betting | Sports Desk | <img src="docs/screenshots/Demo_Sports_Desk.png" width="300" /> |
 
 ## Legacy
 
@@ -150,6 +151,7 @@ domains/
   healthcare/                # Patient portal
   radish-bank/               # Retail banking
   rmobile/                   # Wireless telecom
+  sports-betting/            # Sports betting
 
 frontend/
   src/
