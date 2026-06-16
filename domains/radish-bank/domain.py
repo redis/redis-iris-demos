@@ -268,7 +268,8 @@ class RadishBankDomain:
         ),
         seed_memories=[
             SeedMemory(text="Prefers paperless statements and online banking", topics=["banking", "preferences"]),
-            SeedMemory(text="Interested in fixed deposit products for savings growth", topics=["products", "interests"]),
+            # SeedMemory(text="Interested in fixed deposit products for savings growth", topics=["products", "interests"]),
+            SeedMemory(text="Use Savings Account for placing fixed deposits", topics=["fixed_deposit", "account"])
         ],
         seed_langcache=[
             SeedLangCacheEntry(
@@ -292,6 +293,7 @@ class RadishBankDomain:
         memory_enabled = MemoryService(settings).is_configured() if settings else False
         return {
             "memory_enabled": memory_enabled,
+            "memory_similarity_threshold": 0.5,
         }
 
     def build_system_prompt(

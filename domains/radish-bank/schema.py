@@ -130,7 +130,7 @@ ENTITY_SPECS: tuple[EntitySpec, ...] = (
         fields=(
             FieldSpec("holding_id", "str", "Holding identifier", is_key_component=True),
             FieldSpec("customer_id", "str", "Owner customer id", index="tag"),
-            FieldSpec("product_type", "str", "deposit_account, card, fixed_deposit, insurance", index="tag"),
+            FieldSpec("product_type", "str", "card, fixed_deposit, insurance", index="tag"),
             FieldSpec("product_name", "str", "Display name", index="text"),
             FieldSpec("status", "str", "active or closed", index="tag"),
         ),

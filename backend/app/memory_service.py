@@ -48,6 +48,33 @@ def extract_memory_items(payload: Any) -> list[dict[str, Any]]:
     return []
 
 
+def _domain_runtime_config(settings: Settings) -> dict[str, Any]:
+    from backend.app.core.domain_loader import get_active_domain
+
+    domain = get_active_domain(settings)
+    getter = getattr(domain, "get_runtime_config", None)
+    if callable(getter):
+        return dict(getter(settings=settings) or {})
+    return {}
+
+
+_GLOBAL_MEMORY_SIMILARITY_THRESHOLD = 0.7
+
+
+def _resolve_memory_similarity_threshold(settings: Settings) -> float:
+    settings_value = float(settings.memory_similarity_threshold)
+    runtime_threshold = _domain_runtime_config(settings).get("memory_similarity_threshold")
+    if runtime_threshold is None:
+        return settings_value
+    domain_value = float(runtime_threshold)
+    if (
+        settings_value == _GLOBAL_MEMORY_SIMILARITY_THRESHOLD
+        and domain_value != _GLOBAL_MEMORY_SIMILARITY_THRESHOLD
+    ):
+        return domain_value
+    return settings_value
+
+
 @dataclass(frozen=True)
 class MemoryConnection:
     api_base_url: str
@@ -90,7 +117,7 @@ class MemoryService:
             owner_id=sanitize_owner_id(owner_id or self.settings.memory_owner_id),
             actor_id=sanitize_actor_id(self.settings.memory_actor_id),
             namespace=self.settings.effective_memory_namespace,
-            similarity_threshold=float(self.settings.memory_similarity_threshold),
+            similarity_threshold=_resolve_memory_similarity_threshold(self.settings),
             limit=max(int(self.settings.memory_limit), 1),
         )
 
