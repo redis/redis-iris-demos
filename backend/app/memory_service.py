@@ -154,6 +154,15 @@ class MemoryService:
             filt["sessionId"] = {"eq": session_id}
         return filt
 
+    def _search_similarity_threshold(
+        self,
+        connection: MemoryConnection,
+        similarity_threshold: float | None,
+    ) -> float:
+        if similarity_threshold is not None:
+            return similarity_threshold
+        return connection.similarity_threshold
+
     def search_long_term_memory(
         self,
         *,
@@ -165,6 +174,10 @@ class MemoryService:
     ) -> list[dict[str, Any]]:
         connection = self.connection(owner_id=owner_id)
         payload: dict[str, Any] = {
+            "text": text,
+            "similarityThreshold": self._search_similarity_threshold(
+                connection, similarity_threshold
+            ),
             "filterOp": "all",
             "limit": limit or connection.limit,
             "filter": self._build_search_filter(connection, session_id),
@@ -191,6 +204,10 @@ class MemoryService:
     ) -> list[dict[str, Any]]:
         connection = self.connection(owner_id=owner_id)
         payload: dict[str, Any] = {
+            "text": text,
+            "similarityThreshold": self._search_similarity_threshold(
+                connection, similarity_threshold
+            ),
             "filterOp": "all",
             "limit": limit or connection.limit,
             "filter": self._build_search_filter(connection, session_id),
