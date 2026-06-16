@@ -6,6 +6,7 @@ import backend.app.main as app_main
 class DomainWithDemoUsers:
     manifest = SimpleNamespace(
         id="airline-support",
+        identity=SimpleNamespace(default_id="AIRCUST_001"),
         seed_langcache=[
             SimpleNamespace(
                 attributes={
@@ -29,6 +30,7 @@ class DomainWithDemoUsers:
 class DomainWithoutDemoUsers:
     manifest = SimpleNamespace(
         id="reddash",
+        identity=SimpleNamespace(default_id="CUST_DEMO_001"),
         seed_langcache=[SimpleNamespace(attributes={"domain": "reddash"})],
     )
 
@@ -53,6 +55,16 @@ def test_langcache_scopes_use_active_users_group(monkeypatch) -> None:
         "domain": "airline-support",
         "access_class": "group",
         "cache_group_id": "frequent_en",
+    }
+
+
+def test_langcache_scopes_fall_back_to_default_demo_user_group(monkeypatch) -> None:
+    monkeypatch.setattr(app_main, "domain", DomainWithDemoUsers())
+
+    assert app_main._langcache_attribute_scopes("UNKNOWN_USER")[0] == {
+        "domain": "airline-support",
+        "access_class": "group",
+        "cache_group_id": "senator_en",
     }
 
 

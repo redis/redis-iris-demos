@@ -169,7 +169,7 @@ def _langcache_attribute_scopes(current_user_id: str) -> list[dict[str, str]]:
     if not callable(resolve_demo_user):
         return [public_scope, *legacy_scopes]
 
-    profile = resolve_demo_user(current_user_id) or {}
+    profile = resolve_demo_user(current_user_id) or resolve_demo_user(domain.manifest.identity.default_id) or {}
     cache_group_id = str(profile.get("cache_group_id", "")).strip()
     if not cache_group_id:
         return [public_scope, *legacy_scopes]
