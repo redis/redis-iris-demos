@@ -268,7 +268,7 @@ class RadishBankDomain:
         ),
         seed_memories=[
             SeedMemory(text="Prefers paperless statements and online banking", topics=["banking", "preferences"]),
-            # SeedMemory(text="Interested in fixed deposit products for savings growth", topics=["products", "interests"]),
+            SeedMemory(text="Interested in fixed deposit products for savings growth", topics=["products", "interests"]),
             SeedMemory(text="Use Savings Account for placing fixed deposits", topics=["fixed_deposit", "account"])
         ],
         seed_langcache=[
