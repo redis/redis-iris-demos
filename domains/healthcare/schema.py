@@ -167,6 +167,58 @@ ENTITY_SPECS: tuple[EntitySpec, ...] = (
             ),
         ),
     ),
+    # ── LabResult ───────────────────────────────────────
+    EntitySpec(
+        class_name="LabResult",
+        redis_key_template="healthcare_labresult:{id}",
+        file_name="lab_results.jsonl",
+        id_field="id",
+        fields=(
+            FieldSpec("id", "str", "Lab result ID", is_key_component=True),
+            FieldSpec("patient_id", "str", "Patient", index="tag"),
+            FieldSpec("provider_id", "str", "Ordering provider", index="tag"),
+            FieldSpec("appointment_id", "str", "Associated appointment", index="tag"),
+            FieldSpec("test_name", "str", "Test name", index="text", weight=2.0),
+            FieldSpec("result_value", "str", "Result value", index="text"),
+            FieldSpec("reference_range", "str", "Normal reference range", index="text"),
+            FieldSpec("flag", "str", "Flag: normal, high, low, abnormal", index="tag"),
+            FieldSpec("status", "str", "Status: final, preliminary, pending", index="tag"),
+            FieldSpec("collected_date", "str", "Date specimen collected", index="tag"),
+            FieldSpec("resulted_date", "str", "Date result reported", index="tag"),
+            FieldSpec("notes", "str", "Result notes", index="text"),
+        ),
+        relationships=(
+            RelationshipSpec("patient", "Patient", "patient_id", "Patient"),
+            RelationshipSpec("provider", "Ordering provider", "provider_id", "Provider"),
+            RelationshipSpec("appointment", "Associated appointment", "appointment_id", "Appointment"),
+        ),
+    ),
+    # ── Prescription ────────────────────────────────────
+    EntitySpec(
+        class_name="Prescription",
+        redis_key_template="healthcare_prescription:{id}",
+        file_name="prescriptions.jsonl",
+        id_field="id",
+        fields=(
+            FieldSpec("id", "str", "Prescription ID", is_key_component=True),
+            FieldSpec("patient_id", "str", "Patient", index="tag"),
+            FieldSpec("provider_id", "str", "Prescribing provider", index="tag"),
+            FieldSpec("medication", "str", "Medication name", index="text", weight=2.0),
+            FieldSpec("dosage", "str", "Dosage", index="tag"),
+            FieldSpec("frequency", "str", "Frequency / directions", index="text"),
+            FieldSpec(
+                "status", "str", "Status: active, completed, discontinued, expired", index="tag"
+            ),
+            FieldSpec("prescribed_date", "str", "Date prescribed", index="tag"),
+            FieldSpec("refills_remaining", "str", "Refills remaining", index="tag"),
+            FieldSpec("pharmacy", "str", "Dispensing pharmacy", index="text"),
+            FieldSpec("notes", "str", "Prescription notes", index="text"),
+        ),
+        relationships=(
+            RelationshipSpec("patient", "Patient", "patient_id", "Patient"),
+            RelationshipSpec("provider", "Prescribing provider", "provider_id", "Provider"),
+        ),
+    ),
     # ── HealthDoc ───────────────────────────────────────
     EntitySpec(
         class_name="HealthDoc",

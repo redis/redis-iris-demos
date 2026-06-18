@@ -455,6 +455,177 @@ WAITLIST = [
 
 
 # ═══════════════════════════════════════════════════════════════════════════
+#  HISTORICAL DATA (spanning ~2–3 years, spread across all patients)
+#
+#  Built programmatically from compact tables so dates stay anchored to the
+#  current date. Provider/location are derived from each patient's primary
+#  provider so the history stays internally consistent.
+# ═══════════════════════════════════════════════════════════════════════════
+
+_PROVIDER_LOCATION = {p["id"]: p["location_id"] for p in PROVIDERS}
+_PATIENT_PROVIDER = {p["id"]: p["primary_provider_id"] for p in PATIENTS}
+
+
+def _appt(idx: int, patient_id: str, day_offset: int, hour: int, minute: int,
+          type_: str, status: str, notes: str) -> dict:
+    provider = _PATIENT_PROVIDER[patient_id]
+    return {
+        "id": f"A{idx:03d}",
+        "patient_id": patient_id,
+        "provider_id": provider,
+        "location_id": _PROVIDER_LOCATION[provider],
+        "datetime": appt_dt(day_offset, hour, minute),
+        "type": type_,
+        "status": status,
+        "notes": notes,
+    }
+
+
+def _lab(idx: int, patient_id: str, appt_id: str, day_offset: int, test_name: str,
+         result_value: str, reference_range: str, flag: str, notes: str,
+         status: str = "final") -> dict:
+    return {
+        "id": f"LAB{idx:03d}",
+        "patient_id": patient_id,
+        "provider_id": _PATIENT_PROVIDER[patient_id],
+        "appointment_id": appt_id,
+        "test_name": test_name,
+        "result_value": result_value,
+        "reference_range": reference_range,
+        "flag": flag,
+        "status": status,
+        "collected_date": day_str(day_offset),
+        "resulted_date": day_str(day_offset + 1),
+        "notes": notes,
+    }
+
+
+def _rx(idx: int, patient_id: str, medication: str, dosage: str, frequency: str,
+        status: str, day_offset: int, refills: int, pharmacy: str, notes: str) -> dict:
+    return {
+        "id": f"RX{idx:03d}",
+        "patient_id": patient_id,
+        "provider_id": _PATIENT_PROVIDER[patient_id],
+        "medication": medication,
+        "dosage": dosage,
+        "frequency": frequency,
+        "status": status,
+        "prescribed_date": day_str(day_offset),
+        "refills_remaining": str(refills),
+        "pharmacy": pharmacy,
+        "notes": notes,
+    }
+
+
+# Historical appointments — (id_num, patient, day_offset, hour, minute, type, status, notes)
+_HISTORY_APPTS = [
+    (11, "P001", -735, 9, 0, "checkup", "completed", "Annual physical; baseline lipid panel, LDL borderline-high"),
+    (12, "P001", -370, 9, 30, "checkup", "completed", "Annual physical; LDL still elevated, started statin therapy"),
+    (13, "P001", -185, 10, 0, "follow_up", "completed", "Lipid recheck; LDL improving on atorvastatin"),
+    (14, "P002", -540, 11, 0, "checkup", "completed", "Annual physical, all vitals normal"),
+    (15, "P002", -200, 14, 30, "consultation", "completed", "Seasonal allergy management"),
+    (16, "P003", -700, 11, 0, "checkup", "completed", "Diabetes management review; A1c elevated"),
+    (17, "P003", -330, 11, 30, "follow_up", "completed", "Diabetes follow-up; medication adjusted"),
+    (18, "P004", -610, 15, 0, "consultation", "completed", "Knee pain evaluation"),
+    (19, "P004", -250, 15, 30, "procedure", "completed", "Corticosteroid knee injection"),
+    (20, "P005", -120, 9, 0, "procedure", "completed", "Arthroscopic knee surgery"),
+    (21, "P006", -400, 16, 0, "checkup", "completed", "Annual physical"),
+    (22, "P006", -90, 16, 30, "consultation", "completed", "Abnormal CBC follow-up"),
+    (23, "P007", -150, 10, 0, "checkup", "completed", "Initial prenatal visit"),
+    (24, "P007", -60, 10, 30, "checkup", "completed", "Prenatal follow-up; glucose screening"),
+    (25, "P008", -480, 11, 0, "consultation", "completed", "Headache evaluation"),
+    (26, "P008", -300, 11, 30, "procedure", "completed", "Minor diagnostic procedure"),
+]
+HISTORICAL_APPOINTMENTS = [_appt(*row) for row in _HISTORY_APPTS]
+APPOINTMENTS = APPOINTMENTS + HISTORICAL_APPOINTMENTS
+
+
+# Lab results — (id_num, patient, appt_id, day_offset, test, value, range, flag, notes[, status])
+_LAB_ROWS = [
+    (1, "P001", "A011", -735, "Lipid Panel", "LDL 142 mg/dL", "< 100 mg/dL", "high", "Elevated LDL cholesterol"),
+    (2, "P001", "A011", -735, "Complete Blood Count", "WBC 6.2 K/uL", "4.0–11.0 K/uL", "normal", "Within normal limits"),
+    (3, "P001", "A012", -370, "Lipid Panel", "LDL 138 mg/dL", "< 100 mg/dL", "high", "Statin therapy initiated"),
+    (4, "P001", "A013", -185, "Lipid Panel", "LDL 118 mg/dL", "< 100 mg/dL", "high", "Improving on atorvastatin"),
+    (5, "P001", "A001", -8, "Lipid Panel", "LDL 105 mg/dL", "< 100 mg/dL", "high", "Near goal; follow-up scheduled"),
+    (6, "P002", "A014", -540, "Comprehensive Metabolic Panel", "Glucose 88 mg/dL", "70–99 mg/dL", "normal", "Normal metabolic panel"),
+    (7, "P003", "A016", -700, "Hemoglobin A1c", "8.1 %", "< 5.7 %", "high", "Poorly controlled diabetes"),
+    (8, "P003", "A017", -330, "Hemoglobin A1c", "7.4 %", "< 5.7 %", "high", "Improving with metformin"),
+    (9, "P003", "A004", -6, "Hemoglobin A1c", "6.9 %", "< 5.7 %", "high", "Continued improvement"),
+    (10, "P004", "A018", -610, "Comprehensive Metabolic Panel", "Creatinine 1.1 mg/dL", "0.7–1.3 mg/dL", "normal", "Normal renal function"),
+    (11, "P005", "A020", -120, "Complete Blood Count", "Hemoglobin 13.2 g/dL", "12.0–15.5 g/dL", "normal", "Pre-operative labs normal"),
+    (12, "P006", "A021", -400, "Complete Blood Count", "WBC 12.8 K/uL", "4.0–11.0 K/uL", "high", "Mildly elevated white count"),
+    (13, "P006", "A022", -90, "Complete Blood Count", "WBC 13.5 K/uL", "4.0–11.0 K/uL", "high", "Persistent leukocytosis; specialist referral"),
+    (14, "P007", "A023", -150, "Complete Blood Count", "Hemoglobin 11.8 g/dL", "11.0–14.0 g/dL", "normal", "Normal for pregnancy"),
+    (15, "P007", "A024", -60, "Glucose Tolerance Test", "Glucose 132 mg/dL", "< 140 mg/dL", "normal", "Gestational diabetes screen negative"),
+    (16, "P008", "A025", -480, "Comprehensive Metabolic Panel", "Sodium 140 mEq/L", "135–145 mEq/L", "normal", "Normal panel"),
+]
+LAB_RESULTS = [_lab(*row) for row in _LAB_ROWS]
+
+
+# Prescriptions — (id_num, patient, medication, dosage, frequency, status, day_offset, refills, pharmacy, notes)
+_RX_ROWS = [
+    (1, "P001", "Atorvastatin", "20 mg", "Once daily at bedtime", "active", -370, 3, "Downtown Pharmacy", "For elevated LDL cholesterol"),
+    (2, "P002", "Loratadine", "10 mg", "Once daily as needed", "completed", -200, 0, "Westside Pharmacy", "Seasonal allergy relief"),
+    (3, "P003", "Metformin", "500 mg", "Twice daily with meals", "active", -700, 5, "Downtown Pharmacy", "Type 2 diabetes management"),
+    (4, "P004", "Ibuprofen", "600 mg", "Every 8 hours as needed for pain", "active", -250, 2, "Westside Pharmacy", "Knee osteoarthritis"),
+    (5, "P005", "Naproxen", "500 mg", "Twice daily with food", "active", -120, 1, "Westside Pharmacy", "Post-operative pain management"),
+    (6, "P007", "Prenatal Vitamins", "1 tablet", "Once daily", "active", -150, 9, "Westside Pharmacy", "Prenatal supplementation"),
+    (7, "P008", "Sumatriptan", "50 mg", "As needed at onset of migraine", "active", -480, 4, "Downtown Pharmacy", "Migraine management"),
+]
+PRESCRIPTIONS = [_rx(*row) for row in _RX_ROWS]
+
+
+# Historical (resolved) referrals appended to the active set above
+HISTORICAL_REFERRALS = [
+    {
+        "id": "R007",
+        "patient_id": "P001",
+        "referring_provider_id": "DR001",
+        "to_specialty": "cardiology",
+        "to_provider_id": "DR004",
+        "status": "completed",
+        "urgency": "routine",
+        "notes": "Cardiac evaluation for elevated cholesterol; no acute findings",
+        "received_date": day_str(-360),
+    },
+    {
+        "id": "R008",
+        "patient_id": "P003",
+        "referring_provider_id": "DR001",
+        "to_specialty": "endocrinology",
+        "to_provider_id": "",
+        "status": "completed",
+        "urgency": "routine",
+        "notes": "Diabetes specialist consultation completed",
+        "received_date": day_str(-320),
+    },
+    {
+        "id": "R009",
+        "patient_id": "P004",
+        "referring_provider_id": "DR002",
+        "to_specialty": "orthopedics",
+        "to_provider_id": "DR005",
+        "status": "completed",
+        "urgency": "urgent",
+        "notes": "Knee evaluation completed; injection performed",
+        "received_date": day_str(-260),
+    },
+    {
+        "id": "R010",
+        "patient_id": "P008",
+        "referring_provider_id": "DR002",
+        "to_specialty": "neurology",
+        "to_provider_id": "",
+        "status": "completed",
+        "urgency": "routine",
+        "notes": "Headache workup completed; migraines diagnosed",
+        "received_date": day_str(-470),
+    },
+]
+REFERRALS = REFERRALS + HISTORICAL_REFERRALS
+
+
+# ═══════════════════════════════════════════════════════════════════════════
 #  HEALTH DOCS (5) — patient guides, FAQs, policies
 # ═══════════════════════════════════════════════════════════════════════════
 
@@ -573,6 +744,8 @@ def generate_demo_data(
     write_jsonl(resolved_output_dir, "appointments.jsonl", APPOINTMENTS)
     write_jsonl(resolved_output_dir, "referrals.jsonl", REFERRALS)
     write_jsonl(resolved_output_dir, "waitlist.jsonl", WAITLIST)
+    write_jsonl(resolved_output_dir, "lab_results.jsonl", LAB_RESULTS)
+    write_jsonl(resolved_output_dir, "prescriptions.jsonl", PRESCRIPTIONS)
     write_jsonl(resolved_output_dir, "healthdocs.jsonl", healthdocs)
 
     demo = PATIENTS[0]
@@ -597,6 +770,8 @@ def generate_demo_data(
             "appointments": len(APPOINTMENTS),
             "referrals": len(REFERRALS),
             "waitlist": len(WAITLIST),
+            "lab_results": len(LAB_RESULTS),
+            "prescriptions": len(PRESCRIPTIONS),
             "healthdocs": len(healthdocs),
         },
     )
