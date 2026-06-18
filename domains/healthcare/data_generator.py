@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+from datetime import datetime, timedelta
 from hashlib import sha256
 from pathlib import Path
 
@@ -18,6 +19,28 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from backend.app.core.domain_contract import GeneratedDataset  # noqa: E402
+
+# ═══════════════════════════════════════════════════════════════════════════
+#  DATE ANCHORING
+#
+#  All appointment/referral/waitlist dates are expressed as offsets (in days)
+#  from "today" so the dataset stays centered on the current date no matter
+#  when `make setup` / `make reset` is run. Scheduled appointments stay in the
+#  future; completed / no-show / cancelled ones stay in the past.
+# ═══════════════════════════════════════════════════════════════════════════
+
+TODAY = datetime.now().date()
+
+
+def appt_dt(days_from_today: int, hour: int, minute: int = 0) -> str:
+    """Naive local timestamp 'YYYY-MM-DDTHH:MM:SS' offset from today."""
+    day = TODAY + timedelta(days=days_from_today)
+    return f"{day.isoformat()}T{hour:02d}:{minute:02d}:00"
+
+
+def day_str(days_from_today: int) -> str:
+    """Date-only string 'YYYY-MM-DD' offset from today."""
+    return (TODAY + timedelta(days=days_from_today)).isoformat()
 
 
 def fake_embedding(text: str) -> list[float]:
@@ -213,7 +236,7 @@ APPOINTMENTS = [
         "patient_id": "P001",
         "provider_id": "DR001",
         "location_id": "LOC001",
-        "datetime": "2026-03-10T09:00:00",
+        "datetime": appt_dt(-8, 9, 0),
         "type": "checkup",
         "status": "completed",
         "notes": "Annual physical, all vitals normal",
@@ -223,7 +246,7 @@ APPOINTMENTS = [
         "patient_id": "P001",
         "provider_id": "DR001",
         "location_id": "LOC001",
-        "datetime": "2026-03-17T10:00:00",
+        "datetime": appt_dt(6, 10, 0),
         "type": "follow_up",
         "status": "scheduled",
         "notes": "Follow up on blood work",
@@ -233,7 +256,7 @@ APPOINTMENTS = [
         "patient_id": "P002",
         "provider_id": "DR002",
         "location_id": "LOC001",
-        "datetime": "2026-03-11T14:00:00",
+        "datetime": appt_dt(-7, 14, 0),
         "type": "consultation",
         "status": "no_show",
         "notes": "Patient did not arrive, no call",
@@ -243,7 +266,7 @@ APPOINTMENTS = [
         "patient_id": "P003",
         "provider_id": "DR001",
         "location_id": "LOC001",
-        "datetime": "2026-03-12T11:00:00",
+        "datetime": appt_dt(-6, 11, 0),
         "type": "checkup",
         "status": "completed",
         "notes": "Diabetes management review",
@@ -253,7 +276,7 @@ APPOINTMENTS = [
         "patient_id": "P004",
         "provider_id": "DR003",
         "location_id": "LOC002",
-        "datetime": "2026-03-11T15:30:00",
+        "datetime": appt_dt(-7, 15, 30),
         "type": "procedure",
         "status": "cancelled",
         "notes": "Insurance expired, rescheduling needed",
@@ -263,7 +286,7 @@ APPOINTMENTS = [
         "patient_id": "P005",
         "provider_id": "DR005",
         "location_id": "LOC002",
-        "datetime": "2026-03-13T09:30:00",
+        "datetime": appt_dt(3, 9, 30),
         "type": "follow_up",
         "status": "scheduled",
         "notes": "Post-surgery check",
@@ -273,7 +296,7 @@ APPOINTMENTS = [
         "patient_id": "P006",
         "provider_id": "DR001",
         "location_id": "LOC001",
-        "datetime": "2026-03-10T16:00:00",
+        "datetime": appt_dt(-8, 16, 0),
         "type": "consultation",
         "status": "no_show",
         "notes": "New patient intake - missed",
@@ -283,7 +306,7 @@ APPOINTMENTS = [
         "patient_id": "P007",
         "provider_id": "DR003",
         "location_id": "LOC002",
-        "datetime": "2026-03-14T10:00:00",
+        "datetime": appt_dt(5, 10, 0),
         "type": "checkup",
         "status": "scheduled",
         "notes": "Prenatal visit",
@@ -293,7 +316,7 @@ APPOINTMENTS = [
         "patient_id": "P008",
         "provider_id": "DR002",
         "location_id": "LOC001",
-        "datetime": "2026-03-09T11:00:00",
+        "datetime": appt_dt(-9, 11, 0),
         "type": "procedure",
         "status": "completed",
         "notes": "Minor procedure completed successfully",
@@ -303,7 +326,7 @@ APPOINTMENTS = [
         "patient_id": "P002",
         "provider_id": "DR002",
         "location_id": "LOC001",
-        "datetime": "2026-03-18T14:00:00",
+        "datetime": appt_dt(9, 14, 0),
         "type": "consultation",
         "status": "scheduled",
         "notes": "Rescheduled from no-show",
@@ -324,7 +347,7 @@ REFERRALS = [
         "status": "pending",
         "urgency": "routine",
         "notes": "Elevated cholesterol, recommend cardiac evaluation",
-        "received_date": "2026-03-10",
+        "received_date": day_str(-8),
     },
     {
         "id": "R002",
@@ -335,7 +358,7 @@ REFERRALS = [
         "status": "scheduled",
         "urgency": "routine",
         "notes": "Diabetes specialist consultation",
-        "received_date": "2026-03-05",
+        "received_date": day_str(-13),
     },
     {
         "id": "R003",
@@ -346,7 +369,7 @@ REFERRALS = [
         "status": "pending",
         "urgency": "urgent",
         "notes": "Severe knee pain, possible surgery needed",
-        "received_date": "2026-03-08",
+        "received_date": day_str(-10),
     },
     {
         "id": "R004",
@@ -357,7 +380,7 @@ REFERRALS = [
         "status": "pending",
         "urgency": "stat",
         "notes": "Abnormal lab results, immediate evaluation needed",
-        "received_date": "2026-03-11",
+        "received_date": day_str(-7),
     },
     {
         "id": "R005",
@@ -368,7 +391,7 @@ REFERRALS = [
         "status": "completed",
         "urgency": "routine",
         "notes": "Headache evaluation completed",
-        "received_date": "2026-02-20",
+        "received_date": day_str(-28),
     },
     {
         "id": "R006",
@@ -379,7 +402,7 @@ REFERRALS = [
         "status": "scheduled",
         "urgency": "routine",
         "notes": "Post-surgery rehabilitation",
-        "received_date": "2026-03-09",
+        "received_date": day_str(-9),
     },
 ]
 
@@ -395,7 +418,7 @@ WAITLIST = [
         "location_id": "LOC001",
         "appointment_type": "consultation",
         "flexibility": "mornings",
-        "added_date": "2026-03-08",
+        "added_date": day_str(-10),
         "notes": "Wants to switch from Dr. Patel",
     },
     {
@@ -405,7 +428,7 @@ WAITLIST = [
         "location_id": "LOC002",
         "appointment_type": "procedure",
         "flexibility": "any_time",
-        "added_date": "2026-03-11",
+        "added_date": day_str(-7),
         "notes": "Waiting for insurance to be resolved",
     },
     {
@@ -415,7 +438,7 @@ WAITLIST = [
         "location_id": "LOC001",
         "appointment_type": "checkup",
         "flexibility": "afternoons",
-        "added_date": "2026-03-10",
+        "added_date": day_str(-8),
         "notes": "Missed first appointment, wants to reschedule",
     },
     {
@@ -425,7 +448,7 @@ WAITLIST = [
         "location_id": "LOC002",
         "appointment_type": "follow_up",
         "flexibility": "specific_days",
-        "added_date": "2026-03-12",
+        "added_date": day_str(-6),
         "notes": "Only available Tuesdays and Thursdays",
     },
 ]
