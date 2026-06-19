@@ -64,8 +64,8 @@ class InternalToolService:
     async def aexecute(self, tool_name: str, arguments: dict[str, Any]) -> dict[str, Any]:
         async_executor = getattr(self.domain, "aexecute_internal_tool", None)
         if callable(async_executor):
-            runtime_config = domain_runtime_config(self.domain, self.settings)
             if _accepts_runtime_config(async_executor):
+                runtime_config = domain_runtime_config(self.domain, self.settings)
                 return await async_executor(
                     tool_name,
                     arguments,
