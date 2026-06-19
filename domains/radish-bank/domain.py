@@ -464,13 +464,23 @@ class RadishBankDomain:
             return self._request_fee_waiver(arguments, settings)
         return {"error": f"Unknown tool: {tool_name}"}
 
-    async def aexecute_internal_tool(self, tool_name: str, arguments: dict[str, Any], settings: Any) -> dict[str, Any]:
+    async def aexecute_internal_tool(
+        self,
+        tool_name: str,
+        arguments: dict[str, Any],
+        settings: Any,
+        *,
+        runtime_config: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         if tool_name not in {"search_customer_memory", "remember_customer_detail"}:
             return await asyncio.to_thread(self.execute_internal_tool, tool_name, arguments, settings)
 
         identity = self.manifest.identity
         owner_id = os.getenv(identity.id_env_var, identity.default_id)
-        memory_service = MemoryService(settings)
+        memory_service = MemoryService(
+            settings,
+            similarity_threshold=(runtime_config or {}).get("memory_similarity_threshold"),
+        )
         if not memory_service.is_configured():
             return {"error": "Memory service is not configured for this demo."}
 
