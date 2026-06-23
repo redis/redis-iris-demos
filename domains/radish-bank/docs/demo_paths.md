@@ -50,6 +50,10 @@ Single customer **Merv Kwok** (`CUST001`). Run these prompts **in order** to sho
 
 **"I want to place SGD 2,000 into the 6-month fixed deposit."**
 
+Before this step, check that `MEMORY_SIMILARITY_THRESHOLD` is unset or commented out in
+`.env`. Older `.env` files with `MEMORY_SIMILARITY_THRESHOLD=0.7` will keep overriding
+the Radish Bank memory-search default of `0.5`.
+
 
 | Iris component   | What happens                                                                                                                                                                         |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
