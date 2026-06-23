@@ -85,6 +85,11 @@ make setup
 make dev
 ```
 
+When switching to `radish-bank`, leave `MEMORY_SIMILARITY_THRESHOLD` unset or commented out
+to use the Radish Bank Agent Memory default of `0.5`. Older local `.env` files may still
+contain `MEMORY_SIMILARITY_THRESHOLD=0.7`; keep that only when you want to explicitly
+override the Radish tuning.
+
 
 ## What `make setup` does
 

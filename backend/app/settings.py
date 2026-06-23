@@ -11,6 +11,8 @@ ENV_PATH = ROOT_DIR / ".env"
 if ENV_PATH.exists():
     load_dotenv(ENV_PATH)
 
+DEFAULT_MEMORY_SIMILARITY_THRESHOLD = 0.7
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -59,7 +61,7 @@ class Settings(BaseSettings):
     memory_owner_id: str = Field(default="")
     memory_actor_id: str = Field(default="iris-agent")
     memory_namespace: str = Field(default="")
-    memory_similarity_threshold: float = Field(default=0.7)
+    memory_similarity_threshold: float | None = Field(default=None)
     memory_limit: int = Field(default=6)
 
     langcache_host: str = Field(default="")
@@ -79,6 +81,13 @@ class Settings(BaseSettings):
         default="sentence-transformers/all-mpnet-base-v2",
     )
     hf_token: str = Field(default="", validation_alias="HF_TOKEN")
+
+    @field_validator("memory_similarity_threshold", mode="before")
+    @classmethod
+    def _empty_similarity_threshold_to_none(cls, v: object) -> object:
+        if isinstance(v, str) and v.strip() == "":
+            return None
+        return v
 
     @property
     def effective_memory_namespace(self) -> str:

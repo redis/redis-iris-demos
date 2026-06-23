@@ -79,7 +79,10 @@ internal_tools = InternalToolService(settings)
 cs_service = ContextSurfaceService(settings)
 rag_service = SimpleRAGService(settings)
 runtime_config = domain_runtime_config(domain, settings)
-memory_service = MemoryService(settings)
+memory_service = MemoryService(
+    settings,
+    similarity_threshold=runtime_config.get("memory_similarity_threshold"),
+)
 langcache_service = LangCacheService(settings)
 guardrail_service = GuardrailService(settings, domain.manifest.guardrail)
 
@@ -586,7 +589,6 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
     agent_start = perf_counter()
     llm_total_ms = 0
     tool_total_ms = 0
-    checkpoint_errors = 0
 
     try:
         async for event in agent.astream_events(
