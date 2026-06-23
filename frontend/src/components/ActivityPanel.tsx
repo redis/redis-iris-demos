@@ -448,6 +448,7 @@ function LiveUpdatesFeed({ domain }: { domain: DomainConfig }) {
 /* ─── Conversation detail panel: All Context ─── */
 
 function RedisContextContent({
+  allMessages = [],
   memoryData,
   memoryLoading,
   onRefreshMemory,
@@ -457,6 +458,7 @@ function RedisContextContent({
   domain,
   variant = "overview",
 }: {
+  allMessages?: ChatMessage[];
   memoryData: MemoryDashboardState;
   memoryLoading: boolean;
   onRefreshMemory: () => void;
@@ -481,6 +483,20 @@ function RedisContextContent({
   const longTermCount = memoryData?.long_term?.length ?? 0;
   const shortTermCount = memoryData?.short_term?.length ?? 0;
   const cachedEntries = domain?.seed_langcache ?? [];
+  const langCacheResults = allMessages
+    .flatMap((message) => message.toolEvents)
+    .filter((event) => event.toolKind === "langcache" && event.status === "result");
+  const cacheHits = langCacheResults.filter(
+    (event) => event.toolName === "semantic_cache_search" && event.payload.hit === true
+  );
+  const cacheMisses = langCacheResults.filter(
+    (event) => event.toolName === "semantic_cache_search" && event.payload.hit === false
+  );
+  const cacheStores = langCacheResults.filter(
+    (event) => event.toolName === "semantic_cache_store" && event.payload.stored === true
+  );
+  const hasRuntimeCacheActivity = langCacheResults.length > 0;
+  const runtimeCachePreview = [...cacheStores, ...cacheHits].slice(-3).reverse();
 
   const dataSources = (
     <ExpandableCard
@@ -552,12 +568,43 @@ function RedisContextContent({
       key="langcache"
       title={<><img src="/icons/langcache-64-duotone.svg" alt="" className="card-title-icon" />LangCache</>}
       summary={
-        <>
-          <div className="overview-stat">
-            <span className="overview-stat-value overview-stat-value--sm">{cachedEntries.length}</span>
-            <span className="overview-stat-label">cached response{cachedEntries.length !== 1 ? "s" : ""}</span>
-          </div>
-          {cachedEntries.length > 0 && (
+        hasRuntimeCacheActivity ? (
+          <>
+            <div className="overview-stat-row">
+              <div className="overview-stat">
+                <span className="overview-stat-value overview-stat-value--sm">{cacheStores.length}</span>
+                <span className="overview-stat-label">stored</span>
+              </div>
+              <div className="overview-stat">
+                <span className="overview-stat-value overview-stat-value--sm">{cacheHits.length}</span>
+                <span className="overview-stat-label">hits</span>
+              </div>
+              <div className="overview-stat">
+                <span className="overview-stat-value overview-stat-value--sm">{cacheMisses.length}</span>
+                <span className="overview-stat-label">misses</span>
+              </div>
+            </div>
+            {runtimeCachePreview.length > 0 && (
+              <div className="overview-preview">
+                {runtimeCachePreview.map((event, i) => {
+                  const prompt = String(event.payload.prompt ?? event.payload.cached_prompt ?? "");
+                  const label = event.toolName === "semantic_cache_store" ? "Stored" : "Hit";
+                  return (
+                    <div key={`${event.toolName}-${i}`} className="overview-preview-item">
+                      {label}: {prompt}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="overview-stat">
+              <span className="overview-stat-value overview-stat-value--sm">{cachedEntries.length}</span>
+              <span className="overview-stat-label">preloaded response{cachedEntries.length !== 1 ? "s" : ""}</span>
+            </div>
+            {cachedEntries.length > 0 ? (
             <div className="overview-preview">
               {cachedEntries.map((e, i) => (
                 <div key={i} className="overview-preview-item">
@@ -565,8 +612,13 @@ function RedisContextContent({
                 </div>
               ))}
             </div>
-          )}
-        </>
+            ) : (
+              <div className="overview-preview">
+                <div className="overview-preview-item">Runtime cache entries appear after cache-safe answers.</div>
+              </div>
+            )}
+          </>
+        )
       }
     />
   );
@@ -731,6 +783,7 @@ export function ActivityPanel({
       <div className="activity-panel-body">
         {showOverview ? (
           <RedisContextContent
+            allMessages={allMessages}
             memoryData={memoryData}
             memoryLoading={memoryLoading}
             onRefreshMemory={onRefreshMemory}
@@ -751,6 +804,7 @@ export function ActivityPanel({
             )}
             {contextView === "redis-context" && (
               <RedisContextContent
+                allMessages={allMessages}
                 memoryData={memoryData}
                 memoryLoading={memoryLoading}
                 onRefreshMemory={onRefreshMemory}

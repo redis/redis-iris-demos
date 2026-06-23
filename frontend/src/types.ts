@@ -60,6 +60,13 @@ export type AgentMode = "context_surfaces" | "simple_rag";
 
 export type PromptCard = { eyebrow: string; title: string; prompt: string };
 
+export type DemoUser = {
+  id: string;
+  label: string;
+  subtitle?: string;
+  cache_group_id?: string;
+};
+
 export type UiConfig = {
   show_platform_surface?: boolean;
   show_live_updates?: boolean;
@@ -81,6 +88,7 @@ export type DomainConfig = {
   theme: Record<string, string>;
   logo_src: string;
   ui?: UiConfig;
+  demo_users?: DemoUser[];
   seed_langcache?: { prompt: string; response: string }[];
 } | null;
 

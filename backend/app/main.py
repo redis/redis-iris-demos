@@ -23,7 +23,7 @@ from backend.app.langcache_service import LangCacheService
 from backend.app.langgraph_agent import create_agent, create_checkpointer
 from backend.app.memory_service import MemoryService
 from backend.app.rag_service import SimpleRAGService
-from backend.app.request_context import reset_thread_id, set_thread_id
+from backend.app.request_context import reset_demo_user_id, reset_thread_id, set_demo_user_id, set_thread_id
 from backend.app.settings import get_settings
 
 logging.basicConfig(
@@ -159,10 +159,23 @@ def _logo_src(path: Path) -> str:
     return f"data:{mime_type};base64,{encoded}"
 
 
+def _demo_users() -> list[dict[str, str]]:
+    getter = getattr(domain, "get_demo_users", None)
+    if not callable(getter):
+        return []
+    users: list[dict[str, str]] = []
+    for user in getter() or []:
+        if hasattr(user, "model_dump"):
+            users.append(user.model_dump())
+        elif isinstance(user, dict):
+            users.append({str(k): str(v) for k, v in user.items()})
+    return users
+
+
 def _langcache_attribute_scopes(current_user_id: str) -> list[dict[str, str]]:
     public_scope = {"domain": domain.manifest.id, "access_class": "public"}
     legacy_scopes = []
-    if not any("access_class" in entry.attributes for entry in domain.manifest.seed_langcache):
+    if domain.manifest.seed_langcache and not any("access_class" in entry.attributes for entry in domain.manifest.seed_langcache):
         legacy_scopes.append({"domain": domain.manifest.id})
 
     resolve_demo_user = getattr(domain, "resolve_demo_user", None)
@@ -183,6 +196,47 @@ def _langcache_attribute_scopes(current_user_id: str) -> list[dict[str, str]]:
         public_scope,
         *legacy_scopes,
     ]
+
+
+def _langcache_public_scope() -> dict[str, str]:
+    return {"domain": domain.manifest.id, "access_class": "public"}
+
+
+def _langcache_group_scope(current_user_id: str) -> dict[str, str] | None:
+    for scope in _langcache_attribute_scopes(current_user_id):
+        if scope.get("access_class") == "group" and scope.get("cache_group_id"):
+            return scope
+    return None
+
+
+def _classify_internal_semantic_cache_access(tool_name: str) -> str:
+    if tool_name == "get_current_customer_support_context":
+        return "group"
+    if tool_name in {domain.manifest.identity.tool_name, "submit_card_recovery_selection"}:
+        return "non-cacheable"
+    return "ignored"
+
+
+def _classify_semantic_cache_access(tool_name: str) -> str:
+    if tool_name in _INTERNAL_NAMES:
+        return _classify_internal_semantic_cache_access(tool_name)
+
+    classifier = getattr(domain, "classify_mcp_semantic_cache_access", None)
+    if callable(classifier):
+        result = str(classifier(tool_name))
+        if result in {"public", "group", "non-cacheable", "ignored"}:
+            return result
+    return "ignored"
+
+
+def _langcache_store_attributes(current_user_id: str, access_classes: list[str]) -> dict[str, str] | None:
+    if "non-cacheable" in access_classes:
+        return None
+    if "group" in access_classes:
+        return _langcache_group_scope(current_user_id)
+    if "public" in access_classes:
+        return _langcache_public_scope()
+    return None
 
 
 _INTERNAL_NAMES = {t.name for t in internal_tools.definitions}
@@ -304,6 +358,7 @@ async def domain_config() -> JSONResponse:
         "theme": branding.theme.model_dump(),
         "logo_src": _logo_src(ROOT_DIR / branding.logo_path),
         "ui": branding.ui.model_dump(),
+        "demo_users": _demo_users(),
         "seed_langcache": [
             {"prompt": e.prompt, "response": e.response}
             for e in domain.manifest.seed_langcache
@@ -386,7 +441,8 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
     thread_id = request.thread_id or "default"
     latest_message = request.messages[-1].content if request.messages else ""
     identity = domain.manifest.identity
-    current_user_id = os.getenv(identity.id_env_var, identity.default_id)
+    current_user_id = request.demo_user_id or os.getenv(identity.id_env_var, identity.default_id)
+    demo_user_token = set_demo_user_id(current_user_id)
 
     log.info("━━━ REQUEST [thread=%s] %s", thread_id[:8], latest_message[:80])
 
@@ -434,6 +490,7 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
                 guard_result.get("distance", 0),
                 latest_message[:80],
             )
+            reset_demo_user_id(demo_user_token)
             return
 
     # ── Phase 0: Semantic cache check ──
@@ -455,6 +512,14 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
             cache_scope = candidate_scope
             if cache_result:
                 break
+            yield sse(
+                "tool-result",
+                toolName="semantic_cache_search",
+                toolKind="langcache",
+                payload={"hit": False, "attributes": candidate_scope},
+                durationMs=cache_ms,
+                ts=timer.elapsed_ms(),
+            )
 
         if cache_result:
             yield sse(
@@ -474,16 +539,10 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
             yield sse("text-delta", delta=cached_response, ts=timer.elapsed_ms())
             yield sse("done", totalElapsedMs=timer.elapsed_ms(), cacheHit=True)
             log.info("━━━ CACHE HIT in %dms (similarity=%.3f)", cache_ms, cache_result.get("similarity", 0))
+            reset_demo_user_id(demo_user_token)
             return
         else:
-            yield sse(
-                "tool-result",
-                toolName="semantic_cache_search",
-                toolKind="langcache",
-                payload={"hit": False, "attributes": cache_scope},
-                durationMs=cache_ms,
-                ts=timer.elapsed_ms(),
-            )
+            pass
 
     yield sse("status", text="Initializing agent…", ts=timer.elapsed_ms())
 
@@ -505,6 +564,7 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
     tool_calls_seen = 0
     last_thinking_step: str | None = None
     final_text = ""
+    semantic_cache_access_classes: list[str] = []
     thread_token = set_thread_id(thread_id)
 
     # ── Phase 2: Session memory write ──
@@ -662,6 +722,9 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
                 start = tool_start_times.pop(event["run_id"], perf_counter())
                 duration_ms = max(round((perf_counter() - start) * 1000), 1)
                 tool_total_ms += duration_ms
+                cache_access = _classify_semantic_cache_access(name)
+                if cache_access != "ignored":
+                    semantic_cache_access_classes.append(cache_access)
                 log.info("  tool %-40s %4dms  [%s]", name, duration_ms, _tool_kind(name))
                 yield sse("tool-result", toolName=name, toolKind=_tool_kind(name),
                            payload=output, durationMs=duration_ms, ts=timer.elapsed_ms())
@@ -716,6 +779,7 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
         yield sse("text-delta", delta=f"\n\n⚠️ {error_type}: {short_msg}")
         yield sse("done", totalElapsedMs=timer.elapsed_ms())
         reset_thread_id(thread_token)
+        reset_demo_user_id(demo_user_token)
         return
 
     agent_ms = round((perf_counter() - agent_start) * 1000)
@@ -755,8 +819,37 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
             yield sse("status", text=f"Assistant memory logging unavailable: {exc}", ts=timer.elapsed_ms())
     phases.append(("memory_save", timer.phase("Assistant memory save")))
 
+    # ── Phase 8: Save cache-safe assistant response to LangCache ──
+    if langcache_service.is_configured() and final_text.strip():
+        store_attributes = _langcache_store_attributes(current_user_id, semantic_cache_access_classes)
+        if store_attributes:
+            yield sse(
+                "tool-call",
+                toolName="semantic_cache_store",
+                toolKind="langcache",
+                payload={"prompt": latest_message.strip(), "attributes": store_attributes},
+                ts=timer.elapsed_ms(),
+            )
+            store_start = perf_counter()
+            stored = await langcache_service.store(
+                latest_message.strip(),
+                final_text.strip(),
+                attributes=store_attributes,
+            )
+            store_ms = max(round((perf_counter() - store_start) * 1000), 1)
+            yield sse(
+                "tool-result",
+                toolName="semantic_cache_store",
+                toolKind="langcache",
+                payload={"stored": stored, "attributes": store_attributes},
+                durationMs=store_ms,
+                ts=timer.elapsed_ms(),
+            )
+            phases.append(("langcache_store", timer.phase("LangCache store")))
+
     yield sse("done", totalElapsedMs=timer.elapsed_ms())
     reset_thread_id(thread_token)
+    reset_demo_user_id(demo_user_token)
 
     # ── Request summary ──
     total = timer.elapsed_ms()

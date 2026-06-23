@@ -35,6 +35,7 @@ export default function App() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [threadId, setThreadId] = useState(() => crypto.randomUUID());
+  const [selectedUserId, setSelectedUserId] = useState("");
 
   const [activityPanelOpen, setActivityPanelOpen] = useState(false);
   const [contextView, setContextView] = useState<RedisContextView>("activity");
@@ -70,6 +71,7 @@ export default function App() {
         .then((p: DomainConfig) => {
           if (!cancelled) {
             setDomain(p);
+            setSelectedUserId((current) => current || p?.demo_users?.[0]?.id || "");
             void loadMemoryDashboard();
             void loadTools();
           }
@@ -180,6 +182,15 @@ export default function App() {
     autoOpenedRef.current = false;
   }
 
+  function handleUserChange(newUserId: string) {
+    setSelectedUserId(newUserId);
+    setMessages([]);
+    setInput("");
+    setThreadId(crypto.randomUUID());
+    setActivityPanelOpen(false);
+    autoOpenedRef.current = false;
+  }
+
   async function submitPrompt(prompt: string, event?: FormEvent) {
     event?.preventDefault();
     const trimmed = prompt.trim();
@@ -206,6 +217,7 @@ export default function App() {
           messages: nextMessages.map(({ role, content }) => ({ role, content })),
           mode,
           thread_id: threadId,
+          demo_user_id: selectedUserId || undefined,
         }),
       });
 
@@ -319,6 +331,8 @@ export default function App() {
 
   const backendReady = domain !== null && !memoryLoading && !toolsLoading;
   const allQuickStarts = domain?.starter_prompts ?? [];
+  const demoUsers = domain?.demo_users ?? [];
+  const selectedUser = demoUsers.find((user) => user.id === selectedUserId);
 
   function handleGoHome() {
     setMessages([]);
@@ -349,6 +363,25 @@ export default function App() {
           </div>
         </div>
         <div className="topbar-actions">
+          {demoUsers.length > 0 && (
+            <label className="topbar-user-select">
+              <span className="topbar-user-label">Customer</span>
+              <select
+                value={selectedUserId}
+                onChange={(event) => handleUserChange(event.target.value)}
+                aria-label="Select demo customer"
+              >
+                {demoUsers.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.label}{user.subtitle ? ` · ${user.subtitle}` : ""}
+                  </option>
+                ))}
+              </select>
+              {selectedUser?.cache_group_id && (
+                <span className="topbar-user-scope">{selectedUser.cache_group_id}</span>
+              )}
+            </label>
+          )}
           <button
             className={`topbar-context-btn ${activityPanelOpen ? "active" : ""}`}
             onClick={handleToggleRedisContext}

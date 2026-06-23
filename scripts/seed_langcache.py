@@ -41,11 +41,6 @@ async def main() -> None:
         print("LangCache not configured (skipping). Set LANGCACHE_HOST, LANGCACHE_CACHE_ID, LANGCACHE_API_KEY to enable.")
         return
 
-    seeds = domain.manifest.seed_langcache
-    if not seeds:
-        print(f"Domain '{domain.manifest.id}' has no seed_langcache defined. Nothing to do.")
-        return
-
     print(f"Domain: {domain.manifest.id}")
     if should_flush_before_seed():
         print("Flushing existing LangCache entries...")
@@ -53,6 +48,12 @@ async def main() -> None:
         print(f"  {'OK' if flushed else 'FAILED (continuing anyway)'}")
     else:
         print("Leaving existing LangCache entries in place. Set LANGCACHE_FLUSH_BEFORE_SEED=1 to flush first.")
+
+    seeds = domain.manifest.seed_langcache
+    if not seeds:
+        print(f"Domain '{domain.manifest.id}' has no seed_langcache defined. Nothing to seed.")
+        await service.close()
+        return
 
     print(f"Seeding {len(seeds)} entries...")
     for entry in seeds:
