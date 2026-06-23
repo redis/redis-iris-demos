@@ -84,7 +84,7 @@ class Settings(BaseSettings):
 
     @field_validator("memory_similarity_threshold", mode="before")
     @classmethod
-    def _empty_memory_similarity_threshold_to_unset(cls, v: object) -> object:
+    def _empty_similarity_threshold_to_none(cls, v: object) -> object:
         if isinstance(v, str) and v.strip() == "":
             return None
         return v
