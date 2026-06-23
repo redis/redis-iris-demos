@@ -42,6 +42,7 @@ type ActivityPanelProps = {
   toolsLoading: boolean;
   mode: AgentMode;
   domain: DomainConfig;
+  isStreaming: boolean;
 };
 
 function ChevronIcon({ open, className }: { open: boolean; className?: string }) {
@@ -65,6 +66,7 @@ function ToolRow({
   callPayload,
   resultPayload,
   isComplete,
+  isStreaming = false,
 }: {
   name: string;
   kind?: string;
@@ -72,10 +74,26 @@ function ToolRow({
   callPayload?: Record<string, unknown>;
   resultPayload?: Record<string, unknown>;
   isComplete: boolean;
+  isStreaming?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
   const isDemoBlocked = resultPayload?.demo_blocked === true;
-  const statusClass = isDemoBlocked ? "blocked" : isComplete ? "done" : "running";
+  const hasError =
+    !!resultPayload &&
+    typeof resultPayload === "object" &&
+    !Array.isArray(resultPayload) &&
+    "error" in resultPayload;
+  // No result and the stream is done → the tool never reported back.
+  const isMissing = !isComplete && !isStreaming;
+  const statusClass = isDemoBlocked
+    ? "blocked"
+    : hasError
+    ? "error"
+    : isComplete
+    ? "done"
+    : isMissing
+    ? "missing"
+    : "running";
   return (
     <div className="activity-tool-row">
       <button
@@ -84,7 +102,7 @@ function ToolRow({
         type="button"
       >
         <span className={`activity-tool-status ${statusClass}`}>
-          {isDemoBlocked ? (
+          {isDemoBlocked || hasError ? (
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.3" />
               <path d="M7 4.5V7.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
@@ -94,6 +112,11 @@ function ToolRow({
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.3" />
               <path d="M4 7L6 9L10 5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          ) : isMissing ? (
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.3" />
+              <path d="M4.5 7H9.5" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
             </svg>
           ) : (
             <span className="activity-tool-spinner" />
@@ -130,13 +153,19 @@ function ToolRow({
               <pre>{JSON.stringify(resultPayload, null, 2)}</pre>
             </div>
           )}
+          {isMissing && (
+            <div className="activity-tool-section">
+              <div className="activity-tool-section-label">Result</div>
+              <pre>No tool response was emitted before the stream completed.</pre>
+            </div>
+          )}
         </div>
       )}
     </div>
   );
 }
 
-function ActivityView({ allMessages, mode }: { allMessages: ChatMessage[]; mode: AgentMode }) {
+function ActivityView({ allMessages, mode, isStreaming }: { allMessages: ChatMessage[]; mode: AgentMode; isStreaming: boolean }) {
   const latestAssistant = [...allMessages]
     .reverse()
     .find((m) => m.role === "assistant");
@@ -171,6 +200,7 @@ function ActivityView({ allMessages, mode }: { allMessages: ChatMessage[]; mode:
                 callPayload={tool.callPayload}
                 resultPayload={tool.resultPayload}
                 isComplete={tool.resultPayload !== undefined}
+                isStreaming={isStreaming}
               />
             ))}
           </section>
@@ -192,6 +222,7 @@ function ActivityView({ allMessages, mode }: { allMessages: ChatMessage[]; mode:
                 callPayload={tool.callPayload}
                 resultPayload={tool.resultPayload}
                 isComplete={tool.resultPayload !== undefined}
+                isStreaming={isStreaming}
               />
             ))}
           </section>
@@ -234,6 +265,7 @@ function ActivityView({ allMessages, mode }: { allMessages: ChatMessage[]; mode:
               callPayload={tool.callPayload}
               resultPayload={tool.resultPayload}
               isComplete={tool.resultPayload !== undefined}
+              isStreaming={isStreaming}
             />
           ))}
         </section>
@@ -256,6 +288,7 @@ function ActivityView({ allMessages, mode }: { allMessages: ChatMessage[]; mode:
               callPayload={tool.callPayload}
               resultPayload={tool.resultPayload}
               isComplete={tool.resultPayload !== undefined}
+              isStreaming={isStreaming}
             />
           ))}
         </section>
@@ -276,6 +309,7 @@ function ActivityView({ allMessages, mode }: { allMessages: ChatMessage[]; mode:
               callPayload={tool.callPayload}
               resultPayload={tool.resultPayload}
               isComplete={tool.resultPayload !== undefined}
+              isStreaming={isStreaming}
             />
           ))}
         </section>
@@ -298,6 +332,7 @@ function ActivityView({ allMessages, mode }: { allMessages: ChatMessage[]; mode:
               callPayload={tool.callPayload}
               resultPayload={tool.resultPayload}
               isComplete={tool.resultPayload !== undefined}
+              isStreaming={isStreaming}
             />
           ))}
         </section>
@@ -674,6 +709,7 @@ export function ActivityPanel({
   toolsLoading,
   mode,
   domain,
+  isStreaming,
 }: ActivityPanelProps) {
   const hasMessages = allMessages.length > 0;
   const isRag = mode === "simple_rag";
@@ -740,12 +776,12 @@ export function ActivityPanel({
             domain={domain}
           />
         ) : isRag ? (
-          <ActivityView allMessages={allMessages} mode={mode} />
+          <ActivityView allMessages={allMessages} mode={mode} isStreaming={isStreaming} />
         ) : (
           <>
             {contextView === "activity" && (
               <>
-                <ActivityView allMessages={allMessages} mode={mode} />
+                <ActivityView allMessages={allMessages} mode={mode} isStreaming={isStreaming} />
                 <LiveUpdatesFeed domain={domain} />
               </>
             )}

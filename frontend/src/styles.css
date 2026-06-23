@@ -1039,6 +1039,14 @@ button { cursor: pointer; border: none; background: none; }
   color: #e09520;
 }
 
+.activity-tool-status.error {
+  color: #e5484d;
+}
+
+.activity-tool-status.missing {
+  color: var(--color-text-tertiary);
+}
+
 .demo-notice {
   padding: 4px 0 4px 26px;
   font-size: 0.78rem;
