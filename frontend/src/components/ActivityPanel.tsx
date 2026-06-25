@@ -496,7 +496,24 @@ function RedisContextContent({
     (event) => event.toolName === "semantic_cache_store" && event.payload.stored === true
   );
   const hasRuntimeCacheActivity = langCacheResults.length > 0;
-  const runtimeCachePreview = [...cacheStores, ...cacheHits].slice(-3).reverse();
+  const runtimeCachePreview = allMessages
+    .flatMap((message) => mergeToolEvents(message.toolEvents))
+    .filter((event) => {
+      if (event.toolName === "semantic_cache_store") {
+        return event.resultPayload?.stored === true;
+      }
+      return event.toolName === "semantic_cache_search" && event.resultPayload?.hit === true;
+    })
+    .map((event) => ({
+      toolName: event.toolName,
+      prompt: String(
+        event.toolName === "semantic_cache_store"
+          ? event.callPayload?.prompt ?? ""
+          : event.resultPayload?.cached_prompt ?? ""
+      ),
+    }))
+    .slice(-3)
+    .reverse();
 
   const dataSources = (
     <ExpandableCard
@@ -587,11 +604,10 @@ function RedisContextContent({
             {runtimeCachePreview.length > 0 && (
               <div className="overview-preview">
                 {runtimeCachePreview.map((event, i) => {
-                  const prompt = String(event.payload.prompt ?? event.payload.cached_prompt ?? "");
                   const label = event.toolName === "semantic_cache_store" ? "Stored" : "Hit";
                   return (
                     <div key={`${event.toolName}-${i}`} className="overview-preview-item">
-                      {label}: {prompt}
+                      {label}: {event.prompt}
                     </div>
                   );
                 })}
