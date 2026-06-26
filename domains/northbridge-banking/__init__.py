@@ -1,0 +1,1 @@
+"""Northbridge Banking domain."""

@@ -1613,6 +1613,17 @@ button { cursor: pointer; border: none; background: none; }
     width: 25%;
     opacity: 0.6;
   }
+
+  .topbar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .topbar-actions {
+    flex: 1 1 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
 }
 
 @media (max-width: 600px) {

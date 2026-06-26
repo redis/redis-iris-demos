@@ -383,11 +383,17 @@ class AirlineSupportDomain:
         del arguments
         if tool_name == self.manifest.identity.tool_name:
             identity = self.manifest.identity
-            profile = self.resolve_demo_user(get_demo_user_id() or os.getenv(identity.id_env_var)) or DEMO_PROFILE
+            request_demo_user_id = get_demo_user_id()
+            profile = self.resolve_demo_user(request_demo_user_id or os.getenv(identity.id_env_var)) or DEMO_PROFILE
+            display_name = str(profile.get("display_name", identity.default_name))
+            email = str(profile.get("email", identity.default_email))
+            if not request_demo_user_id:
+                display_name = os.getenv(identity.name_env_var, display_name)
+                email = os.getenv(identity.email_env_var, email)
             return {
                 identity.id_field: str(profile.get(identity.id_field, identity.default_id)),
-                "display_name": os.getenv(identity.name_env_var, str(profile.get("display_name", identity.default_name))),
-                "email": os.getenv(identity.email_env_var, str(profile.get("email", identity.default_email))),
+                "display_name": display_name,
+                "email": email,
                 "profile_reference": str(profile.get("profile_reference", DEMO_PROFILE["profile_reference"])),
                 "ticket_name_masked": str(profile.get("ticket_name_masked", DEMO_PROFILE["ticket_name_masked"])),
                 "loyalty_member_id_masked": str(

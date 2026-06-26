@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 590 817">
+  <!-- Northbridge Bank left background: card security and support routing -->
+
+  <g transform="rotate(-6 95 130)">
+    <rect x="-24" y="48" width="225" height="142" rx="14" fill="#dceefb" opacity=".58"/>
+    <rect x="-24" y="48" width="225" height="142" rx="14" fill="none" stroke="#1499e6" stroke-width="1.1" opacity=".22"/>
+    <rect x="-4" y="72" width="80" height="4" rx="2" fill="#35556f" opacity=".26"/>
+    <rect x="-4" y="92" width="118" height="7" rx="3.5" fill="#35556f" opacity=".34"/>
+    <rect x="-4" y="122" width="34" height="4" rx="2" fill="#35556f" opacity=".22"/>
+    <rect x="42" y="122" width="34" height="4" rx="2" fill="#35556f" opacity=".20"/>
+    <rect x="88" y="122" width="34" height="4" rx="2" fill="#35556f" opacity=".18"/>
+    <rect x="134" y="122" width="34" height="4" rx="2" fill="#35556f" opacity=".16"/>
+    <rect x="-4" y="148" width="76" height="3" rx="1.5" fill="#607a95" opacity=".24"/>
+    <rect x="128" y="142" width="48" height="24" rx="7" fill="#1499e6" opacity=".14"/>
+    <path d="M151 148v-8c0-7 5-12 12-12s12 5 12 12v8" fill="none" stroke="#1499e6" stroke-width="2" opacity=".30"/>
+    <rect x="145" y="148" width="36" height="24" rx="6" fill="#1499e6" opacity=".22"/>
+    <circle cx="163" cy="160" r="3" fill="#0c2f4f" opacity=".24"/>
+  </g>
+
+  <g transform="translate(8 285)">
+    <rect x="0" y="0" width="210" height="238" rx="13" fill="#ffffff" opacity=".52"/>
+    <rect x="0" y="0" width="210" height="238" rx="13" fill="none" stroke="#1499e6" stroke-width=".8" opacity=".17"/>
+    <rect x="18" y="18" width="116" height="5" rx="2.5" fill="#35556f" opacity=".30"/>
+    <line x1="18" y1="38" x2="192" y2="38" stroke="#1499e6" stroke-width=".7" opacity=".16"/>
+
+    <g transform="translate(18 60)">
+      <circle cx="11" cy="11" r="11" fill="#1499e6" opacity=".16"/>
+      <path d="M7 12l3 3 6-8" fill="none" stroke="#1499e6" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity=".42"/>
+      <rect x="34" y="4" width="86" height="4" rx="2" fill="#35556f" opacity=".28"/>
+      <rect x="34" y="15" width="124" height="3" rx="1.5" fill="#607a95" opacity=".18"/>
+      <rect x="150" y="2" width="36" height="14" rx="7" fill="#1499e6" opacity=".13"/>
+    </g>
+
+    <g transform="translate(18 110)">
+      <circle cx="11" cy="11" r="11" fill="#dceefb" opacity=".70"/>
+      <path d="M6 10h10M11 5v10" stroke="#1499e6" stroke-width="1.7" stroke-linecap="round" opacity=".35"/>
+      <rect x="34" y="4" width="102" height="4" rx="2" fill="#35556f" opacity=".26"/>
+      <rect x="34" y="15" width="92" height="3" rx="1.5" fill="#607a95" opacity=".17"/>
+      <rect x="150" y="2" width="36" height="14" rx="7" fill="#35556f" opacity=".12"/>
+    </g>
+
+    <g transform="translate(18 160)">
+      <circle cx="11" cy="11" r="11" fill="#4ebcff" opacity=".16"/>
+      <path d="M6 12c4-7 12-7 16 0" fill="none" stroke="#1499e6" stroke-width="1.5" stroke-linecap="round" opacity=".34"/>
+      <rect x="34" y="4" width="92" height="4" rx="2" fill="#35556f" opacity=".24"/>
+      <rect x="34" y="15" width="112" height="3" rx="1.5" fill="#607a95" opacity=".16"/>
+      <rect x="150" y="2" width="36" height="14" rx="7" fill="#1499e6" opacity=".12"/>
+    </g>
+  </g>
+
+  <g transform="rotate(10 88 690)">
+    <rect x="-28" y="610" width="204" height="126" rx="13" fill="#dceefb" opacity=".56"/>
+    <rect x="-28" y="610" width="204" height="126" rx="13" fill="none" stroke="#1499e6" stroke-width="1" opacity=".22"/>
+    <rect x="-2" y="638" width="24" height="18" rx="4" fill="#f3c74f" opacity=".24"/>
+    <line x1="-2" y1="680" x2="142" y2="680" stroke="#35556f" stroke-width="5" stroke-linecap="round" opacity=".25"/>
+    <rect x="-2" y="704" width="78" height="4" rx="2" fill="#607a95" opacity=".24"/>
+    <rect x="118" y="698" width="36" height="22" rx="7" fill="#1499e6" opacity=".15"/>
+    <path d="M132 706l6 6 11-13" fill="none" stroke="#1499e6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".42"/>
+  </g>
+
+  <circle cx="30" cy="250" r="3" fill="#1499e6" opacity=".18"/>
+  <circle cx="172" cy="560" r="2" fill="#4ebcff" opacity=".20"/>
+  <circle cx="52" cy="790" r="3" fill="#1499e6" opacity=".15"/>
+</svg>

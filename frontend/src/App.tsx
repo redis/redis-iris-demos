@@ -194,6 +194,7 @@ export default function App() {
   function handleDemoUserChange(userId: string) {
     setSelectedDemoUserId(userId);
     setMessages([]);
+    setInput("");
     setThreadId(crypto.randomUUID());
     setActivityPanelOpen(false);
     autoOpenedRef.current = false;
