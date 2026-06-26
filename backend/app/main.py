@@ -363,13 +363,14 @@ async def domain_config() -> JSONResponse:
             {"prompt": e.prompt, "response": e.response}
             for e in domain.manifest.seed_langcache
         ],
+        "demo_users": domain.get_demo_users() if callable(getattr(domain, "get_demo_users", None)) else [],
     })
 
 
 @app.get("/api/memory/dashboard")
-async def memory_dashboard(thread_id: str | None = None) -> JSONResponse:
+async def memory_dashboard(thread_id: str | None = None, demo_user_id: str | None = None) -> JSONResponse:
     identity = domain.manifest.identity
-    current_user_id = os.getenv(identity.id_env_var, identity.default_id)
+    current_user_id = demo_user_id or os.getenv(identity.id_env_var, identity.default_id)
     if not memory_service.is_configured():
         return JSONResponse(
             {

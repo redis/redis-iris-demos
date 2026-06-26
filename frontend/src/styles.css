@@ -213,46 +213,6 @@ button { cursor: pointer; border: none; background: none; }
   gap: 8px;
 }
 
-.topbar-user-select {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 38px;
-  padding: 5px 8px 5px 12px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.86);
-  color: var(--color-text-primary);
-}
-
-.topbar-user-label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: var(--color-text-tertiary);
-  text-transform: uppercase;
-}
-
-.topbar-user-select select {
-  max-width: 220px;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--color-text-primary);
-  font-size: 0.88rem;
-  font-weight: 650;
-}
-
-.topbar-user-scope {
-  padding: 2px 7px;
-  border-radius: var(--radius-pill);
-  background: var(--color-redis-soft);
-  color: var(--color-text-secondary);
-  font-size: 0.72rem;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
 .topbar-context-btn {
   display: inline-flex;
   align-items: center;
@@ -286,6 +246,50 @@ button { cursor: pointer; border: none; background: none; }
   border-radius: 4px;
   object-fit: contain;
   flex-shrink: 0;
+}
+
+.topbar-demo-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 38px;
+  padding: 0 10px 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.topbar-demo-user span:first-child {
+  color: var(--color-text-tertiary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.topbar-demo-user select {
+  max-width: 290px;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+
+.topbar-demo-user-badge {
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 4px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--color-redis-soft);
+  color: var(--color-text-secondary);
+  font-size: 0.72rem;
+  font-weight: 700;
 }
 
 /* ── Empty State ─────────────────────────────────────── */
@@ -1626,15 +1630,5 @@ button { cursor: pointer; border: none; background: none; }
   .shell--landing::before,
   .shell--landing::after {
     display: none;
-  }
-
-  .topbar-user-select {
-    width: 100%;
-  }
-
-  .topbar-user-select select {
-    flex: 1;
-    max-width: none;
-    min-width: 0;
   }
 }

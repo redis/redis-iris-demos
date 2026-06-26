@@ -24,6 +24,7 @@ from backend.app.core.domain_contract import (
 )
 from backend.app.core.domain_schema import EntitySpec, validate_entity_specs
 from backend.app.redis_connection import create_redis_client
+from backend.app.request_context import get_demo_user_id
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -382,11 +383,17 @@ class AirlineSupportDomain:
         del arguments
         if tool_name == self.manifest.identity.tool_name:
             identity = self.manifest.identity
-            profile = self.resolve_demo_user(os.getenv(identity.id_env_var)) or DEMO_PROFILE
+            request_demo_user_id = get_demo_user_id()
+            profile = self.resolve_demo_user(request_demo_user_id or os.getenv(identity.id_env_var)) or DEMO_PROFILE
+            display_name = str(profile.get("display_name", identity.default_name))
+            email = str(profile.get("email", identity.default_email))
+            if not request_demo_user_id:
+                display_name = os.getenv(identity.name_env_var, display_name)
+                email = os.getenv(identity.email_env_var, email)
             return {
                 identity.id_field: str(profile.get(identity.id_field, identity.default_id)),
-                "display_name": os.getenv(identity.name_env_var, str(profile.get("display_name", identity.default_name))),
-                "email": os.getenv(identity.email_env_var, str(profile.get("email", identity.default_email))),
+                "display_name": display_name,
+                "email": email,
                 "profile_reference": str(profile.get("profile_reference", DEMO_PROFILE["profile_reference"])),
                 "ticket_name_masked": str(profile.get("ticket_name_masked", DEMO_PROFILE["ticket_name_masked"])),
                 "loyalty_member_id_masked": str(
@@ -406,7 +413,7 @@ class AirlineSupportDomain:
                 "cache_group_id": str(profile.get("cache_group_id", DEMO_PROFILE["cache_group_id"])),
             }
         if tool_name == "get_current_service_tier_context":
-            profile = self.resolve_demo_user(os.getenv(self.manifest.identity.id_env_var)) or DEMO_PROFILE
+            profile = self.resolve_demo_user(get_demo_user_id() or os.getenv(self.manifest.identity.id_env_var)) or DEMO_PROFILE
             return {
                 "status_tier": str(profile.get("status_tier", DEMO_PROFILE["status_tier"])),
                 "preferred_language": str(profile.get("preferred_language", DEMO_PROFILE["preferred_language"])),

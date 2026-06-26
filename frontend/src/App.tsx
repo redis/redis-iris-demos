@@ -35,7 +35,7 @@ export default function App() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [threadId, setThreadId] = useState(() => crypto.randomUUID());
-  const [selectedUserId, setSelectedUserId] = useState("");
+  const [selectedDemoUserId, setSelectedDemoUserId] = useState<string | null>(null);
 
   const [activityPanelOpen, setActivityPanelOpen] = useState(false);
   const [contextView, setContextView] = useState<RedisContextView>("activity");
@@ -71,7 +71,12 @@ export default function App() {
         .then((p: DomainConfig) => {
           if (!cancelled) {
             setDomain(p);
-            setSelectedUserId((current) => current || p?.demo_users?.[0]?.id || "");
+            setSelectedDemoUserId((current) => {
+              const users = p?.demo_users ?? [];
+              return current && users.some((user) => user.id === current)
+                ? current
+                : users[0]?.id ?? null;
+            });
             void loadMemoryDashboard();
             void loadTools();
           }
@@ -111,6 +116,8 @@ export default function App() {
     };
   }, [domain]);
 
+  const selectedDemoUser = domain?.demo_users?.find((user) => user.id === selectedDemoUserId);
+
   useEffect(() => {
     if (autoOpenedRef.current || !hasMessages) return;
     let latest: ChatMessage | undefined;
@@ -128,7 +135,9 @@ export default function App() {
     setMemoryLoading(true);
     try {
       const response = await fetch(
-        `${apiUrl("/api/memory/dashboard")}?thread_id=${encodeURIComponent(threadId)}`
+        `${apiUrl("/api/memory/dashboard")}?thread_id=${encodeURIComponent(threadId)}${
+          selectedDemoUserId ? `&demo_user_id=${encodeURIComponent(selectedDemoUserId)}` : ""
+        }`
       );
       setMemoryData(await response.json());
     } catch {
@@ -182,8 +191,8 @@ export default function App() {
     autoOpenedRef.current = false;
   }
 
-  function handleUserChange(newUserId: string) {
-    setSelectedUserId(newUserId);
+  function handleDemoUserChange(userId: string) {
+    setSelectedDemoUserId(userId);
     setMessages([]);
     setInput("");
     setThreadId(crypto.randomUUID());
@@ -217,7 +226,7 @@ export default function App() {
           messages: nextMessages.map(({ role, content }) => ({ role, content })),
           mode,
           thread_id: threadId,
-          demo_user_id: selectedUserId || undefined,
+          demo_user_id: selectedDemoUserId,
         }),
       });
 
@@ -331,8 +340,6 @@ export default function App() {
 
   const backendReady = domain !== null && !memoryLoading && !toolsLoading;
   const allQuickStarts = domain?.starter_prompts ?? [];
-  const demoUsers = domain?.demo_users ?? [];
-  const selectedUser = demoUsers.find((user) => user.id === selectedUserId);
 
   function handleGoHome() {
     setMessages([]);
@@ -363,22 +370,22 @@ export default function App() {
           </div>
         </div>
         <div className="topbar-actions">
-          {demoUsers.length > 0 && (
-            <label className="topbar-user-select">
-              <span className="topbar-user-label">Customer</span>
+          {domain?.demo_users && domain.demo_users.length > 0 && selectedDemoUser && (
+            <label className="topbar-demo-user">
+              <span>Customer</span>
               <select
-                value={selectedUserId}
-                onChange={(event) => handleUserChange(event.target.value)}
+                value={selectedDemoUserId ?? ""}
+                onChange={(event) => handleDemoUserChange(event.target.value)}
                 aria-label="Select demo customer"
               >
-                {demoUsers.map((user) => (
+                {domain.demo_users.map((user) => (
                   <option key={user.id} value={user.id}>
-                    {user.label}{user.subtitle ? ` · ${user.subtitle}` : ""}
+                    {user.label}{user.subtitle ? ` • ${user.subtitle}` : ""}
                   </option>
                 ))}
               </select>
-              {selectedUser?.cache_group_id && (
-                <span className="topbar-user-scope">{selectedUser.cache_group_id}</span>
+              {selectedDemoUser.cache_group_id && (
+                <span className="topbar-demo-user-badge">{selectedDemoUser.cache_group_id}</span>
               )}
             </label>
           )}

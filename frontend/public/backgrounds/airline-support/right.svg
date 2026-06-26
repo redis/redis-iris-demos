@@ -1,0 +1,55 @@
+<svg width="632" height="817" viewBox="0 0 632 817" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="632" height="817" fill="#EAF5FF"/>
+  <circle cx="512" cy="126" r="108" fill="#78C5FF" fill-opacity="0.16"/>
+  <circle cx="388" cy="672" r="164" fill="#FFD37A" fill-opacity="0.14"/>
+  <path d="M632 236C536 184 424 186 288 238C170 284 76 276 0 232V817H632V236Z" fill="#DDF0FF"/>
+
+  <g opacity="0.66" fill="none" stroke-linecap="round">
+    <path d="M0 122C168 242 340 220 650 88" stroke="#FFC44F" stroke-width="28"/>
+    <path d="M0 122C168 242 340 220 650 88" stroke="#FFF5D8" stroke-width="8"/>
+    <path d="M70 730C228 604 406 584 676 426" stroke="#FFC44F" stroke-width="26"/>
+    <path d="M70 730C228 604 406 584 676 426" stroke="#FFF5D8" stroke-width="7"/>
+  </g>
+
+  <g opacity="0.96">
+    <rect x="248" y="140" width="318" height="212" rx="28" transform="rotate(6 248 140)" fill="#FFFFFF"/>
+    <rect x="248" y="140" width="318" height="212" rx="28" transform="rotate(6 248 140)" stroke="#C7DFF6"/>
+    <rect x="282" y="172" width="250" height="42" rx="12" transform="rotate(6 282 172)" fill="#06233F"/>
+    <text x="304" y="202" transform="rotate(6 304 202)" fill="#B9F3FF" font-family="'IBM Plex Mono', Menlo, monospace" font-size="18">DEPARTURES</text>
+    <g font-family="'IBM Plex Mono', Menlo, monospace" font-size="17">
+      <text x="296" y="256" transform="rotate(6 296 256)" fill="#24425F">ZX018</text>
+      <text x="386" y="266" transform="rotate(6 386 266)" fill="#24425F">HAM</text>
+      <text x="480" y="276" transform="rotate(6 480 276)" fill="#0B77D8">ON TIME</text>
+      <text x="292" y="300" transform="rotate(6 292 300)" fill="#24425F">ZX406</text>
+      <text x="382" y="310" transform="rotate(6 382 310)" fill="#24425F">JFK</text>
+      <text x="478" y="320" transform="rotate(6 478 320)" fill="#FF8A3D">REBOOKED</text>
+      <text x="288" y="344" transform="rotate(6 288 344)" fill="#24425F">ZX402</text>
+      <text x="378" y="354" transform="rotate(6 378 354)" fill="#24425F">JFK</text>
+      <text x="476" y="364" transform="rotate(6 476 364)" fill="#D9271E">CANCELLED</text>
+    </g>
+  </g>
+
+  <g opacity="0.95">
+    <ellipse cx="376" cy="596" rx="238" ry="132" transform="rotate(-7 376 596)" fill="#FFFFFF" stroke="#B9D8F5" stroke-width="4"/>
+    <path d="M174 634C300 560 438 550 586 598C474 696 304 710 174 634Z" fill="#DDF0FF"/>
+    <path d="M284 634C390 588 486 586 570 618" stroke="#0B77D8" stroke-width="20" opacity="0.78"/>
+    <circle cx="344" cy="542" r="26" fill="#CFE8FF"/>
+    <circle cx="424" cy="526" r="26" fill="#CFE8FF"/>
+    <circle cx="506" cy="532" r="26" fill="#CFE8FF"/>
+    <path d="M468 660L628 714L492 756L354 694L468 660Z" fill="#FFFFFF" stroke="#B9D8F5" stroke-width="3"/>
+  </g>
+
+  <g opacity="0.7">
+    <path d="M74 438C116 382 186 354 256 368C326 382 382 438 394 508C296 468 184 476 74 438Z" fill="#FFFFFF" stroke="#C7DFF6"/>
+    <path d="M112 436C206 404 298 416 366 480" stroke="#0B77D8" stroke-width="12" opacity="0.42"/>
+    <path d="M122 470L310 454" stroke="#C7DFF6" stroke-width="6" stroke-linecap="round"/>
+  </g>
+
+  <rect width="178" height="817" fill="url(#fadeRight)"/>
+  <defs>
+    <linearGradient id="fadeRight" x1="178" y1="408.5" x2="0" y2="408.5" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EAF5FF" stop-opacity="0"/>
+      <stop offset="1" stop-color="#EAF5FF"/>
+    </linearGradient>
+  </defs>
+</svg>
