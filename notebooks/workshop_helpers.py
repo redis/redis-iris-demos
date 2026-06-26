@@ -908,8 +908,10 @@ async def chat_turn(
         )
         trace.append(f"Long-term memory: {len(long_term_memories)} match(es)")
 
+    prior_events = session_events[:-1] if session_events else []
+
     context_sections: list[str] = []
-    short_term_context = _short_term_memory_context(session_events)
+    short_term_context = _short_term_memory_context(prior_events)
     long_term_context = _long_term_memory_context(long_term_memories)
     if short_term_context:
         context_sections.append(f"Short-term memory:\n{short_term_context}")
@@ -935,7 +937,6 @@ async def chat_turn(
     llm_with_tools = llm.bind_tools(tools)
 
     messages: list[Any] = [SystemMessage(content=system_prompt)]
-    prior_events = session_events[:-1] if session_events else []
     messages.extend(_session_messages(prior_events))
     messages.append(HumanMessage(content=enriched_message))
 
@@ -986,7 +987,7 @@ async def chat_turn(
         assistant_message=final_text,
         cache_hit=False,
         long_term_memory_count=len(long_term_memories),
-        session_event_count=len(session_events) + (2 if memory_service.is_configured() else 0),
+        session_event_count=len(session_events) + (1 if memory_service.is_configured() else 0),
         tool_calls=tool_names,
         trace=trace,
     )
