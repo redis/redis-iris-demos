@@ -35,6 +35,7 @@ export default function App() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [threadId, setThreadId] = useState(() => crypto.randomUUID());
+  const [selectedDemoUserId, setSelectedDemoUserId] = useState<string | null>(null);
 
   const [activityPanelOpen, setActivityPanelOpen] = useState(false);
   const [contextView, setContextView] = useState<RedisContextView>("activity");
@@ -70,6 +71,12 @@ export default function App() {
         .then((p: DomainConfig) => {
           if (!cancelled) {
             setDomain(p);
+            setSelectedDemoUserId((current) => {
+              const users = p?.demo_users ?? [];
+              return current && users.some((user) => user.id === current)
+                ? current
+                : users[0]?.id ?? null;
+            });
             void loadMemoryDashboard();
             void loadTools();
           }
@@ -109,6 +116,8 @@ export default function App() {
     };
   }, [domain]);
 
+  const selectedDemoUser = domain?.demo_users?.find((user) => user.id === selectedDemoUserId);
+
   useEffect(() => {
     if (autoOpenedRef.current || !hasMessages) return;
     let latest: ChatMessage | undefined;
@@ -126,7 +135,9 @@ export default function App() {
     setMemoryLoading(true);
     try {
       const response = await fetch(
-        `${apiUrl("/api/memory/dashboard")}?thread_id=${encodeURIComponent(threadId)}`
+        `${apiUrl("/api/memory/dashboard")}?thread_id=${encodeURIComponent(threadId)}${
+          selectedDemoUserId ? `&demo_user_id=${encodeURIComponent(selectedDemoUserId)}` : ""
+        }`
       );
       setMemoryData(await response.json());
     } catch {
@@ -180,6 +191,14 @@ export default function App() {
     autoOpenedRef.current = false;
   }
 
+  function handleDemoUserChange(userId: string) {
+    setSelectedDemoUserId(userId);
+    setMessages([]);
+    setThreadId(crypto.randomUUID());
+    setActivityPanelOpen(false);
+    autoOpenedRef.current = false;
+  }
+
   async function submitPrompt(prompt: string, event?: FormEvent) {
     event?.preventDefault();
     const trimmed = prompt.trim();
@@ -206,6 +225,7 @@ export default function App() {
           messages: nextMessages.map(({ role, content }) => ({ role, content })),
           mode,
           thread_id: threadId,
+          demo_user_id: selectedDemoUserId,
         }),
       });
 
@@ -349,6 +369,25 @@ export default function App() {
           </div>
         </div>
         <div className="topbar-actions">
+          {domain?.demo_users && domain.demo_users.length > 0 && selectedDemoUser && (
+            <label className="topbar-demo-user">
+              <span>Customer</span>
+              <select
+                value={selectedDemoUserId ?? ""}
+                onChange={(event) => handleDemoUserChange(event.target.value)}
+                aria-label="Select demo customer"
+              >
+                {domain.demo_users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.label}{user.subtitle ? ` • ${user.subtitle}` : ""}
+                  </option>
+                ))}
+              </select>
+              {selectedDemoUser.cache_group_id && (
+                <span className="topbar-demo-user-badge">{selectedDemoUser.cache_group_id}</span>
+              )}
+            </label>
+          )}
           <button
             className={`topbar-context-btn ${activityPanelOpen ? "active" : ""}`}
             onClick={handleToggleRedisContext}

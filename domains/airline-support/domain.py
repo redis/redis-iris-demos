@@ -24,6 +24,7 @@ from backend.app.core.domain_contract import (
 )
 from backend.app.core.domain_schema import EntitySpec, validate_entity_specs
 from backend.app.redis_connection import create_redis_client
+from backend.app.request_context import get_demo_user_id
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -382,7 +383,7 @@ class AirlineSupportDomain:
         del arguments
         if tool_name == self.manifest.identity.tool_name:
             identity = self.manifest.identity
-            profile = self.resolve_demo_user(os.getenv(identity.id_env_var)) or DEMO_PROFILE
+            profile = self.resolve_demo_user(get_demo_user_id() or os.getenv(identity.id_env_var)) or DEMO_PROFILE
             return {
                 identity.id_field: str(profile.get(identity.id_field, identity.default_id)),
                 "display_name": os.getenv(identity.name_env_var, str(profile.get("display_name", identity.default_name))),
@@ -406,7 +407,7 @@ class AirlineSupportDomain:
                 "cache_group_id": str(profile.get("cache_group_id", DEMO_PROFILE["cache_group_id"])),
             }
         if tool_name == "get_current_service_tier_context":
-            profile = self.resolve_demo_user(os.getenv(self.manifest.identity.id_env_var)) or DEMO_PROFILE
+            profile = self.resolve_demo_user(get_demo_user_id() or os.getenv(self.manifest.identity.id_env_var)) or DEMO_PROFILE
             return {
                 "status_tier": str(profile.get("status_tier", DEMO_PROFILE["status_tier"])),
                 "preferred_language": str(profile.get("preferred_language", DEMO_PROFILE["preferred_language"])),

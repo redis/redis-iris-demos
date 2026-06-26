@@ -23,7 +23,7 @@ from backend.app.langcache_service import LangCacheService
 from backend.app.langgraph_agent import create_agent, create_checkpointer
 from backend.app.memory_service import MemoryService
 from backend.app.rag_service import SimpleRAGService
-from backend.app.request_context import reset_thread_id, set_thread_id
+from backend.app.request_context import reset_demo_user_id, reset_thread_id, set_demo_user_id, set_thread_id
 from backend.app.settings import get_settings
 
 logging.basicConfig(
@@ -308,13 +308,14 @@ async def domain_config() -> JSONResponse:
             {"prompt": e.prompt, "response": e.response}
             for e in domain.manifest.seed_langcache
         ],
+        "demo_users": domain.get_demo_users() if callable(getattr(domain, "get_demo_users", None)) else [],
     })
 
 
 @app.get("/api/memory/dashboard")
-async def memory_dashboard(thread_id: str | None = None) -> JSONResponse:
+async def memory_dashboard(thread_id: str | None = None, demo_user_id: str | None = None) -> JSONResponse:
     identity = domain.manifest.identity
-    current_user_id = os.getenv(identity.id_env_var, identity.default_id)
+    current_user_id = demo_user_id or os.getenv(identity.id_env_var, identity.default_id)
     if not memory_service.is_configured():
         return JSONResponse(
             {
@@ -386,7 +387,7 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
     thread_id = request.thread_id or "default"
     latest_message = request.messages[-1].content if request.messages else ""
     identity = domain.manifest.identity
-    current_user_id = os.getenv(identity.id_env_var, identity.default_id)
+    current_user_id = request.demo_user_id or os.getenv(identity.id_env_var, identity.default_id)
 
     log.info("━━━ REQUEST [thread=%s] %s", thread_id[:8], latest_message[:80])
 
@@ -506,6 +507,7 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
     last_thinking_step: str | None = None
     final_text = ""
     thread_token = set_thread_id(thread_id)
+    demo_user_token = set_demo_user_id(current_user_id)
 
     # ── Phase 2: Session memory write ──
     if memory_service.is_configured() and latest_message.strip():
@@ -715,6 +717,7 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
         yield sse("error", errorType=error_type, message=short_msg, ts=timer.elapsed_ms())
         yield sse("text-delta", delta=f"\n\n⚠️ {error_type}: {short_msg}")
         yield sse("done", totalElapsedMs=timer.elapsed_ms())
+        reset_demo_user_id(demo_user_token)
         reset_thread_id(thread_token)
         return
 
@@ -756,6 +759,7 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
     phases.append(("memory_save", timer.phase("Assistant memory save")))
 
     yield sse("done", totalElapsedMs=timer.elapsed_ms())
+    reset_demo_user_id(demo_user_token)
     reset_thread_id(thread_token)
 
     # ── Request summary ──

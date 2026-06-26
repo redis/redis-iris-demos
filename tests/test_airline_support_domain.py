@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+from backend.app.request_context import reset_demo_user_id, set_demo_user_id
 from backend.app.core.domain_loader import load_domain
 
 
@@ -61,6 +62,23 @@ def test_airline_support_domain_loads() -> None:
 
     demo_users = domain.get_demo_users()
     assert [user for user in demo_users if user["cache_group_id"] == "senator_en"]
+
+
+def test_airline_support_internal_tools_use_request_demo_user() -> None:
+    domain = load_domain("airline-support")
+    token = set_demo_user_id("AIRCUST_003")
+    try:
+        identity = domain.execute_internal_tool("get_current_user_profile", {}, settings=None)
+        tier_context = domain.execute_internal_tool("get_current_service_tier_context", {}, settings=None)
+    finally:
+        reset_demo_user_id(token)
+
+    assert identity["customer_id"] == "AIRCUST_003"
+    assert identity["display_name"] == "Jonas Klein"
+    assert identity["status_tier"] == "Frequent"
+    assert identity["cache_group_id"] == "frequent_en"
+    assert tier_context["status_tier"] == "Frequent"
+    assert tier_context["cache_group_id"] == "frequent_en"
 
 
 def test_airline_support_data_generator_writes_expected_files(tmp_path: Path) -> None:

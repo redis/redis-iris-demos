@@ -248,6 +248,50 @@ button { cursor: pointer; border: none; background: none; }
   flex-shrink: 0;
 }
 
+.topbar-demo-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 38px;
+  padding: 0 10px 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.topbar-demo-user span:first-child {
+  color: var(--color-text-tertiary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.topbar-demo-user select {
+  max-width: 290px;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  background: transparent;
+  border: 0;
+  outline: 0;
+}
+
+.topbar-demo-user-badge {
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 4px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--color-redis-soft);
+  color: var(--color-text-secondary);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
 /* ── Empty State ─────────────────────────────────────── */
 .empty-state {
   flex: 1;
@@ -1577,4 +1621,3 @@ button { cursor: pointer; border: none; background: none; }
     display: none;
   }
 }
-
