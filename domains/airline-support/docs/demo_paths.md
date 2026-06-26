@@ -144,7 +144,8 @@ Suggested passenger order:
 2. `Lena Hartmann` (`Senator • EN`)
 3. Optional comparison: `Jonas Klein` (`Frequent • EN`)
 
-Set `DEMO_USER_ID` to the selected passenger before each run.
+Select the passenger from the top-bar customer selector before each run. For
+non-UI runs, set `DEMO_USER_ID` before starting the backend.
 
 Expected tool sequence:
 1. `get_current_service_tier_context`
