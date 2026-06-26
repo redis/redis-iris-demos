@@ -260,17 +260,21 @@ class LangCacheService:
         if not self.is_configured():
             return None
         client = await self._get_client()
-        response = await client.post(
-            f"{self._base_url()}/entries/search",
-            headers=self._headers(),
-            json={
-                "prompt": prompt,
-                "similarityThreshold": self._threshold,
-                "searchStrategies": ["semantic"],
-            },
-        )
-        response.raise_for_status()
-        entries = response.json().get("data", [])
+        try:
+            response = await client.post(
+                f"{self._base_url()}/entries/search",
+                headers=self._headers(),
+                json={
+                    "prompt": prompt,
+                    "similarityThreshold": self._threshold,
+                    "searchStrategies": ["semantic"],
+                },
+            )
+            response.raise_for_status()
+            entries = response.json().get("data", [])
+        except (httpx.HTTPError, ValueError) as exc:
+            print(f"LangCache lookup failed. Continuing as cache miss: {exc}")
+            return None
         if not entries:
             return None
         best = entries[0]
@@ -643,6 +647,24 @@ async def _create_surface(settings: Settings, data_model: dict[str, Any]) -> str
     return str(response.json()["id"])
 
 
+async def _update_surface(settings: Settings, surface_id: str, data_model: dict[str, Any]) -> None:
+    api_url = str(cs_config.api_url).rstrip("/")
+    async with httpx.AsyncClient(timeout=60.0) as client:
+        response = await client.put(
+            f"{api_url}/api/v1/context-surfaces/{surface_id}",
+            headers=_admin_headers(settings.ctx_admin_key),
+            json={
+                "name": WORKSHOP_SURFACE_NAME,
+                "description": "Workshop context surface for Radish Bank demo data",
+                "data_model": data_model,
+            },
+        )
+    if response.status_code != 200:
+        raise RuntimeError(
+            f"Failed to update context surface ({response.status_code}): {response.text}"
+        )
+
+
 async def _create_agent_key(settings: Settings, surface_id: str) -> str:
     api_url = str(cs_config.api_url).rstrip("/")
     async with httpx.AsyncClient(timeout=60.0) as client:
@@ -708,12 +730,18 @@ async def run_workshop_setup(
     entities: list[type[ContextModel]],
     *,
     force_recreate: bool = False,
+    update_existing: bool = False,
 ) -> SetupResult:
     """Create surface and agent key; store IDs in the session environment."""
     validate_env()
+    if force_recreate and update_existing:
+        raise ValueError("Use either force_recreate=True or update_existing=True, not both.")
     settings = get_settings()
 
     if not force_recreate and settings.ctx_surface_id and settings.mcp_agent_key:
+        if update_existing:
+            data_model = _build_data_model(entities)
+            await _update_surface(settings, settings.ctx_surface_id, data_model)
         return SetupResult(
             surface_id=settings.ctx_surface_id,
             agent_key=settings.mcp_agent_key,
