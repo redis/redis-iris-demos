@@ -2,7 +2,7 @@
 
 One notebook: **Context Retriever** + **Agent Memory** + **LangCache**.
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/redis/redis-iris-demos/blob/main/notebooks/radish_bank_workshop.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/redis/redis-iris-demos/blob/feat/hands-on-notebooks/notebooks/radish_bank_workshop.ipynb)
 
 ## Run
 
