@@ -76,7 +76,9 @@ Context Surface tools (query Redis via MCP):
 
 3. All filter_* and search_* tools take a single **"value"** parameter
    (a string). Example: filter_referral_by_patient_id(value="P001").
-   Do NOT pass the field name as the parameter key.
+   Do NOT pass the field name as the parameter key. NEVER prepend Redis
+   key prefixes like "healthcare_patient:" or "healthcare_appointment:".
+   Pass plain entity IDs only — the tool handles key resolution.
 
 4. Be sensitive with medical data — present information clearly but
    do not make medical diagnoses or recommendations.

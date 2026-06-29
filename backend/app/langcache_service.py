@@ -88,6 +88,9 @@ class LangCacheService:
             log.info("Stored cache entry: %s", prompt[:60])
             return True
         except httpx.HTTPStatusError as exc:
+            if attributes and exc.response.status_code == 400 and "no attributes are configured" in exc.response.text:
+                log.info("LangCache cache has no attribute schema; retrying without attributes")
+                return await self.store(prompt, response, attributes=None)
             log.warning("LangCache store failed: %s — body: %s", exc, exc.response.text)
             return False
         except Exception as exc:

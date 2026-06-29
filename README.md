@@ -21,13 +21,15 @@ Every domain runs Context Retriever, Agent Memory, LangCache, and Semantic Routi
 
 ## Domains
 
-| Domain | App | Industry | Screenshot |
-|--------|-----|----------|------------|
-| `reddash` | Reddash | Food delivery | <img src="docs/screenshots/Demo_Redis_Eats.png" width="300" /> |
-| `electrohub` | ElectroHub | Electronics retail | <img src="docs/screenshots/Demo_ElectroHub.png" width="300" /> |
-| `finance-researcher` | ShiftIQ | Financial research | <img src="docs/screenshots/Demo_ShiftIQ.png" width="300" /> |
-| `healthcare` | RedHealthConnect | Healthcare | <img src="docs/screenshots/Demo_RedHealthConnect.png" width="300" /> |
-| `radish-bank` | Radish Bank | Retail banking | <img src="docs/screenshots/Demo_Radish_Bank.png" width="300" /> |
+| Industry | App | Screenshot |
+|----------|-----|------------|
+| Food delivery | Redis Eats | <img src="docs/screenshots/Demo_Redis_Eats.png" width="300" /> |
+| Electronics Retail | ElectroHub | <img src="docs/screenshots/Demo_ElectroHub.png" width="300" /> |
+| Financial research | ShiftIQ | <img src="docs/screenshots/Demo_ShiftIQ.png" width="300" /> |
+| Healthcare | RedHealthConnect | <img src="docs/screenshots/Demo_RedHealthConnect.png" width="300" /> |
+| Retail banking | Radish Bank | <img src="docs/screenshots/Demo_Radish_Bank.png" width="300" /> |
+| Telcp | R-Mobile | <img src="docs/screenshots/Demo_R-Mobile.png" width="300" /> |
+| Sports betting | Sports Desk | <img src="docs/screenshots/Demo_Sports_Desk.png" width="300" /> |
 
 ## Legacy
 
@@ -83,6 +85,11 @@ make setup
 make dev
 ```
 
+When switching to `radish-bank`, leave `MEMORY_SIMILARITY_THRESHOLD` unset or commented out
+to use the Radish Bank Agent Memory default of `0.5`. Older local `.env` files may still
+contain `MEMORY_SIMILARITY_THRESHOLD=0.7`; keep that only when you want to explicitly
+override the Radish tuning.
+
 
 ## What `make setup` does
 
@@ -100,13 +107,31 @@ make dev
 
 ## Creating a New Domain
 
-```bash
-make create-domain DOMAIN=my-industry
-```
+Adding a new vertical (e.g., telecom, travel, insurance). Every domain follows the same structure, so the process is repeatable.
 
-This scaffolds the required files under `domains/my-industry/`. See the [domain-pack-authoring skill](.codex/skills/domain-pack-authoring/SKILL.md) for the full contract, checklist, and Iris-specific requirements (guardrail routes, seed memories, LangCache entries, landing page backgrounds).
+### What you need to create
+
+| File | What goes in it |
+|------|----------------|
+| `domains/<id>/schema.py` | Redis data entities (customers, orders, products, etc.) |
+| `domains/<id>/domain.py` | Manifest: branding, theme, guardrail routes, seed memories, seed cache |
+| `domains/<id>/prompt.py` | Agent system prompt with tool hints and workflows |
+| `domains/<id>/data_generator.py` | Synthetic demo data (realistic names, amounts, scenarios) |
+| `domains/<id>/assets/logo.svg` | Domain logo (renders at 28x28 in the topbar) |
+| `domains/<id>/docs/demo_paths.md` | 2-4 scripted demo conversation paths |
+| `frontend/public/backgrounds/<id>/left.svg` | Landing page left illustration (~590x817, <35KB) |
+| `frontend/public/backgrounds/<id>/right.svg` | Landing page right illustration (~632x817, <35KB) |
 
 Each domain implements the `DomainPack` protocol defined in `backend/app/core/domain_contract.py`.
+
+### Using AI to create a domain
+
+The fastest way to create a new vertical is with an AI coding assistant. Detailed authoring skills are available for both:
+
+- **Claude Code**: `.claude/skills/domain-pack-authoring.md`
+- **Codex**: `.codex/skills/domain-pack-authoring/SKILL.md`
+
+Just ask: *"Create a new domain for [your vertical]"* — the skill guides the agent through the full process: entity design, branding, realistic guardrail routes, seed data, prompts, and demo scenarios.
 
 ## Project Structure
 
@@ -130,6 +155,8 @@ domains/
   finance-researcher/        # Financial research
   healthcare/                # Patient portal
   radish-bank/               # Retail banking
+  rmobile/                   # Wireless telecom
+  sports-betting/            # Sports betting
 
 frontend/
   src/

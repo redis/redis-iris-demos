@@ -1,0 +1,1 @@
+"""Sports Betting domain."""

@@ -1,74 +1,206 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 590 817" fill="none">
-  <!-- Large ascending bar chart, bottom-left -->
-  <rect x="-30" y="580" width="70" height="237" rx="4" fill="#D4F0FF"/>
-  <rect x="50" y="500" width="70" height="317" rx="4" fill="#A3E2FF"/>
-  <rect x="130" y="400" width="70" height="417" rx="4" fill="#6fd3ff"/>
-  <rect x="210" y="310" width="70" height="507" rx="4" fill="#3BAADB"/>
-  <rect x="290" y="380" width="70" height="437" rx="4" fill="#6fd3ff" opacity="0.6"/>
-  <rect x="370" y="460" width="70" height="357" rx="4" fill="#A3E2FF" opacity="0.4"/>
 
-  <!-- Uptrend arrow over bars -->
-  <line x1="5" y1="560" x2="325" y2="270" stroke="#33D6A4" stroke-width="5" stroke-linecap="round"/>
-  <polygon points="325,270 300,300 340,308" fill="#33D6A4"/>
+  <!-- ============================================== -->
+  <!-- TOP-LEFT: STOCK CHART PANEL (y: 30-320)        -->
+  <!-- ============================================== -->
+  <g>
+    <!-- Panel background -->
+    <rect x="-10" y="30" width="230" height="280" rx="8" ry="8"
+      fill="#d2dfe8" opacity="0.45" stroke="#6fd3ff" stroke-width="1" stroke-opacity="0.20"/>
 
-  <!-- Candlestick chart, upper-left -->
-  <rect x="20" y="100" width="260" height="220" rx="10" fill="#D4F0FF" opacity="0.5"/>
-  <line x1="20" y1="140" x2="280" y2="140" stroke="#A3E2FF" stroke-width="1.5"/>
-  <!-- Candle 1 green -->
-  <line x1="60" y1="170" x2="60" y2="290" stroke="#33D6A4" stroke-width="2.5"/>
-  <rect x="46" y="195" width="28" height="60" rx="3" fill="#33D6A4"/>
-  <!-- Candle 2 red -->
-  <line x1="105" y1="180" x2="105" y2="300" stroke="#E85D5D" stroke-width="2.5"/>
-  <rect x="91" y="205" width="28" height="65" rx="3" fill="#E85D5D"/>
-  <!-- Candle 3 green -->
-  <line x1="150" y1="155" x2="150" y2="275" stroke="#33D6A4" stroke-width="2.5"/>
-  <rect x="136" y="170" width="28" height="70" rx="3" fill="#33D6A4"/>
-  <!-- Candle 4 red -->
-  <line x1="195" y1="165" x2="195" y2="285" stroke="#E85D5D" stroke-width="2.5"/>
-  <rect x="181" y="190" width="28" height="55" rx="3" fill="#E85D5D"/>
-  <!-- Candle 5 green (tallest) -->
-  <line x1="240" y1="150" x2="240" y2="280" stroke="#33D6A4" stroke-width="2.5"/>
-  <rect x="226" y="158" width="28" height="80" rx="3" fill="#33D6A4"/>
+    <!-- Ticker name placeholder -->
+    <rect x="12" y="48" width="70" height="5" rx="2" fill="#9fb0c2" opacity="0.40"/>
+    <!-- Price placeholder -->
+    <rect x="12" y="60" width="50" height="4" rx="2" fill="#9fb0c2" opacity="0.30"/>
+    <!-- Green up arrow + percentage -->
+    <polygon points="90,63 95,55 100,63" fill="#33d6a4" opacity="0.35"/>
+    <rect x="103" y="57" width="32" height="4" rx="2" fill="#33d6a4" opacity="0.30"/>
 
-  <!-- Magnifying glass over last candle -->
-  <circle cx="240" cy="158" r="45" stroke="#1F7AA3" stroke-width="4" fill="#D4F0FF" fill-opacity="0.3"/>
-  <line x1="272" y1="190" x2="308" y2="226" stroke="#1F7AA3" stroke-width="6" stroke-linecap="round"/>
+    <!-- Chart area background -->
+    <rect x="12" y="78" width="200" height="160" rx="4" fill="#c0d0dc" opacity="0.20"/>
 
-  <!-- Dollar sign circle, left edge -->
-  <circle cx="-20" cy="420" r="65" fill="#A3E2FF" opacity="0.7"/>
-  <circle cx="-20" cy="420" r="65" stroke="#3BAADB" stroke-width="3" fill="none"/>
-  <line x1="-20" y1="390" x2="-20" y2="450" stroke="#1F7AA3" stroke-width="4" stroke-linecap="round"/>
-  <path d="M-36,403 C-36,393 -4,393 -4,403 C-4,413 -36,418 -36,428 C-36,438 -4,443 -4,433" stroke="#1F7AA3" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <!-- Horizontal grid lines -->
+    <line x1="12" y1="110" x2="212" y2="110" stroke="#6fd3ff" stroke-width="0.5" opacity="0.15"/>
+    <line x1="12" y1="142" x2="212" y2="142" stroke="#6fd3ff" stroke-width="0.5" opacity="0.15"/>
+    <line x1="12" y1="174" x2="212" y2="174" stroke="#6fd3ff" stroke-width="0.5" opacity="0.15"/>
+    <line x1="12" y1="206" x2="212" y2="206" stroke="#6fd3ff" stroke-width="0.5" opacity="0.15"/>
 
-  <!-- Trend lines lower section -->
-  <polyline points="-20,700 100,660 200,680 300,590 400,530 480,470" stroke="#3BAADB" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="100" cy="660" r="6" fill="#3BAADB"/>
-  <circle cx="200" cy="680" r="6" fill="#3BAADB"/>
-  <circle cx="300" cy="590" r="6" fill="#3BAADB"/>
-  <circle cx="400" cy="530" r="6" fill="#3BAADB"/>
+    <!-- Vertical dashed grid lines -->
+    <line x1="52" y1="78" x2="52" y2="238" stroke="#6fd3ff" stroke-width="0.5" opacity="0.12" stroke-dasharray="3 4"/>
+    <line x1="92" y1="78" x2="92" y2="238" stroke="#6fd3ff" stroke-width="0.5" opacity="0.12" stroke-dasharray="3 4"/>
+    <line x1="132" y1="78" x2="132" y2="238" stroke="#6fd3ff" stroke-width="0.5" opacity="0.12" stroke-dasharray="3 4"/>
+    <line x1="172" y1="78" x2="172" y2="238" stroke="#6fd3ff" stroke-width="0.5" opacity="0.12" stroke-dasharray="3 4"/>
+    <line x1="212" y1="78" x2="212" y2="238" stroke="#6fd3ff" stroke-width="0.5" opacity="0.12" stroke-dasharray="3 4"/>
 
-  <!-- Grid lines -->
-  <line x1="0" y1="400" x2="420" y2="400" stroke="#A3E2FF" stroke-width="1" opacity="0.4"/>
-  <line x1="0" y1="500" x2="370" y2="500" stroke="#A3E2FF" stroke-width="1" opacity="0.4"/>
-  <line x1="0" y1="600" x2="320" y2="600" stroke="#A3E2FF" stroke-width="1" opacity="0.3"/>
+    <!-- Area fill under price line -->
+    <polygon points="32,228 62,218 92,233 122,198 152,208 182,178 212,158 212,238 32,238"
+      fill="#33d6a4" opacity="0.10"/>
 
-  <!-- Ticker bars top-left -->
-  <rect x="-40" y="30" width="200" height="26" rx="5" fill="#A3E2FF" opacity="0.6"/>
-  <rect x="-40" y="64" width="160" height="26" rx="5" fill="#D4F0FF" opacity="0.5"/>
-  <circle cx="140" cy="43" r="6" fill="#33D6A4"/>
-  <circle cx="100" cy="77" r="5" fill="#E85D5D"/>
+    <!-- Stock price polyline (upward trend with dips) -->
+    <polyline points="32,228 62,218 92,233 122,198 152,208 182,178 212,158"
+      stroke="#2791ff" stroke-width="2" opacity="0.35" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 
-  <!-- Large decorative ring, left edge -->
-  <circle cx="-80" cy="650" r="130" stroke="#6fd3ff" stroke-width="3" fill="none" opacity="0.35"/>
-  <circle cx="-80" cy="650" r="100" stroke="#A3E2FF" stroke-width="2" fill="none" opacity="0.25"/>
+    <!-- Data points on price line -->
+    <circle cx="32" cy="228" r="2.5" fill="#2791ff" opacity="0.30"/>
+    <circle cx="92" cy="233" r="2.5" fill="#2791ff" opacity="0.30"/>
+    <circle cx="122" cy="198" r="2.5" fill="#2791ff" opacity="0.30"/>
+    <circle cx="182" cy="178" r="2.5" fill="#2791ff" opacity="0.30"/>
+    <circle cx="212" cy="158" r="3" fill="#2791ff" opacity="0.35"/>
 
-  <!-- Accent dots fading right -->
-  <circle cx="350" cy="150" r="5" fill="#6fd3ff" opacity="0.35"/>
-  <circle cx="380" cy="130" r="4" fill="#A3E2FF" opacity="0.3"/>
-  <circle cx="420" cy="200" r="3" fill="#3BAADB" opacity="0.2"/>
-  <circle cx="460" cy="350" r="4" fill="#A3E2FF" opacity="0.15"/>
+    <!-- Volume bars below chart -->
+    <rect x="27" y="254" width="12" height="18" rx="1" fill="#c0d0dc" opacity="0.40"/>
+    <rect x="45" y="260" width="12" height="12" rx="1" fill="#c0d0dc" opacity="0.35"/>
+    <rect x="63" y="249" width="12" height="23" rx="1" fill="#c0d0dc" opacity="0.40"/>
+    <rect x="81" y="256" width="12" height="16" rx="1" fill="#33d6a4" opacity="0.30"/>
+    <rect x="99" y="252" width="12" height="20" rx="1" fill="#c0d0dc" opacity="0.35"/>
+    <rect x="117" y="258" width="12" height="14" rx="1" fill="#c0d0dc" opacity="0.30"/>
+    <rect x="135" y="246" width="12" height="26" rx="1" fill="#33d6a4" opacity="0.30"/>
+    <rect x="153" y="254" width="12" height="18" rx="1" fill="#c0d0dc" opacity="0.35"/>
+    <rect x="171" y="250" width="12" height="22" rx="1" fill="#33d6a4" opacity="0.25"/>
+    <rect x="189" y="244" width="12" height="28" rx="1" fill="#33d6a4" opacity="0.30"/>
 
-  <!-- Small uptrend triangles -->
-  <polygon points="430,340 445,310 460,340" fill="#33D6A4" opacity="0.3"/>
-  <polygon points="480,280 492,256 504,280" fill="#33D6A4" opacity="0.2"/>
+    <!-- Date labels below volume (placeholder lines) -->
+    <rect x="30" y="278" width="18" height="3" rx="1.5" fill="#9fb0c2" opacity="0.20"/>
+    <rect x="84" y="278" width="18" height="3" rx="1.5" fill="#9fb0c2" opacity="0.20"/>
+    <rect x="138" y="278" width="18" height="3" rx="1.5" fill="#9fb0c2" opacity="0.20"/>
+    <rect x="192" y="278" width="18" height="3" rx="1.5" fill="#9fb0c2" opacity="0.20"/>
+  </g>
+
+  <!-- ============================================== -->
+  <!-- MID-LEFT: WATCHLIST / TICKER LIST (y: 370-560) -->
+  <!-- ============================================== -->
+  <g>
+    <!-- Card background -->
+    <rect x="5" y="370" width="200" height="190" rx="8" ry="8"
+      fill="#d2dfe8" opacity="0.50" stroke="#6fd3ff" stroke-width="1" stroke-opacity="0.18"/>
+
+    <!-- Header: "Watchlist" placeholder -->
+    <rect x="18" y="384" width="65" height="5" rx="2" fill="#9fb0c2" opacity="0.40"/>
+    <!-- Thin divider line under header -->
+    <line x1="18" y1="396" x2="190" y2="396" stroke="#6fd3ff" stroke-width="0.5" opacity="0.20"/>
+
+    <!-- Row 1 (alternating background) -->
+    <rect x="10" y="402" width="190" height="28" rx="3" fill="#c0d0dc" opacity="0.15"/>
+    <!-- Ticker symbol -->
+    <rect x="18" y="411" width="30" height="4" rx="2" fill="#9fb0c2" opacity="0.40"/>
+    <!-- Company name -->
+    <rect x="54" y="412" width="70" height="3" rx="1.5" fill="#9fb0c2" opacity="0.25"/>
+    <!-- Price -->
+    <rect x="145" y="409" width="35" height="4" rx="2" fill="#9fb0c2" opacity="0.35"/>
+    <!-- Gain indicator -->
+    <rect x="152" y="417" width="28" height="10" rx="3" fill="#33d6a4" opacity="0.30"/>
+
+    <!-- Row 2 -->
+    <!-- Ticker symbol -->
+    <rect x="18" y="439" width="26" height="4" rx="2" fill="#9fb0c2" opacity="0.40"/>
+    <!-- Company name -->
+    <rect x="54" y="440" width="85" height="3" rx="1.5" fill="#9fb0c2" opacity="0.25"/>
+    <!-- Price -->
+    <rect x="145" y="437" width="35" height="4" rx="2" fill="#9fb0c2" opacity="0.35"/>
+    <!-- Loss indicator -->
+    <rect x="152" y="445" width="28" height="10" rx="3" fill="#ff6b6b" opacity="0.22"/>
+
+    <!-- Row 3 (alternating background) -->
+    <rect x="10" y="458" width="190" height="28" rx="3" fill="#c0d0dc" opacity="0.15"/>
+    <!-- Ticker symbol -->
+    <rect x="18" y="467" width="34" height="4" rx="2" fill="#9fb0c2" opacity="0.40"/>
+    <!-- Company name -->
+    <rect x="54" y="468" width="78" height="3" rx="1.5" fill="#9fb0c2" opacity="0.25"/>
+    <!-- Price -->
+    <rect x="145" y="465" width="35" height="4" rx="2" fill="#9fb0c2" opacity="0.35"/>
+    <!-- Gain indicator -->
+    <rect x="152" y="473" width="28" height="10" rx="3" fill="#33d6a4" opacity="0.25"/>
+
+    <!-- Row 4 -->
+    <!-- Ticker symbol -->
+    <rect x="18" y="495" width="28" height="4" rx="2" fill="#9fb0c2" opacity="0.40"/>
+    <!-- Company name -->
+    <rect x="54" y="496" width="65" height="3" rx="1.5" fill="#9fb0c2" opacity="0.25"/>
+    <!-- Price -->
+    <rect x="145" y="493" width="35" height="4" rx="2" fill="#9fb0c2" opacity="0.35"/>
+    <!-- Gain indicator -->
+    <rect x="152" y="501" width="28" height="10" rx="3" fill="#33d6a4" opacity="0.30"/>
+
+    <!-- Row 5 (alternating background) -->
+    <rect x="10" y="514" width="190" height="28" rx="3" fill="#c0d0dc" opacity="0.15"/>
+    <!-- Ticker symbol -->
+    <rect x="18" y="523" width="32" height="4" rx="2" fill="#9fb0c2" opacity="0.40"/>
+    <!-- Company name -->
+    <rect x="54" y="524" width="92" height="3" rx="1.5" fill="#9fb0c2" opacity="0.25"/>
+    <!-- Price -->
+    <rect x="145" y="521" width="35" height="4" rx="2" fill="#9fb0c2" opacity="0.35"/>
+    <!-- Loss indicator -->
+    <rect x="152" y="529" width="28" height="10" rx="3" fill="#ff6b6b" opacity="0.20"/>
+  </g>
+
+  <!-- ============================================== -->
+  <!-- BOTTOM-LEFT: FADED DATA TABLE (y: 600-800)     -->
+  <!-- ============================================== -->
+  <g transform="rotate(-3, 100, 700)">
+    <!-- Table card background -->
+    <rect x="-5" y="600" width="210" height="190" rx="6" ry="6"
+      fill="#d2dfe8" opacity="0.40" stroke="#6fd3ff" stroke-width="0.8" stroke-opacity="0.15"/>
+
+    <!-- Table header row -->
+    <rect x="5" y="612" width="195" height="22" rx="3" fill="#c0d0dc" opacity="0.30"/>
+    <!-- Header cells -->
+    <rect x="12" y="619" width="35" height="4" rx="2" fill="#9fb0c2" opacity="0.40"/>
+    <rect x="58" y="619" width="42" height="4" rx="2" fill="#9fb0c2" opacity="0.40"/>
+    <rect x="112" y="619" width="30" height="4" rx="2" fill="#9fb0c2" opacity="0.40"/>
+    <rect x="155" y="619" width="36" height="4" rx="2" fill="#9fb0c2" opacity="0.40"/>
+
+    <!-- Row separator -->
+    <line x1="5" y1="638" x2="200" y2="638" stroke="#6fd3ff" stroke-width="0.5" opacity="0.15"/>
+
+    <!-- Data row 1 -->
+    <rect x="12" y="646" width="28" height="3" rx="1.5" fill="#9fb0c2" opacity="0.30"/>
+    <rect x="58" y="646" width="38" height="3" rx="1.5" fill="#9fb0c2" opacity="0.25"/>
+    <rect x="112" y="646" width="25" height="3" rx="1.5" fill="#33d6a4" opacity="0.30"/>
+    <rect x="155" y="646" width="32" height="3" rx="1.5" fill="#9fb0c2" opacity="0.25"/>
+
+    <!-- Row separator -->
+    <line x1="5" y1="658" x2="200" y2="658" stroke="#6fd3ff" stroke-width="0.4" opacity="0.12"/>
+
+    <!-- Data row 2 -->
+    <rect x="12" y="666" width="32" height="3" rx="1.5" fill="#9fb0c2" opacity="0.30"/>
+    <rect x="58" y="666" width="30" height="3" rx="1.5" fill="#9fb0c2" opacity="0.25"/>
+    <rect x="112" y="666" width="22" height="3" rx="1.5" fill="#ff6b6b" opacity="0.22"/>
+    <rect x="155" y="666" width="28" height="3" rx="1.5" fill="#9fb0c2" opacity="0.25"/>
+
+    <!-- Row separator -->
+    <line x1="5" y1="678" x2="200" y2="678" stroke="#6fd3ff" stroke-width="0.4" opacity="0.12"/>
+
+    <!-- Data row 3 -->
+    <rect x="12" y="686" width="26" height="3" rx="1.5" fill="#9fb0c2" opacity="0.30"/>
+    <rect x="58" y="686" width="44" height="3" rx="1.5" fill="#9fb0c2" opacity="0.25"/>
+    <rect x="112" y="686" width="28" height="3" rx="1.5" fill="#33d6a4" opacity="0.25"/>
+    <rect x="155" y="686" width="34" height="3" rx="1.5" fill="#9fb0c2" opacity="0.25"/>
+
+    <!-- Row separator -->
+    <line x1="5" y1="698" x2="200" y2="698" stroke="#6fd3ff" stroke-width="0.4" opacity="0.12"/>
+
+    <!-- Data row 4 -->
+    <rect x="12" y="706" width="30" height="3" rx="1.5" fill="#9fb0c2" opacity="0.30"/>
+    <rect x="58" y="706" width="36" height="3" rx="1.5" fill="#9fb0c2" opacity="0.25"/>
+    <rect x="112" y="706" width="20" height="3" rx="1.5" fill="#33d6a4" opacity="0.28"/>
+    <rect x="155" y="706" width="30" height="3" rx="1.5" fill="#9fb0c2" opacity="0.25"/>
+
+    <!-- Row separator -->
+    <line x1="5" y1="718" x2="200" y2="718" stroke="#6fd3ff" stroke-width="0.4" opacity="0.12"/>
+
+    <!-- Data row 5 -->
+    <rect x="12" y="726" width="34" height="3" rx="1.5" fill="#9fb0c2" opacity="0.28"/>
+    <rect x="58" y="726" width="40" height="3" rx="1.5" fill="#9fb0c2" opacity="0.22"/>
+    <rect x="112" y="726" width="24" height="3" rx="1.5" fill="#ff6b6b" opacity="0.20"/>
+    <rect x="155" y="726" width="26" height="3" rx="1.5" fill="#9fb0c2" opacity="0.22"/>
+
+    <!-- Table footer line -->
+    <line x1="5" y1="740" x2="200" y2="740" stroke="#6fd3ff" stroke-width="0.5" opacity="0.15"/>
+
+    <!-- Summary row at bottom -->
+    <rect x="12" y="750" width="40" height="4" rx="2" fill="#9fb0c2" opacity="0.30"/>
+    <rect x="112" y="750" width="30" height="4" rx="2" fill="#33d6a4" opacity="0.25"/>
+    <rect x="155" y="750" width="36" height="4" rx="2" fill="#9fb0c2" opacity="0.28"/>
+  </g>
+
 </svg>

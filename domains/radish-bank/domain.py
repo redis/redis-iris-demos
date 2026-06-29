@@ -121,7 +121,7 @@ class RadishBankDomain:
         branding=BrandingConfig(
             app_name="Radish Bank",
             subtitle="Customer Care",
-            hero_title="Welcome to Radish Bank — how can we help today?",
+            hero_title="Banking Made Easy",
             placeholder_text="Ask about accounts, cards, FDs, insurance, branches, or fee waivers…",
             logo_path="domains/radish-bank/assets/logo.svg",
             demo_steps=[
@@ -171,7 +171,7 @@ class RadishBankDomain:
                 soft="#cfe8dc",
                 accent="#2ecc71",
                 user="#0d1f18",
-                landing_bg="#E8F8EE",
+                landing_bg="#F4F7F5",
             ),
         ),
         namespace=NamespaceConfig(
@@ -269,6 +269,7 @@ class RadishBankDomain:
         seed_memories=[
             SeedMemory(text="Prefers paperless statements and online banking", topics=["banking", "preferences"]),
             SeedMemory(text="Interested in fixed deposit products for savings growth", topics=["products", "interests"]),
+            SeedMemory(text="Use Savings Account for placing fixed deposits", topics=["fixed_deposit", "account"])
         ],
         seed_langcache=[
             SeedLangCacheEntry(
@@ -292,6 +293,7 @@ class RadishBankDomain:
         memory_enabled = MemoryService(settings).is_configured() if settings else False
         return {
             "memory_enabled": memory_enabled,
+            "memory_similarity_threshold": 0.5,
         }
 
     def build_system_prompt(
@@ -462,13 +464,23 @@ class RadishBankDomain:
             return self._request_fee_waiver(arguments, settings)
         return {"error": f"Unknown tool: {tool_name}"}
 
-    async def aexecute_internal_tool(self, tool_name: str, arguments: dict[str, Any], settings: Any) -> dict[str, Any]:
+    async def aexecute_internal_tool(
+        self,
+        tool_name: str,
+        arguments: dict[str, Any],
+        settings: Any,
+        *,
+        runtime_config: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         if tool_name not in {"search_customer_memory", "remember_customer_detail"}:
             return await asyncio.to_thread(self.execute_internal_tool, tool_name, arguments, settings)
 
         identity = self.manifest.identity
         owner_id = os.getenv(identity.id_env_var, identity.default_id)
-        memory_service = MemoryService(settings)
+        memory_service = MemoryService(
+            settings,
+            similarity_threshold=(runtime_config or {}).get("memory_similarity_threshold"),
+        )
         if not memory_service.is_configured():
             return {"error": "Memory service is not configured for this demo."}
 

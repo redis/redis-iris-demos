@@ -112,6 +112,10 @@ Context Surface tools (query Redis via MCP):
 
 {niche_software_guidance}
 
+4. FOR FILTER TOOLS, pass plain entity IDs only — e.g. value="ORD_1001",
+   value="CUST_001". NEVER prepend Redis key prefixes like
+   "electrohub_order:" or "electrohub_customer:". The tool handles key resolution.
+
 5. BREAK COMPLEX SHOPPING QUESTIONS INTO SMALLER STEPS:
    • what kind of device is probably needed?
    • what level of performance is reasonable?

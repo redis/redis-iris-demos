@@ -105,7 +105,7 @@ create-domain:
 	@uv run python scripts/create_domain.py $(DOMAIN)
 
 backend:
-	@uv run uvicorn backend.app.main:app --reload --host $(BACKEND_HOST) --port $(BACKEND_PORT)
+	@uv run python -m uvicorn backend.app.main:app --reload --host $(BACKEND_HOST) --port $(BACKEND_PORT)
 
 frontend:
 	@cd frontend && npm run dev -- --host 0.0.0.0 --port $(FRONTEND_PORT)

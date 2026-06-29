@@ -343,7 +343,7 @@ class FinanceResearcherDomain:
         branding=BrandingConfig(
             app_name="ShiftIQ",
             subtitle="Market shifts, made clear.",
-            hero_title="ShiftIQ",
+            hero_title="Finance Research Assistant",
             placeholder_text="Compare companies, documents, metrics, or recent events...",
             logo_path="domains/finance-researcher/assets/logo.svg",
             demo_steps=[
@@ -388,7 +388,7 @@ class FinanceResearcherDomain:
                 soft="#d2deeb",
                 accent="#6fd3ff",
                 user="#13263a",
-                landing_bg="#EBF3FA",
+                landing_bg="#F3F4F1",
             ),
             ui=UiConfig(
                 show_platform_surface=True,

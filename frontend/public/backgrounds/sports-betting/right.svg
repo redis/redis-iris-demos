@@ -1,0 +1,42 @@
+<svg width="632" height="817" viewBox="0 0 632 817" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="632" height="817" fill="#EEF8F2"/>
+  <circle cx="568" cy="140" r="112" fill="#00C78C" fill-opacity="0.10"/>
+  <circle cx="500" cy="692" r="152" fill="#F8D24C" fill-opacity="0.10"/>
+  <path d="M632 302C570 266 504 260 432 286C356 314 290 314 220 286V817H632V302Z" fill="#DDF1E8" fill-opacity="0.62"/>
+
+  <g opacity="0.86">
+    <rect x="396" y="182" width="228" height="314" rx="24" fill="#10251F"/>
+    <rect x="420" y="216" width="180" height="38" rx="10" fill="#00C78C" fill-opacity="0.86"/>
+    <rect x="420" y="286" width="180" height="44" rx="10" fill="#F7FCF9"/>
+    <rect x="442" y="302" width="78" height="7" rx="3.5" fill="#10251F" fill-opacity="0.56"/>
+    <rect x="542" y="299" width="36" height="14" rx="7" fill="#F8D24C" fill-opacity="0.86"/>
+    <rect x="420" y="354" width="180" height="44" rx="10" fill="#F7FCF9"/>
+    <rect x="442" y="370" width="96" height="7" rx="3.5" fill="#10251F" fill-opacity="0.52"/>
+    <rect x="542" y="367" width="36" height="14" rx="7" fill="#F8D24C" fill-opacity="0.72"/>
+    <rect x="420" y="422" width="180" height="44" rx="10" fill="#F7FCF9"/>
+    <rect x="442" y="438" width="68" height="7" rx="3.5" fill="#10251F" fill-opacity="0.46"/>
+    <rect x="542" y="435" width="36" height="14" rx="7" fill="#F8D24C" fill-opacity="0.58"/>
+  </g>
+
+  <g opacity="0.62">
+    <path d="M476 570H620V664H476V570Z" fill="#10251F"/>
+    <path d="M500 600H590M500 626H570M500 650H584" stroke="#00C78C" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="588" cy="600" r="10" fill="#F8D24C"/>
+  </g>
+
+  <g opacity="0.52">
+    <circle cx="404" cy="578" r="52" fill="#F7FCF9"/>
+    <circle cx="404" cy="578" r="39" fill="#10251F"/>
+    <path d="M404 542V614M368 578H440" stroke="#F7FCF9" stroke-width="4" stroke-linecap="round"/>
+    <path d="M380 552C394 560 414 560 428 552M380 604C394 596 414 596 428 604" stroke="#F7FCF9" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <rect width="320" height="817" fill="url(#fadeRight)"/>
+  <defs>
+    <linearGradient id="fadeRight" x1="320" y1="408.5" x2="0" y2="408.5" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EEF8F2" stop-opacity="0"/>
+      <stop offset="0.62" stop-color="#EEF8F2" stop-opacity="0.84"/>
+      <stop offset="1" stop-color="#EEF8F2"/>
+    </linearGradient>
+  </defs>
+</svg>

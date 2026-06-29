@@ -1,119 +1,208 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 632 817" fill="none">
-  <!-- Line graph with upward trend, bottom-right -->
-  <!-- Grid lines -->
-  <line x1="250" y1="550" x2="650" y2="550" stroke="#A3E2FF" stroke-width="1" opacity="0.3"/>
-  <line x1="250" y1="620" x2="650" y2="620" stroke="#A3E2FF" stroke-width="1" opacity="0.3"/>
-  <line x1="250" y1="690" x2="650" y2="690" stroke="#A3E2FF" stroke-width="1" opacity="0.3"/>
-  <line x1="250" y1="480" x2="650" y2="480" stroke="#A3E2FF" stroke-width="1" opacity="0.2"/>
 
-  <!-- Area fill under line -->
-  <polygon points="280,720 340,690 400,700 460,640 520,580 580,520 640,460 640,817 280,817" fill="#D4F0FF" opacity="0.4"/>
+  <!-- ============================================== -->
+  <!-- TOP-RIGHT: CANDLESTICK CHART (y: 20-280)       -->
+  <!-- ============================================== -->
+  <g>
+    <!-- Panel background -->
+    <rect x="435" y="20" width="220" height="250" rx="8" ry="8"
+      fill="#d2dfe8" opacity="0.45" stroke="#6fd3ff" stroke-width="1" stroke-opacity="0.20"/>
 
-  <!-- Main trend line -->
-  <polyline points="280,720 340,690 400,700 460,640 520,580 580,520 640,460" stroke="#3BAADB" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- Secondary trend line -->
-  <polyline points="300,750 360,730 420,740 480,690 540,640 600,590 650,540" stroke="#A3E2FF" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Chart title placeholder -->
+    <rect x="450" y="35" width="60" height="5" rx="2" fill="#9fb0c2" opacity="0.38"/>
+    <!-- Subtitle placeholder -->
+    <rect x="450" y="46" width="40" height="3" rx="1.5" fill="#9fb0c2" opacity="0.25"/>
 
-  <!-- Data points on main line -->
-  <circle cx="340" cy="690" r="6" fill="white" stroke="#3BAADB" stroke-width="3"/>
-  <circle cx="400" cy="700" r="6" fill="white" stroke="#3BAADB" stroke-width="3"/>
-  <circle cx="460" cy="640" r="6" fill="white" stroke="#3BAADB" stroke-width="3"/>
-  <circle cx="520" cy="580" r="6" fill="white" stroke="#3BAADB" stroke-width="3"/>
-  <circle cx="580" cy="520" r="6" fill="white" stroke="#3BAADB" stroke-width="3"/>
+    <!-- Chart area background -->
+    <rect x="448" y="58" width="195" height="160" rx="4" fill="#c0d0dc" opacity="0.18"/>
 
-  <!-- Green uptrend arrow on line chart -->
-  <line x1="560" y1="540" x2="640" y2="440" stroke="#33D6A4" stroke-width="3" stroke-linecap="round"/>
-  <polygon points="640,440 620,460 645,465" fill="#33D6A4"/>
+    <!-- Horizontal grid lines -->
+    <line x1="448" y1="90" x2="643" y2="90" stroke="#6fd3ff" stroke-width="0.5" opacity="0.15"/>
+    <line x1="448" y1="118" x2="643" y2="118" stroke="#6fd3ff" stroke-width="0.5" opacity="0.15"/>
+    <line x1="448" y1="146" x2="643" y2="146" stroke="#6fd3ff" stroke-width="0.5" opacity="0.15"/>
+    <line x1="448" y1="174" x2="643" y2="174" stroke="#6fd3ff" stroke-width="0.5" opacity="0.15"/>
+    <line x1="448" y1="202" x2="643" y2="202" stroke="#6fd3ff" stroke-width="0.5" opacity="0.15"/>
 
-  <!-- Baseline axis -->
-  <line x1="270" y1="760" x2="650" y2="760" stroke="#3BAADB" stroke-width="2"/>
-  <line x1="270" y1="400" x2="270" y2="760" stroke="#3BAADB" stroke-width="2"/>
+    <!-- Candlestick 1 - down (red) -->
+    <line x1="458" y1="80" x2="458" y2="130" stroke="#ff6b6b" stroke-width="1" opacity="0.22"/>
+    <rect x="454" y="88" width="8" height="30" rx="1" fill="#ff6b6b" opacity="0.22"/>
 
-  <!-- Pie chart, top-right, partially cut off -->
-  <circle cx="570" cy="130" r="110" fill="#D4F0FF"/>
-  <!-- Segment 1 - large -->
-  <path d="M570,130 L570,20 A110,110 0 0,1 668,80 Z" fill="#3BAADB"/>
-  <!-- Segment 2 -->
-  <path d="M570,130 L668,80 A110,110 0 0,1 650,220 Z" fill="#6fd3ff"/>
-  <!-- Segment 3 -->
-  <path d="M570,130 L650,220 A110,110 0 0,1 530,235 Z" fill="#A3E2FF"/>
-  <!-- Segment 4 - remaining -->
-  <path d="M570,130 L530,235 A110,110 0 0,1 570,20 Z" fill="#D4F0FF" stroke="#A3E2FF" stroke-width="1"/>
-  <!-- Pie chart border -->
-  <circle cx="570" cy="130" r="110" stroke="#3BAADB" stroke-width="2.5" fill="none"/>
-  <!-- Inner circle (donut) -->
-  <circle cx="570" cy="130" r="45" fill="#EBF3FA"/>
-  <circle cx="570" cy="130" r="45" stroke="#A3E2FF" stroke-width="2" fill="none" opacity="0.5"/>
+    <!-- Candlestick 2 - down (red) -->
+    <line x1="471" y1="92" x2="471" y2="140" stroke="#ff6b6b" stroke-width="1" opacity="0.20"/>
+    <rect x="467" y="100" width="8" height="28" rx="1" fill="#ff6b6b" opacity="0.20"/>
 
-  <!-- Briefcase icon, mid-right -->
-  <rect x="480" y="320" width="80" height="60" rx="6" fill="#6fd3ff"/>
-  <rect x="480" y="320" width="80" height="60" rx="6" stroke="#3BAADB" stroke-width="2.5" fill="none"/>
-  <!-- Briefcase handle -->
-  <path d="M505,320 L505,308 C505,300 515,296 520,296 C525,296 535,300 535,308 L535,320" stroke="#3BAADB" stroke-width="2.5" fill="none"/>
-  <!-- Briefcase middle band -->
-  <line x1="480" y1="345" x2="560" y2="345" stroke="#3BAADB" stroke-width="2"/>
-  <!-- Briefcase clasp -->
-  <rect x="512" y="339" width="16" height="12" rx="3" fill="#1F7AA3"/>
+    <!-- Candlestick 3 - up (green) -->
+    <line x1="484" y1="96" x2="484" y2="148" stroke="#33d6a4" stroke-width="1" opacity="0.30"/>
+    <rect x="480" y="108" width="8" height="26" rx="1" fill="#33d6a4" opacity="0.28"/>
 
-  <!-- Stock ticker tape elements -->
-  <!-- Ticker strip top area -->
-  <rect x="300" y="40" width="120" height="28" rx="5" fill="#A3E2FF" opacity="0.4"/>
-  <rect x="430" y="40" width="90" height="28" rx="5" fill="#6fd3ff" opacity="0.35"/>
-  <rect x="530" y="40" width="110" height="28" rx="5" fill="#D4F0FF" opacity="0.3"/>
-  <!-- Second ticker row -->
-  <rect x="360" y="76" width="100" height="28" rx="5" fill="#D4F0FF" opacity="0.3"/>
-  <rect x="470" y="76" width="80" height="28" rx="5" fill="#A3E2FF" opacity="0.25"/>
-  <rect x="560" y="76" width="80" height="28" rx="5" fill="#6fd3ff" opacity="0.2"/>
+    <!-- Candlestick 4 - up (green) -->
+    <line x1="497" y1="85" x2="497" y2="132" stroke="#33d6a4" stroke-width="1" opacity="0.30"/>
+    <rect x="493" y="92" width="8" height="24" rx="1" fill="#33d6a4" opacity="0.30"/>
 
-  <!-- Small green/red ticker indicators -->
-  <polygon points="320,52 328,44 336,52" fill="#33D6A4" opacity="0.5"/>
-  <polygon points="450,52 458,60 466,52" fill="#E85D5D" opacity="0.4"/>
-  <polygon points="550,52 558,44 566,52" fill="#33D6A4" opacity="0.35"/>
-  <!-- Ticker value bars -->
-  <rect x="340" y="49" width="50" height="4" rx="2" fill="#3BAADB" opacity="0.3"/>
-  <rect x="470" y="49" width="40" height="4" rx="2" fill="#3BAADB" opacity="0.25"/>
+    <!-- Candlestick 5 - up (green) -->
+    <line x1="510" y1="75" x2="510" y2="120" stroke="#33d6a4" stroke-width="1" opacity="0.32"/>
+    <rect x="506" y="82" width="8" height="22" rx="1" fill="#33d6a4" opacity="0.30"/>
 
-  <!-- Newspaper / document pages, right side -->
-  <!-- Document 1, large, partially off-screen -->
-  <rect x="530" y="430" width="130" height="170" rx="8" fill="white" opacity="0.5"/>
-  <rect x="530" y="430" width="130" height="170" rx="8" stroke="#A3E2FF" stroke-width="2" fill="none" opacity="0.5"/>
-  <!-- Document header line -->
-  <rect x="548" y="450" width="70" height="6" rx="3" fill="#3BAADB" opacity="0.35"/>
-  <!-- Document body lines -->
-  <rect x="548" y="470" width="94" height="4" rx="2" fill="#A3E2FF" opacity="0.3"/>
-  <rect x="548" y="482" width="88" height="4" rx="2" fill="#A3E2FF" opacity="0.25"/>
-  <rect x="548" y="494" width="94" height="4" rx="2" fill="#A3E2FF" opacity="0.25"/>
-  <rect x="548" y="506" width="60" height="4" rx="2" fill="#A3E2FF" opacity="0.2"/>
-  <!-- Mini chart in document -->
-  <rect x="548" y="524" width="94" height="50" rx="4" fill="#D4F0FF" opacity="0.3"/>
-  <polyline points="554,564 568,555 580,560 594,545 610,540 630,530" stroke="#6fd3ff" stroke-width="2" fill="none" opacity="0.4" stroke-linecap="round"/>
+    <!-- Candlestick 6 - down (red) -->
+    <line x1="523" y1="82" x2="523" y2="135" stroke="#ff6b6b" stroke-width="1" opacity="0.22"/>
+    <rect x="519" y="90" width="8" height="32" rx="1" fill="#ff6b6b" opacity="0.22"/>
 
-  <!-- Document 2, behind and offset -->
-  <rect x="560" y="415" width="110" height="150" rx="8" fill="white" opacity="0.25"/>
-  <rect x="560" y="415" width="110" height="150" rx="8" stroke="#D4F0FF" stroke-width="1.5" fill="none" opacity="0.3"/>
+    <!-- Candlestick 7 - down (red) -->
+    <line x1="536" y1="95" x2="536" y2="150" stroke="#ff6b6b" stroke-width="1" opacity="0.20"/>
+    <rect x="532" y="105" width="8" height="30" rx="1" fill="#ff6b6b" opacity="0.18"/>
 
-  <!-- Large decorative circle, partially visible right edge -->
-  <circle cx="680" cy="650" r="140" stroke="#6fd3ff" stroke-width="3" fill="none" opacity="0.2"/>
-  <circle cx="680" cy="650" r="105" stroke="#A3E2FF" stroke-width="2" fill="none" opacity="0.12"/>
+    <!-- Candlestick 8 - up (green) -->
+    <line x1="549" y1="88" x2="549" y2="145" stroke="#33d6a4" stroke-width="1" opacity="0.30"/>
+    <rect x="545" y="100" width="8" height="28" rx="1" fill="#33d6a4" opacity="0.28"/>
 
-  <!-- Dashboard panel outline -->
-  <rect x="350" y="260" width="290" height="160" rx="12" stroke="#6fd3ff" stroke-width="2" fill="none" opacity="0.12"/>
-  <line x1="350" y1="295" x2="640" y2="295" stroke="#6fd3ff" stroke-width="1.5" opacity="0.12"/>
+    <!-- Candlestick 9 - up (green) -->
+    <line x1="562" y1="72" x2="562" y2="125" stroke="#33d6a4" stroke-width="1" opacity="0.32"/>
+    <rect x="558" y="80" width="8" height="26" rx="1" fill="#33d6a4" opacity="0.32"/>
 
-  <!-- Decorative accent dots, fading left -->
-  <circle cx="250" cy="300" r="4" fill="#A3E2FF" opacity="0.2"/>
-  <circle cx="230" cy="340" r="3" fill="#D4F0FF" opacity="0.15"/>
-  <circle cx="210" cy="280" r="3" fill="#6fd3ff" opacity="0.12"/>
-  <circle cx="270" cy="450" r="3" fill="#A3E2FF" opacity="0.15"/>
-  <circle cx="300" cy="380" r="4" fill="#D4F0FF" opacity="0.12"/>
+    <!-- Candlestick 10 - up (green) -->
+    <line x1="575" y1="65" x2="575" y2="110" stroke="#33d6a4" stroke-width="1" opacity="0.35"/>
+    <rect x="571" y="72" width="8" height="22" rx="1" fill="#33d6a4" opacity="0.32"/>
 
-  <!-- Subtle up-arrows scattered -->
-  <polygon points="380,310 388,298 396,310" fill="#33D6A4" opacity="0.15"/>
-  <polygon points="600,300 606,290 612,300" fill="#33D6A4" opacity="0.12"/>
+    <!-- Candlestick 11 - down (red) -->
+    <line x1="588" y1="70" x2="588" y2="118" stroke="#ff6b6b" stroke-width="1" opacity="0.22"/>
+    <rect x="584" y="78" width="8" height="28" rx="1" fill="#ff6b6b" opacity="0.20"/>
 
-  <!-- Horizontal bar indicators in dashboard -->
-  <rect x="370" y="310" width="80" height="10" rx="5" fill="#6fd3ff" opacity="0.2"/>
-  <rect x="370" y="330" width="120" height="10" rx="5" fill="#A3E2FF" opacity="0.18"/>
-  <rect x="370" y="350" width="60" height="10" rx="5" fill="#D4F0FF" opacity="0.15"/>
-  <rect x="370" y="370" width="100" height="10" rx="5" fill="#6fd3ff" opacity="0.12"/>
+    <!-- Candlestick 12 - up (green) -->
+    <line x1="601" y1="62" x2="601" y2="108" stroke="#33d6a4" stroke-width="1" opacity="0.32"/>
+    <rect x="597" y="68" width="8" height="24" rx="1" fill="#33d6a4" opacity="0.30"/>
+
+    <!-- Candlestick 13 - up (green) -->
+    <line x1="614" y1="56" x2="614" y2="100" stroke="#33d6a4" stroke-width="1" opacity="0.35"/>
+    <rect x="610" y="62" width="8" height="20" rx="1" fill="#33d6a4" opacity="0.32"/>
+
+    <!-- Candlestick 14 - down (red, smaller) -->
+    <line x1="627" y1="60" x2="627" y2="98" stroke="#ff6b6b" stroke-width="1" opacity="0.20"/>
+    <rect x="623" y="66" width="8" height="22" rx="1" fill="#ff6b6b" opacity="0.18"/>
+
+    <!-- Volume bars below candlestick chart -->
+    <rect x="454" y="226" width="8" height="16" rx="1" fill="#c0d0dc" opacity="0.35"/>
+    <rect x="467" y="230" width="8" height="12" rx="1" fill="#c0d0dc" opacity="0.30"/>
+    <rect x="480" y="224" width="8" height="18" rx="1" fill="#c0d0dc" opacity="0.35"/>
+    <rect x="493" y="220" width="8" height="22" rx="1" fill="#33d6a4" opacity="0.25"/>
+    <rect x="506" y="222" width="8" height="20" rx="1" fill="#33d6a4" opacity="0.28"/>
+    <rect x="519" y="228" width="8" height="14" rx="1" fill="#c0d0dc" opacity="0.30"/>
+    <rect x="532" y="226" width="8" height="16" rx="1" fill="#c0d0dc" opacity="0.30"/>
+    <rect x="545" y="224" width="8" height="18" rx="1" fill="#c0d0dc" opacity="0.32"/>
+    <rect x="558" y="218" width="8" height="24" rx="1" fill="#33d6a4" opacity="0.28"/>
+    <rect x="571" y="216" width="8" height="26" rx="1" fill="#33d6a4" opacity="0.30"/>
+    <rect x="584" y="228" width="8" height="14" rx="1" fill="#c0d0dc" opacity="0.28"/>
+    <rect x="597" y="222" width="8" height="20" rx="1" fill="#33d6a4" opacity="0.25"/>
+    <rect x="610" y="220" width="8" height="22" rx="1" fill="#33d6a4" opacity="0.28"/>
+    <rect x="623" y="226" width="8" height="16" rx="1" fill="#c0d0dc" opacity="0.25"/>
+
+    <!-- Date axis placeholder lines -->
+    <rect x="456" y="248" width="16" height="3" rx="1.5" fill="#9fb0c2" opacity="0.20"/>
+    <rect x="508" y="248" width="16" height="3" rx="1.5" fill="#9fb0c2" opacity="0.20"/>
+    <rect x="560" y="248" width="16" height="3" rx="1.5" fill="#9fb0c2" opacity="0.20"/>
+    <rect x="612" y="248" width="16" height="3" rx="1.5" fill="#9fb0c2" opacity="0.20"/>
+  </g>
+
+  <!-- ============================================== -->
+  <!-- MID-RIGHT: METRICS / FUNDAMENTALS (y: 320-530) -->
+  <!-- ============================================== -->
+  <g>
+    <!-- Card background -->
+    <rect x="465" y="320" width="190" height="210" rx="8" ry="8"
+      fill="#d2dfe8" opacity="0.50" stroke="#6fd3ff" stroke-width="1" stroke-opacity="0.18"/>
+
+    <!-- Card title placeholder -->
+    <rect x="480" y="336" width="72" height="5" rx="2" fill="#9fb0c2" opacity="0.40"/>
+
+    <!-- Divider under title -->
+    <line x1="480" y1="350" x2="640" y2="350" stroke="#6fd3ff" stroke-width="0.5" opacity="0.20"/>
+
+    <!-- Metric row 1: P/E Ratio -->
+    <rect x="480" y="362" width="55" height="4" rx="2" fill="#9fb0c2" opacity="0.30"/>
+    <rect x="595" y="362" width="40" height="4" rx="2" fill="#9fb0c2" opacity="0.40"/>
+
+    <!-- Metric row 2: Market Cap -->
+    <rect x="480" y="384" width="68" height="4" rx="2" fill="#9fb0c2" opacity="0.30"/>
+    <rect x="590" y="384" width="45" height="4" rx="2" fill="#9fb0c2" opacity="0.40"/>
+
+    <!-- Section divider -->
+    <line x1="480" y1="402" x2="640" y2="402" stroke="#6fd3ff" stroke-width="0.4" opacity="0.15"/>
+
+    <!-- Metric row 3: Revenue -->
+    <rect x="480" y="414" width="50" height="4" rx="2" fill="#9fb0c2" opacity="0.30"/>
+    <rect x="598" y="414" width="37" height="4" rx="2" fill="#33d6a4" opacity="0.30"/>
+
+    <!-- Metric row 4: EPS -->
+    <rect x="480" y="436" width="42" height="4" rx="2" fill="#9fb0c2" opacity="0.30"/>
+    <rect x="600" y="436" width="35" height="4" rx="2" fill="#33d6a4" opacity="0.28"/>
+
+    <!-- Metric row 5: Dividend Yield -->
+    <rect x="480" y="458" width="60" height="4" rx="2" fill="#9fb0c2" opacity="0.30"/>
+    <rect x="602" y="458" width="33" height="4" rx="2" fill="#9fb0c2" opacity="0.35"/>
+
+    <!-- Mini donut chart -->
+    <!-- Outer ring segments -->
+    <!-- Segment 1 (blue, ~40%) -->
+    <path d="M535,505 L535,485 A20,20 0 0,1 553,500 Z"
+      fill="#2791ff" opacity="0.30"/>
+    <!-- Segment 2 (green, ~35%) -->
+    <path d="M535,505 L553,500 A20,20 0 0,1 537,525 Z"
+      fill="#33d6a4" opacity="0.28"/>
+    <!-- Segment 3 (grey, ~25%) -->
+    <path d="M535,505 L537,525 A20,20 0 0,1 535,485 Z"
+      fill="#c0d0dc" opacity="0.40"/>
+    <!-- Inner hole for donut -->
+    <circle cx="535" cy="505" r="10" fill="#d2dfe8" opacity="0.50"/>
+
+    <!-- Donut legend placeholders -->
+    <rect x="565" y="494" width="6" height="6" rx="1" fill="#2791ff" opacity="0.30"/>
+    <rect x="575" y="495" width="30" height="3" rx="1.5" fill="#9fb0c2" opacity="0.25"/>
+    <rect x="565" y="506" width="6" height="6" rx="1" fill="#33d6a4" opacity="0.28"/>
+    <rect x="575" y="507" width="35" height="3" rx="1.5" fill="#9fb0c2" opacity="0.25"/>
+    <rect x="565" y="518" width="6" height="6" rx="1" fill="#c0d0dc" opacity="0.40"/>
+    <rect x="575" y="519" width="25" height="3" rx="1.5" fill="#9fb0c2" opacity="0.25"/>
+  </g>
+
+  <!-- ============================================== -->
+  <!-- BOTTOM-RIGHT: PERFORMANCE SUMMARY (y: 570-800) -->
+  <!-- ============================================== -->
+  <g transform="rotate(4, 555, 685)">
+    <!-- Card background -->
+    <rect x="455" y="570" width="200" height="220" rx="8" ry="8"
+      fill="#d2dfe8" opacity="0.45" stroke="#6fd3ff" stroke-width="1" stroke-opacity="0.18"/>
+
+    <!-- Header: "Performance" placeholder -->
+    <rect x="470" y="586" width="80" height="5" rx="2" fill="#9fb0c2" opacity="0.40"/>
+    <!-- Divider -->
+    <line x1="470" y1="600" x2="640" y2="600" stroke="#6fd3ff" stroke-width="0.5" opacity="0.18"/>
+
+    <!-- Horizontal bar chart -->
+
+    <!-- Bar 1: 1Y (longest, blue) -->
+    <rect x="470" y="614" width="28" height="3" rx="1.5" fill="#9fb0c2" opacity="0.30"/>
+    <rect x="505" y="610" width="120" height="12" rx="4" fill="#2791ff" opacity="0.28"/>
+
+    <!-- Bar 2: 6M (medium-long, green) -->
+    <rect x="470" y="640" width="24" height="3" rx="1.5" fill="#9fb0c2" opacity="0.30"/>
+    <rect x="505" y="636" width="95" height="12" rx="4" fill="#33d6a4" opacity="0.30"/>
+
+    <!-- Bar 3: 3M (shorter, green) -->
+    <rect x="470" y="666" width="26" height="3" rx="1.5" fill="#9fb0c2" opacity="0.30"/>
+    <rect x="505" y="662" width="68" height="12" rx="4" fill="#33d6a4" opacity="0.25"/>
+
+    <!-- Bar 4: 1M (short, red — loss period) -->
+    <rect x="470" y="692" width="22" height="3" rx="1.5" fill="#9fb0c2" opacity="0.30"/>
+    <rect x="505" y="688" width="40" height="12" rx="4" fill="#ff6b6b" opacity="0.22"/>
+
+    <!-- Divider before summary -->
+    <line x1="470" y1="714" x2="640" y2="714" stroke="#6fd3ff" stroke-width="0.4" opacity="0.15"/>
+
+    <!-- Summary line 1: Total Return -->
+    <rect x="470" y="726" width="58" height="4" rx="2" fill="#9fb0c2" opacity="0.30"/>
+    <rect x="578" y="726" width="45" height="4" rx="2" fill="#33d6a4" opacity="0.30"/>
+
+    <!-- Summary line 2: Benchmark -->
+    <rect x="470" y="746" width="72" height="4" rx="2" fill="#9fb0c2" opacity="0.28"/>
+    <rect x="582" y="746" width="40" height="4" rx="2" fill="#9fb0c2" opacity="0.35"/>
+  </g>
+
 </svg>

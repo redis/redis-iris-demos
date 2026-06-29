@@ -13,6 +13,7 @@ from typing import Any
 
 from openai import AsyncOpenAI
 from redisvl.extensions.router import Route, SemanticRouter
+from redisvl.extensions.router.schema import RoutingConfig
 from redisvl.utils.vectorize import OpenAITextVectorizer
 
 from backend.app.core.domain_contract import GuardrailConfig
@@ -32,6 +33,11 @@ class GuardrailService:
         self._openai = AsyncOpenAI(api_key=settings.openai_api_key)
         self._router: SemanticRouter | None = None
         self._lock = asyncio.Lock()
+        self._block_messages: dict[str, str] = {
+            route.name: route.block_message
+            for route in (guardrail_config.routes if guardrail_config else [])
+            if route.block_message
+        }
 
     def is_configured(self) -> bool:
         return bool(self._enabled and self._config and self._openai_api_key and self._redis_url)
@@ -66,6 +72,11 @@ class GuardrailService:
                     name=router_name,
                     vectorizer=vectorizer,
                     routes=routes,
+                    # Classify on the single closest reference ("min") rather than the
+                    # default per-route average. Attack/intent routes (e.g. unauthorized
+                    # access) carry many phrasing variants; one strong match should fire
+                    # the route instead of being diluted by less-similar references.
+                    routing_config=RoutingConfig(aggregation_method="min"),
                     redis_url=self._redis_url,
                     overwrite=True,
                 )
@@ -83,15 +94,21 @@ class GuardrailService:
 
     async def check(self, vector: list[float]) -> dict[str, Any]:
         if not self._config:
-            return {"allowed": True, "route": None, "distance": None}
+            return {"allowed": True, "route": None, "distance": None, "block_message": None}
         try:
             router = await self._ensure_router()
             match = await asyncio.to_thread(router, None, vector)
             allowed = match.name == self._config.allowed_route_name
-            return {"allowed": allowed, "route": match.name, "distance": match.distance}
+            block_message = None if allowed else self._block_messages.get(match.name)
+            return {
+                "allowed": allowed,
+                "route": match.name,
+                "distance": match.distance,
+                "block_message": block_message,
+            }
         except Exception:
             log.warning("Guardrail check failed, allowing through", exc_info=True)
-            return {"allowed": True, "route": None, "distance": None}
+            return {"allowed": True, "route": None, "distance": None, "block_message": None}
 
     async def warm_up(self) -> None:
         if self.is_configured():

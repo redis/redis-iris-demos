@@ -49,7 +49,7 @@ class ElectrohubDomain:
         branding=BrandingConfig(
             app_name="ElectroHub",
             subtitle="Electronics Concierge",
-            hero_title="Shop hardware, pickup, and order support in one place.",
+            hero_title="Shopping Made Easy",
             placeholder_text="Ask about products, store pickup, or your shipment...",
             logo_path="domains/electrohub/assets/logo.png",
             demo_steps=[
@@ -61,8 +61,8 @@ class ElectrohubDomain:
             starter_prompts=[
                 PromptCard(
                     eyebrow="Context",
-                    title="Find me something for OpenClaw",
-                    prompt="I am looking for a MacMini to run OpenClaw on, what machines do you have in stock that would help?",
+                    title="Find me computers in stock",
+                    prompt="I am looking for a MacMini, what do you have in stock??",
                 ),
                 PromptCard(
                     eyebrow="Context",
@@ -99,7 +99,7 @@ class ElectrohubDomain:
                 soft="#d5e5fb",
                 accent="#31c7ff",
                 user="#12345b",
-                landing_bg="#E8F4FE",
+                landing_bg="##F0F4F8",
             ),
         ),
         namespace=NamespaceConfig(

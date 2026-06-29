@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 632 817">
+
+  <!-- ============================================= -->
+  <!-- TOP-RIGHT: Bill Summary Card (y: 40-260)      -->
+  <!-- ============================================= -->
+
+  <g transform="rotate(6, 530, 150)">
+    <rect x="396" y="54" width="230" height="170" rx="14" fill="#b0adb5" opacity="0.10"/>
+  </g>
+
+  <g transform="rotate(6, 530, 150)">
+    <rect x="392" y="50" width="230" height="170" rx="14" fill="#e8e6eb" opacity="0.50"/>
+    <rect x="392" y="50" width="230" height="170" rx="14" fill="none" stroke="#c5c2ca" stroke-width="1.2" opacity="0.20"/>
+    <rect x="392" y="50" width="230" height="5" rx="14" fill="#e20074" opacity="0.12"/>
+
+    <rect x="412" y="78" width="85" height="3" rx="1.5" fill="#b0adb5" opacity="0.40"/>
+    <rect x="412" y="98" width="110" height="7" rx="3" fill="#b0adb5" opacity="0.45"/>
+    <rect x="412" y="118" width="60" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.28"/>
+
+    <line x1="412" y1="135" x2="602" y2="135" stroke="#c5c2ca" stroke-width="0.6" opacity="0.15"/>
+
+    <rect x="412" y="145" width="70" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.32"/>
+    <rect x="570" y="145" width="30" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.32"/>
+    <rect x="412" y="157" width="85" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.26"/>
+    <rect x="565" y="157" width="35" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.26"/>
+    <rect x="412" y="169" width="55" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.22"/>
+    <rect x="572" y="169" width="28" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.22"/>
+
+    <rect x="550" y="74" width="52" height="14" rx="4" fill="#e20074" opacity="0.08"/>
+    <rect x="558" y="79" width="36" height="3" rx="1.5" fill="#b0adb5" opacity="0.28"/>
+
+    <circle cx="600" cy="100" r="4" fill="#e20074" opacity="0.18"/>
+  </g>
+
+  <!-- Small card peeking top-right -->
+  <g transform="rotate(14, 580, 30)">
+    <rect x="500" y="-15" width="140" height="75" rx="10" fill="#dddbe0" opacity="0.38"/>
+    <rect x="500" y="-15" width="140" height="75" rx="10" fill="none" stroke="#c5c2ca" stroke-width="0.8" opacity="0.15"/>
+    <rect x="520" y="10" width="55" height="3" rx="1.5" fill="#b0adb5" opacity="0.28"/>
+    <rect x="520" y="22" width="80" height="4.5" rx="2" fill="#b0adb5" opacity="0.32"/>
+  </g>
+
+
+  <!-- ============================================= -->
+  <!-- MID-RIGHT: Plan Cards (y: 310-560)            -->
+  <!-- ============================================= -->
+
+  <!-- Plan card 1 -->
+  <g transform="translate(400, 310)">
+    <rect x="0" y="0" width="190" height="110" rx="12" fill="#e8e6eb" opacity="0.45"/>
+    <rect x="0" y="0" width="190" height="110" rx="12" fill="none" stroke="#c5c2ca" stroke-width="0.8" opacity="0.15"/>
+
+    <rect x="14" y="16" width="80" height="3.5" rx="1.75" fill="#b0adb5" opacity="0.42"/>
+    <rect x="14" y="32" width="55" height="6" rx="3" fill="#b0adb5" opacity="0.45"/>
+    <rect x="78" y="34" width="30" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.25"/>
+
+    <line x1="14" y1="50" x2="176" y2="50" stroke="#c5c2ca" stroke-width="0.5" opacity="0.12"/>
+
+    <circle cx="22" cy="62" r="2.5" fill="#e20074" opacity="0.12"/>
+    <rect x="32" y="60" width="100" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.28"/>
+    <circle cx="22" cy="76" r="2.5" fill="#e20074" opacity="0.12"/>
+    <rect x="32" y="74" width="85" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.24"/>
+    <circle cx="22" cy="90" r="2.5" fill="#e20074" opacity="0.12"/>
+    <rect x="32" y="88" width="110" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.22"/>
+  </g>
+
+  <!-- Plan card 2 -->
+  <g transform="translate(420, 440)">
+    <rect x="0" y="0" width="190" height="110" rx="12" fill="#dddbe0" opacity="0.38"/>
+    <rect x="0" y="0" width="190" height="110" rx="12" fill="none" stroke="#c5c2ca" stroke-width="0.8" opacity="0.12"/>
+
+    <rect x="120" y="-6" width="52" height="16" rx="5" fill="#e20074" opacity="0.08"/>
+    <rect x="128" y="-1" width="36" height="3" rx="1.5" fill="#b0adb5" opacity="0.32"/>
+
+    <rect x="14" y="16" width="90" height="3.5" rx="1.75" fill="#b0adb5" opacity="0.36"/>
+    <rect x="14" y="32" width="50" height="6" rx="3" fill="#b0adb5" opacity="0.40"/>
+    <rect x="72" y="34" width="35" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.22"/>
+
+    <line x1="14" y1="50" x2="176" y2="50" stroke="#c5c2ca" stroke-width="0.5" opacity="0.10"/>
+
+    <circle cx="22" cy="62" r="2.5" fill="#e20074" opacity="0.10"/>
+    <rect x="32" y="60" width="95" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.24"/>
+    <circle cx="22" cy="76" r="2.5" fill="#e20074" opacity="0.10"/>
+    <rect x="32" y="74" width="75" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.20"/>
+    <circle cx="22" cy="90" r="2.5" fill="#e20074" opacity="0.10"/>
+    <rect x="32" y="88" width="105" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.18"/>
+  </g>
+
+
+  <!-- ============================================= -->
+  <!-- BOTTOM-RIGHT: Network Card (y: 600-780)       -->
+  <!-- ============================================= -->
+
+  <g transform="rotate(-8, 530, 700)">
+    <rect x="404" y="636" width="210" height="140" rx="12" fill="#b0adb5" opacity="0.08"/>
+  </g>
+
+  <g transform="rotate(-8, 530, 700)">
+    <rect x="400" y="632" width="210" height="140" rx="12" fill="#e8e6eb" opacity="0.45"/>
+    <rect x="400" y="632" width="210" height="140" rx="12" fill="none" stroke="#c5c2ca" stroke-width="1" opacity="0.18"/>
+
+    <rect x="420" y="656" width="90" height="3" rx="1.5" fill="#b0adb5" opacity="0.35"/>
+
+    <!-- Signal bars -->
+    <rect x="420" y="690" width="10" height="8" rx="2" fill="#b0adb5" opacity="0.35"/>
+    <rect x="436" y="684" width="10" height="14" rx="2" fill="#b0adb5" opacity="0.35"/>
+    <rect x="452" y="678" width="10" height="20" rx="2" fill="#b0adb5" opacity="0.35"/>
+    <rect x="468" y="672" width="10" height="26" rx="2" fill="#e20074" opacity="0.14"/>
+    <rect x="484" y="672" width="10" height="26" rx="2" fill="#d8d6dc" opacity="0.30"/>
+
+    <rect x="510" y="680" width="28" height="14" rx="4" fill="#e20074" opacity="0.08"/>
+    <rect x="516" y="685" width="16" height="3" rx="1.5" fill="#b0adb5" opacity="0.25"/>
+
+    <rect x="420" y="718" width="70" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.28"/>
+    <rect x="420" y="730" width="160" height="6" rx="3" fill="#d8d6dc" opacity="0.40"/>
+    <rect x="420" y="730" width="130" height="6" rx="3" fill="#e20074" opacity="0.08"/>
+    <rect x="420" y="744" width="50" height="2.5" rx="1.25" fill="#b0adb5" opacity="0.20"/>
+  </g>
+
+  <!-- Decorative dots -->
+  <circle cx="380" cy="280" r="2" fill="#c5c2ca" opacity="0.15"/>
+  <circle cx="620" cy="580" r="1.5" fill="#d8d6dc" opacity="0.18"/>
+  <circle cx="400" cy="600" r="2.5" fill="#c5c2ca" opacity="0.12"/>
+  <circle cx="580" cy="290" r="2" fill="#b0adb5" opacity="0.15"/>
+
+</svg>

@@ -1,102 +1,157 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 632 817" fill="none">
-  <!-- Circuit board traces - background pattern toward right -->
-  <path d="M612 150 L612 300 L550 300" stroke="#B8EBFF" stroke-width="3" stroke-linecap="round"/>
-  <path d="M612 400 L612 500 L570 500 L570 560" stroke="#B8EBFF" stroke-width="3" stroke-linecap="round"/>
-  <path d="M560 80 L560 160 L500 160 L500 220" stroke="#B8EBFF" stroke-width="3" stroke-linecap="round"/>
-  <path d="M580 650 L580 700 L520 700 L520 750" stroke="#B8EBFF" stroke-width="3" stroke-linecap="round"/>
-  <circle cx="550" cy="300" r="5" fill="#B8EBFF"/>
-  <circle cx="570" cy="560" r="5" fill="#B8EBFF"/>
-  <circle cx="500" cy="220" r="5" fill="#B8EBFF"/>
-  <circle cx="520" cy="750" r="5" fill="#B8EBFF"/>
-  <circle cx="612" cy="150" r="4" fill="#7DD8FF"/>
-  <circle cx="560" cy="80" r="4" fill="#7DD8FF"/>
 
-  <!-- Lighter traces further left -->
-  <path d="M400 50 L400 100 L360 100" stroke="#B8EBFF" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
-  <path d="M320 200 L320 250 L280 250" stroke="#B8EBFF" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
-  <circle cx="360" cy="100" r="3" fill="#B8EBFF" opacity="0.5"/>
-  <circle cx="280" cy="250" r="3" fill="#B8EBFF" opacity="0.3"/>
+  <!-- ============================================= -->
+  <!-- ElectroHub Right Background                   -->
+  <!-- Faded e-commerce UI: specs panel, comparison, -->
+  <!-- phone app view — frosted shopping interface   -->
+  <!-- All elements x > 390                          -->
+  <!-- ============================================= -->
 
-  <!-- Gaming Controller - top right, partially cut off -->
-  <!-- Body -->
-  <path d="M480 60 C440 60, 420 90, 420 130 C420 170, 450 200, 480 210 L500 220 C510 230, 520 230, 530 220 L540 210 C560 210, 570 200, 580 180 L620 160 C650 150, 670 130, 670 100 C670 70, 650 50, 620 50 L580 50 C560 50, 540 55, 530 60 Z" fill="#1a8fd0"/>
-  <!-- Inner detail -->
-  <path d="M490 80 C470 80, 450 100, 450 130 C450 155, 465 175, 485 185 L540 185 C560 175, 580 155, 590 130 C600 105, 600 80, 580 70 L530 70 C510 70, 500 75, 490 80 Z" fill="#0A5A8C"/>
-  <!-- D-pad -->
-  <rect x="470" y="110" width="30" height="10" rx="3" fill="#31c7ff"/>
-  <rect x="480" y="100" width="10" height="30" rx="3" fill="#31c7ff"/>
-  <!-- Action buttons -->
-  <circle cx="560" cy="100" r="7" fill="#31c7ff"/>
-  <circle cx="575" cy="115" r="7" fill="#7DD8FF"/>
-  <circle cx="545" cy="115" r="7" fill="#7DD8FF"/>
-  <circle cx="560" cy="130" r="7" fill="#31c7ff"/>
-  <!-- Analog sticks -->
-  <circle cx="505" cy="155" r="12" fill="#1a8fd0" stroke="#31c7ff" stroke-width="2"/>
-  <circle cx="545" cy="155" r="12" fill="#1a8fd0" stroke="#31c7ff" stroke-width="2"/>
+  <!-- ===== TOP-RIGHT: Product Specs / Detail Panel ===== -->
 
-  <!-- Monitor/Display - mid right area -->
-  <rect x="420" y="280" width="220" height="150" rx="10" fill="#1a8fd0"/>
-  <rect x="432" y="292" width="196" height="126" rx="4" fill="#0A5A8C"/>
-  <!-- Screen content -->
-  <rect x="445" y="305" width="80" height="10" rx="3" fill="#31c7ff" opacity="0.6"/>
-  <rect x="445" y="325" width="120" height="70" rx="4" fill="#1a8fd0" opacity="0.5"/>
-  <rect x="575" y="305" width="40" height="40" rx="6" fill="#31c7ff" opacity="0.4"/>
-  <!-- Monitor stand -->
-  <rect x="505" y="430" width="30" height="30" rx="2" fill="#31c7ff"/>
-  <rect x="485" y="455" width="70" height="8" rx="4" fill="#1a8fd0"/>
+  <!-- Specs panel body -->
+  <rect x="430" y="20" width="210" height="230" rx="12" fill="#d0e8f7" fill-opacity="0.50" stroke="#31c7ff" stroke-width="1" stroke-opacity="0.20"/>
 
-  <!-- Smart Speaker - mid right -->
-  <ellipse cx="580" cy="520" rx="45" ry="20" fill="#1a8fd0"/>
-  <rect x="535" y="420" width="90" height="100" rx="45" fill="#31c7ff"/>
-  <rect x="545" y="430" width="70" height="80" rx="35" fill="#1a8fd0"/>
-  <!-- Speaker mesh dots -->
-  <circle cx="565" cy="460" r="3" fill="#7DD8FF" opacity="0.6"/>
-  <circle cx="580" cy="460" r="3" fill="#7DD8FF" opacity="0.6"/>
-  <circle cx="595" cy="460" r="3" fill="#7DD8FF" opacity="0.6"/>
-  <circle cx="565" cy="475" r="3" fill="#7DD8FF" opacity="0.6"/>
-  <circle cx="580" cy="475" r="3" fill="#7DD8FF" opacity="0.6"/>
-  <circle cx="595" cy="475" r="3" fill="#7DD8FF" opacity="0.6"/>
-  <circle cx="565" cy="490" r="3" fill="#7DD8FF" opacity="0.6"/>
-  <circle cx="580" cy="490" r="3" fill="#7DD8FF" opacity="0.6"/>
-  <circle cx="595" cy="490" r="3" fill="#7DD8FF" opacity="0.6"/>
-  <!-- Light ring on top -->
-  <ellipse cx="580" cy="425" rx="25" ry="8" fill="none" stroke="#7DD8FF" stroke-width="3"/>
+  <!-- Section header line -->
+  <rect x="446" y="38" width="70" height="5" rx="2" fill="#91a3bd" fill-opacity="0.38"/>
 
-  <!-- Star rating icons - scattered -->
-  <!-- Star 1 -->
-  <polygon points="350,380 356,396 374,396 360,406 365,422 350,413 335,422 340,406 326,396 344,396" fill="#31c7ff" opacity="0.5"/>
-  <!-- Star 2 -->
-  <polygon points="420,550 424,562 438,562 427,569 431,581 420,574 409,581 413,569 402,562 416,562" fill="#7DD8FF" opacity="0.4"/>
-  <!-- Star 3 -->
-  <polygon points="300,480 304,490 314,490 306,496 309,506 300,500 291,506 294,496 286,490 296,490" fill="#B8EBFF" opacity="0.4"/>
+  <!-- Divider under header -->
+  <line x1="446" y1="52" x2="624" y2="52" stroke="#31c7ff" stroke-width="0.6" stroke-opacity="0.18"/>
 
-  <!-- Large Smartphone - bottom right, partially cut off -->
-  <rect x="470" y="590" width="190" height="350" rx="24" fill="#1a8fd0"/>
-  <rect x="480" y="605" width="170" height="320" rx="16" fill="#0A5A8C"/>
-  <!-- Phone screen content -->
-  <rect x="495" y="625" width="100" height="14" rx="4" fill="#31c7ff" opacity="0.6"/>
-  <rect x="495" y="650" width="70" height="10" rx="3" fill="#7DD8FF" opacity="0.4"/>
-  <rect x="495" y="675" width="140" height="80" rx="8" fill="#1a8fd0" opacity="0.5"/>
-  <rect x="495" y="770" width="140" height="40" rx="8" fill="#31c7ff" opacity="0.3"/>
-  <!-- Phone notch -->
-  <rect x="535" y="595" width="60" height="12" rx="6" fill="#0A5A8C"/>
-  <!-- Camera dot -->
-  <circle cx="600" cy="601" r="5" fill="#31c7ff"/>
-  <!-- Home indicator -->
-  <rect x="535" y="900" width="60" height="5" rx="2.5" fill="#7DD8FF" opacity="0.5"/>
+  <!-- Spec row 1: label + value -->
+  <rect x="446" y="64" width="50" height="3" rx="2" fill="#91a3bd" fill-opacity="0.30"/>
+  <rect x="530" y="64" width="80" height="3" rx="2" fill="#91a3bd" fill-opacity="0.22"/>
 
-  <!-- Power button icon - decorative -->
-  <circle cx="300" cy="680" r="16" stroke="#B8EBFF" stroke-width="3" fill="none" opacity="0.35"/>
-  <path d="M300 664 L300 673" stroke="#B8EBFF" stroke-width="3" stroke-linecap="round" opacity="0.35"/>
+  <!-- Spec row 2 -->
+  <rect x="446" y="88" width="40" height="3" rx="2" fill="#91a3bd" fill-opacity="0.30"/>
+  <rect x="530" y="88" width="70" height="3" rx="2" fill="#91a3bd" fill-opacity="0.22"/>
 
-  <!-- Bluetooth icon - small decorative -->
-  <path d="M350 620 L360 630 L350 640 M350 620 L350 640 L360 630 L350 620" stroke="#7DD8FF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
+  <!-- Spec row 3 -->
+  <rect x="446" y="112" width="55" height="3" rx="2" fill="#91a3bd" fill-opacity="0.28"/>
+  <rect x="530" y="112" width="90" height="3" rx="2" fill="#91a3bd" fill-opacity="0.20"/>
 
-  <!-- Small decorative dots -->
-  <circle cx="350" cy="300" r="4" fill="#B8EBFF" opacity="0.4"/>
-  <circle cx="280" cy="400" r="3" fill="#B8EBFF" opacity="0.3"/>
-  <circle cx="250" cy="550" r="3" fill="#B8EBFF" opacity="0.2"/>
-  <circle cx="450" cy="560" r="5" fill="#7DD8FF" opacity="0.3"/>
-  <circle cx="380" cy="750" r="4" fill="#B8EBFF" opacity="0.3"/>
-  <circle cx="320" cy="700" r="3" fill="#B8EBFF" opacity="0.2"/>
+  <!-- Spec row 4 -->
+  <rect x="446" y="136" width="45" height="3" rx="2" fill="#91a3bd" fill-opacity="0.28"/>
+  <rect x="530" y="136" width="60" height="3" rx="2" fill="#91a3bd" fill-opacity="0.22"/>
+
+  <!-- Spec row 5 -->
+  <rect x="446" y="160" width="58" height="3" rx="2" fill="#91a3bd" fill-opacity="0.26"/>
+  <rect x="530" y="160" width="75" height="3" rx="2" fill="#91a3bd" fill-opacity="0.20"/>
+
+  <!-- Spec row 6 -->
+  <rect x="446" y="184" width="42" height="3" rx="2" fill="#91a3bd" fill-opacity="0.26"/>
+  <rect x="530" y="184" width="65" height="3" rx="2" fill="#91a3bd" fill-opacity="0.18"/>
+
+  <!-- Spec row 7 -->
+  <rect x="446" y="208" width="52" height="3" rx="2" fill="#91a3bd" fill-opacity="0.24"/>
+  <rect x="530" y="208" width="55" height="3" rx="2" fill="#91a3bd" fill-opacity="0.18"/>
+
+  <!-- "In Stock" badge -->
+  <rect x="446" y="226" width="60" height="16" rx="4" fill="#31c7ff" fill-opacity="0.18" stroke="#31c7ff" stroke-width="0.6" stroke-opacity="0.22"/>
+  <rect x="456" y="232" width="40" height="3" rx="2" fill="#91a3bd" fill-opacity="0.30"/>
+
+
+  <!-- ===== MID-RIGHT: Feature Comparison Checklist ===== -->
+
+  <!-- Comparison panel -->
+  <rect x="480" y="300" width="160" height="210" rx="10" fill="#d0e8f7" fill-opacity="0.45" stroke="#31c7ff" stroke-width="0.8" stroke-opacity="0.18"/>
+
+  <!-- Panel header -->
+  <rect x="496" y="316" width="65" height="4" rx="2" fill="#91a3bd" fill-opacity="0.36"/>
+  <line x1="496" y1="328" x2="624" y2="328" stroke="#31c7ff" stroke-width="0.5" stroke-opacity="0.15"/>
+
+  <!-- Feature row 1: check circle + text -->
+  <circle cx="506" cy="346" r="6" fill="#31c7ff" fill-opacity="0.16" stroke="#31c7ff" stroke-width="0.7" stroke-opacity="0.22"/>
+  <!-- Checkmark inside circle -->
+  <path d="M503 346 L505 349 L510 343" stroke="#1a6bc4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.28" fill="none"/>
+  <rect x="518" y="344" width="100" height="3" rx="2" fill="#91a3bd" fill-opacity="0.28"/>
+
+  <!-- Feature row 2 -->
+  <circle cx="506" cy="374" r="6" fill="#31c7ff" fill-opacity="0.16" stroke="#31c7ff" stroke-width="0.7" stroke-opacity="0.22"/>
+  <path d="M503 374 L505 377 L510 371" stroke="#1a6bc4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.28" fill="none"/>
+  <rect x="518" y="372" width="90" height="3" rx="2" fill="#91a3bd" fill-opacity="0.26"/>
+
+  <!-- Feature row 3 -->
+  <circle cx="506" cy="402" r="6" fill="#31c7ff" fill-opacity="0.16" stroke="#31c7ff" stroke-width="0.7" stroke-opacity="0.22"/>
+  <path d="M503 402 L505 405 L510 399" stroke="#1a6bc4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.25" fill="none"/>
+  <rect x="518" y="400" width="80" height="3" rx="2" fill="#91a3bd" fill-opacity="0.25"/>
+
+  <!-- Feature row 4 -->
+  <circle cx="506" cy="430" r="6" fill="#31c7ff" fill-opacity="0.14" stroke="#31c7ff" stroke-width="0.7" stroke-opacity="0.20"/>
+  <path d="M503 430 L505 433 L510 427" stroke="#1a6bc4" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.22" fill="none"/>
+  <rect x="518" y="428" width="95" height="3" rx="2" fill="#91a3bd" fill-opacity="0.24"/>
+
+  <!-- Feature row 5 -->
+  <circle cx="506" cy="458" r="6" fill="#b8d4ee" fill-opacity="0.25" stroke="#31c7ff" stroke-width="0.7" stroke-opacity="0.18"/>
+  <rect x="518" y="456" width="85" height="3" rx="2" fill="#91a3bd" fill-opacity="0.22"/>
+
+  <!-- Feature row 6 -->
+  <circle cx="506" cy="486" r="6" fill="#b8d4ee" fill-opacity="0.22" stroke="#31c7ff" stroke-width="0.7" stroke-opacity="0.16"/>
+  <rect x="518" y="484" width="75" height="3" rx="2" fill="#91a3bd" fill-opacity="0.20"/>
+
+
+  <!-- ===== BOTTOM-RIGHT: Faded Phone with App View ===== -->
+  <g transform="rotate(6, 570, 700)">
+
+    <!-- Phone outer shell -->
+    <rect x="475" y="560" width="170" height="320" rx="20" fill="#d0e8f7" fill-opacity="0.50" stroke="#31c7ff" stroke-width="1.2" stroke-opacity="0.22"/>
+
+    <!-- Phone screen area -->
+    <rect x="485" y="580" width="150" height="280" rx="10" fill="#b8d4ee" fill-opacity="0.20"/>
+
+    <!-- Status bar line -->
+    <rect x="495" y="588" width="40" height="2" rx="1" fill="#91a3bd" fill-opacity="0.25"/>
+    <rect x="610" y="588" width="18" height="2" rx="1" fill="#91a3bd" fill-opacity="0.25"/>
+
+    <!-- App header / search bar -->
+    <rect x="495" y="598" width="130" height="20" rx="5" fill="#d0e8f7" fill-opacity="0.50" stroke="#31c7ff" stroke-width="0.5" stroke-opacity="0.18"/>
+    <rect x="505" y="606" width="60" height="3" rx="2" fill="#91a3bd" fill-opacity="0.25"/>
+    <!-- Search icon placeholder -->
+    <circle cx="612" cy="608" r="4" stroke="#91a3bd" stroke-width="0.8" stroke-opacity="0.25" fill="none"/>
+
+    <!-- Product card 1 in phone -->
+    <rect x="495" y="626" width="130" height="60" rx="6" fill="#d0e8f7" fill-opacity="0.45" stroke="#31c7ff" stroke-width="0.5" stroke-opacity="0.15"/>
+    <!-- Thumbnail -->
+    <rect x="501" y="632" width="42" height="42" rx="4" fill="#b8d4ee" fill-opacity="0.40"/>
+    <!-- Name line -->
+    <rect x="550" y="636" width="65" height="3" rx="2" fill="#91a3bd" fill-opacity="0.28"/>
+    <!-- Sub line -->
+    <rect x="550" y="646" width="45" height="2" rx="1" fill="#91a3bd" fill-opacity="0.20"/>
+    <!-- Price -->
+    <rect x="550" y="658" width="35" height="3" rx="2" fill="#1a6bc4" fill-opacity="0.25"/>
+    <!-- Stars -->
+    <circle cx="596" cy="660" r="2" fill="#1a6bc4" fill-opacity="0.20"/>
+    <circle cx="604" cy="660" r="2" fill="#1a6bc4" fill-opacity="0.20"/>
+    <circle cx="612" cy="660" r="2" fill="#b8d4ee" fill-opacity="0.28"/>
+
+    <!-- Product card 2 in phone -->
+    <rect x="495" y="694" width="130" height="60" rx="6" fill="#d0e8f7" fill-opacity="0.40" stroke="#31c7ff" stroke-width="0.5" stroke-opacity="0.14"/>
+    <rect x="501" y="700" width="42" height="42" rx="4" fill="#b8d4ee" fill-opacity="0.35"/>
+    <rect x="550" y="704" width="60" height="3" rx="2" fill="#91a3bd" fill-opacity="0.26"/>
+    <rect x="550" y="714" width="40" height="2" rx="1" fill="#91a3bd" fill-opacity="0.18"/>
+    <rect x="550" y="726" width="38" height="3" rx="2" fill="#1a6bc4" fill-opacity="0.22"/>
+    <circle cx="600" cy="728" r="2" fill="#1a6bc4" fill-opacity="0.18"/>
+    <circle cx="608" cy="728" r="2" fill="#1a6bc4" fill-opacity="0.18"/>
+    <circle cx="616" cy="728" r="2" fill="#b8d4ee" fill-opacity="0.24"/>
+
+    <!-- Product card 3 in phone -->
+    <rect x="495" y="762" width="130" height="60" rx="6" fill="#d0e8f7" fill-opacity="0.35" stroke="#31c7ff" stroke-width="0.5" stroke-opacity="0.12"/>
+    <rect x="501" y="768" width="42" height="42" rx="4" fill="#b8d4ee" fill-opacity="0.30"/>
+    <rect x="550" y="772" width="55" height="3" rx="2" fill="#91a3bd" fill-opacity="0.22"/>
+    <rect x="550" y="782" width="38" height="2" rx="1" fill="#91a3bd" fill-opacity="0.16"/>
+    <rect x="550" y="794" width="32" height="3" rx="2" fill="#1a6bc4" fill-opacity="0.20"/>
+
+    <!-- Bottom nav bar -->
+    <rect x="495" y="832" width="130" height="20" rx="4" fill="#d0e8f7" fill-opacity="0.40"/>
+    <!-- Nav icons (small circles) -->
+    <circle cx="515" cy="842" r="4" fill="#91a3bd" fill-opacity="0.22"/>
+    <circle cx="540" cy="842" r="4" fill="#91a3bd" fill-opacity="0.22"/>
+    <circle cx="565" cy="842" r="4" fill="#31c7ff" fill-opacity="0.25"/>
+    <circle cx="590" cy="842" r="4" fill="#91a3bd" fill-opacity="0.22"/>
+
+    <!-- Phone home indicator -->
+    <rect x="535" y="860" width="50" height="3" rx="2" fill="#91a3bd" fill-opacity="0.20"/>
+
+  </g>
+
 </svg>

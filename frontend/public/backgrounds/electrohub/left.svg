@@ -1,92 +1,136 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 590 817" fill="none">
-  <!-- Circuit board traces - background pattern toward left -->
-  <path d="M20 200 L20 350 L80 350" stroke="#B8EBFF" stroke-width="3" stroke-linecap="round"/>
-  <path d="M20 350 L20 500 L60 500 L60 540" stroke="#B8EBFF" stroke-width="3" stroke-linecap="round"/>
-  <path d="M80 100 L80 180 L140 180 L140 250" stroke="#B8EBFF" stroke-width="3" stroke-linecap="round"/>
-  <path d="M50 600 L50 650 L120 650 L120 700" stroke="#B8EBFF" stroke-width="3" stroke-linecap="round"/>
-  <circle cx="80" cy="350" r="5" fill="#B8EBFF"/>
-  <circle cx="60" cy="540" r="5" fill="#B8EBFF"/>
-  <circle cx="140" cy="250" r="5" fill="#B8EBFF"/>
-  <circle cx="120" cy="700" r="5" fill="#B8EBFF"/>
-  <circle cx="20" cy="200" r="4" fill="#7DD8FF"/>
-  <circle cx="80" cy="100" r="4" fill="#7DD8FF"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 817" fill="none">
 
-  <!-- More circuit traces further right but lighter -->
-  <path d="M200 50 L200 120 L250 120" stroke="#B8EBFF" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
-  <path d="M300 150 L300 200 L340 200" stroke="#B8EBFF" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
-  <circle cx="250" cy="120" r="3" fill="#B8EBFF" opacity="0.5"/>
-  <circle cx="340" cy="200" r="3" fill="#B8EBFF" opacity="0.3"/>
+  <!-- ============================================= -->
+  <!-- ElectroHub Left Background                    -->
+  <!-- Faded e-commerce UI: product cards, cart,     -->
+  <!-- ratings — like a frosted Best Buy interface   -->
+  <!-- All elements x < 230                          -->
+  <!-- ============================================= -->
 
-  <!-- Headphones - top left area, partially cut off -->
-  <!-- Headband -->
-  <path d="M-20 120 C-20 40, 130 40, 130 120" stroke="#1a8fd0" stroke-width="14" stroke-linecap="round" fill="none"/>
-  <!-- Left ear cup -->
-  <rect x="-45" y="110" width="55" height="75" rx="20" fill="#31c7ff"/>
-  <rect x="-35" y="120" width="35" height="55" rx="14" fill="#1a8fd0"/>
-  <!-- Right ear cup -->
-  <rect x="105" y="110" width="55" height="75" rx="20" fill="#31c7ff"/>
-  <rect x="115" y="120" width="35" height="55" rx="14" fill="#1a8fd0"/>
-  <!-- Ear cushion details -->
-  <ellipse cx="132" cy="147" rx="12" ry="20" fill="#0A5A8C"/>
-  <ellipse cx="-17" cy="147" rx="12" ry="20" fill="#0A5A8C"/>
+  <!-- ===== TOP-LEFT: Large Product Card (tilted -3deg) ===== -->
+  <g transform="rotate(-3, 90, 170)">
+    <!-- Card body -->
+    <rect x="-10" y="30" width="200" height="280" rx="12" fill="#d0e8f7" fill-opacity="0.50" stroke="#31c7ff" stroke-width="1" stroke-opacity="0.20"/>
 
-  <!-- WiFi signal arcs - upper area -->
-  <path d="M180 300 C180 300, 200 280, 220 300" stroke="#7DD8FF" stroke-width="4" stroke-linecap="round" fill="none"/>
-  <path d="M170 310 C170 310, 200 275, 230 310" stroke="#7DD8FF" stroke-width="4" stroke-linecap="round" fill="none"/>
-  <path d="M160 320 C160 320, 200 270, 240 320" stroke="#7DD8FF" stroke-width="4" stroke-linecap="round" fill="none"/>
-  <circle cx="200" cy="310" r="6" fill="#31c7ff"/>
+    <!-- Product image placeholder -->
+    <rect x="0" y="42" width="180" height="140" rx="8" fill="#b8d4ee" fill-opacity="0.45"/>
 
-  <!-- USB-C Connector - mid left -->
-  <rect x="-10" y="380" width="90" height="40" rx="10" fill="#1a8fd0"/>
-  <rect x="5" y="390" width="60" height="20" rx="6" fill="#0A5A8C"/>
-  <rect x="80" y="393" width="30" height="14" rx="4" fill="#31c7ff"/>
-  <!-- USB pins -->
-  <rect x="15" y="396" width="4" height="8" rx="1" fill="#7DD8FF"/>
-  <rect x="25" y="396" width="4" height="8" rx="1" fill="#7DD8FF"/>
-  <rect x="35" y="396" width="4" height="8" rx="1" fill="#7DD8FF"/>
-  <rect x="45" y="396" width="4" height="8" rx="1" fill="#7DD8FF"/>
+    <!-- Product name line -->
+    <rect x="10" y="196" width="120" height="4" rx="2" fill="#91a3bd" fill-opacity="0.35"/>
 
-  <!-- Cable from USB connector -->
-  <path d="M-10 400 C-60 400, -60 450, -30 480" stroke="#1a8fd0" stroke-width="6" stroke-linecap="round" fill="none"/>
+    <!-- Brand/category line -->
+    <rect x="10" y="210" width="80" height="3" rx="2" fill="#91a3bd" fill-opacity="0.25"/>
 
-  <!-- Another cable/connector - mid area -->
-  <path d="M150 450 L150 520 C150 540, 130 540, 130 560 L130 620" stroke="#7DD8FF" stroke-width="5" stroke-linecap="round" fill="none"/>
-  <circle cx="150" cy="450" r="8" fill="#31c7ff"/>
-  <circle cx="130" cy="620" r="6" fill="#B8EBFF"/>
+    <!-- Star ratings: 5 circles -->
+    <circle cx="16" cy="230" r="3" fill="#1a6bc4" fill-opacity="0.25"/>
+    <circle cx="30" cy="230" r="3" fill="#1a6bc4" fill-opacity="0.25"/>
+    <circle cx="44" cy="230" r="3" fill="#1a6bc4" fill-opacity="0.25"/>
+    <circle cx="58" cy="230" r="3" fill="#1a6bc4" fill-opacity="0.25"/>
+    <circle cx="72" cy="230" r="3" fill="#b8d4ee" fill-opacity="0.35"/>
 
-  <!-- Large Laptop - bottom left, partially cut off -->
-  <!-- Screen -->
-  <rect x="-120" y="580" width="380" height="240" rx="12" fill="#1a8fd0"/>
-  <rect x="-100" y="600" width="340" height="200" rx="6" fill="#0A5A8C"/>
-  <!-- Screen content (abstract UI) -->
-  <rect x="-80" y="620" width="120" height="14" rx="4" fill="#31c7ff" opacity="0.7"/>
-  <rect x="-80" y="644" width="80" height="10" rx="3" fill="#7DD8FF" opacity="0.5"/>
-  <rect x="-80" y="664" width="200" height="100" rx="6" fill="#1a8fd0" opacity="0.6"/>
-  <rect x="60" y="620" width="60" height="30" rx="6" fill="#31c7ff" opacity="0.4"/>
-  <!-- Keyboard base -->
-  <path d="M-150 820 L-120 817 L280 817 L300 850 L-170 850 Z" fill="#31c7ff"/>
-  <!-- Hinge -->
-  <rect x="-120" y="812" width="380" height="8" rx="3" fill="#1a8fd0"/>
+    <!-- Rating count line -->
+    <rect x="84" y="228" width="30" height="3" rx="2" fill="#91a3bd" fill-opacity="0.20"/>
 
-  <!-- Small chip/processor - decorative element -->
-  <rect x="220" y="500" width="50" height="50" rx="6" fill="#31c7ff" opacity="0.6"/>
-  <rect x="230" y="510" width="30" height="30" rx="3" fill="#0A5A8C" opacity="0.6"/>
-  <!-- Chip pins -->
-  <rect x="215" y="512" width="8" height="4" rx="1" fill="#7DD8FF" opacity="0.5"/>
-  <rect x="215" y="522" width="8" height="4" rx="1" fill="#7DD8FF" opacity="0.5"/>
-  <rect x="215" y="532" width="8" height="4" rx="1" fill="#7DD8FF" opacity="0.5"/>
-  <rect x="267" y="512" width="8" height="4" rx="1" fill="#7DD8FF" opacity="0.5"/>
-  <rect x="267" y="522" width="8" height="4" rx="1" fill="#7DD8FF" opacity="0.5"/>
-  <rect x="267" y="532" width="8" height="4" rx="1" fill="#7DD8FF" opacity="0.5"/>
+    <!-- Price line (bolder) -->
+    <rect x="10" y="250" width="60" height="5" rx="2" fill="#1a6bc4" fill-opacity="0.30"/>
 
-  <!-- Power button icon -->
-  <circle cx="320" cy="680" r="18" stroke="#B8EBFF" stroke-width="4" fill="none" opacity="0.4"/>
-  <path d="M320 662 L320 672" stroke="#B8EBFF" stroke-width="4" stroke-linecap="round" opacity="0.4"/>
+    <!-- Original price (strikethrough) -->
+    <rect x="80" y="251" width="40" height="3" rx="2" fill="#91a3bd" fill-opacity="0.20"/>
 
-  <!-- Small decorative dots - scattered -->
-  <circle cx="280" cy="400" r="4" fill="#B8EBFF" opacity="0.4"/>
-  <circle cx="350" cy="350" r="3" fill="#B8EBFF" opacity="0.3"/>
-  <circle cx="400" cy="500" r="3" fill="#B8EBFF" opacity="0.2"/>
-  <circle cx="100" cy="480" r="5" fill="#7DD8FF" opacity="0.4"/>
-  <circle cx="250" cy="750" r="4" fill="#B8EBFF" opacity="0.3"/>
+    <!-- Add to Cart button -->
+    <rect x="10" y="272" width="100" height="28" rx="6" fill="#31c7ff" fill-opacity="0.18" stroke="#31c7ff" stroke-width="0.8" stroke-opacity="0.22"/>
+    <!-- Button text line -->
+    <rect x="28" y="282" width="64" height="4" rx="2" fill="#91a3bd" fill-opacity="0.30"/>
+  </g>
+
+
+  <!-- ===== MID-LEFT: Mini Product Grid (2 cards) ===== -->
+
+  <!-- Card 1 -->
+  <rect x="10" y="355" width="120" height="160" rx="10" fill="#d0e8f7" fill-opacity="0.45" stroke="#31c7ff" stroke-width="0.8" stroke-opacity="0.18"/>
+  <!-- Image placeholder -->
+  <rect x="18" y="363" width="104" height="80" rx="6" fill="#b8d4ee" fill-opacity="0.40"/>
+  <!-- Name line -->
+  <rect x="18" y="453" width="70" height="3" rx="2" fill="#91a3bd" fill-opacity="0.30"/>
+  <!-- Sub line -->
+  <rect x="18" y="463" width="50" height="3" rx="2" fill="#91a3bd" fill-opacity="0.22"/>
+  <!-- Stars -->
+  <circle cx="24" cy="480" r="2.5" fill="#1a6bc4" fill-opacity="0.22"/>
+  <circle cx="34" cy="480" r="2.5" fill="#1a6bc4" fill-opacity="0.22"/>
+  <circle cx="44" cy="480" r="2.5" fill="#1a6bc4" fill-opacity="0.22"/>
+  <circle cx="54" cy="480" r="2.5" fill="#b8d4ee" fill-opacity="0.30"/>
+  <circle cx="64" cy="480" r="2.5" fill="#b8d4ee" fill-opacity="0.30"/>
+  <!-- Price -->
+  <rect x="18" y="494" width="45" height="4" rx="2" fill="#1a6bc4" fill-opacity="0.28"/>
+
+  <!-- Card 2 -->
+  <rect x="140" y="355" width="120" height="160" rx="10" fill="#d0e8f7" fill-opacity="0.40" stroke="#31c7ff" stroke-width="0.8" stroke-opacity="0.15"/>
+  <!-- Image placeholder -->
+  <rect x="148" y="363" width="104" height="80" rx="6" fill="#b8d4ee" fill-opacity="0.35"/>
+  <!-- Name line -->
+  <rect x="148" y="453" width="75" height="3" rx="2" fill="#91a3bd" fill-opacity="0.28"/>
+  <!-- Sub line -->
+  <rect x="148" y="463" width="55" height="3" rx="2" fill="#91a3bd" fill-opacity="0.20"/>
+  <!-- Stars -->
+  <circle cx="154" cy="480" r="2.5" fill="#1a6bc4" fill-opacity="0.20"/>
+  <circle cx="164" cy="480" r="2.5" fill="#1a6bc4" fill-opacity="0.20"/>
+  <circle cx="174" cy="480" r="2.5" fill="#1a6bc4" fill-opacity="0.20"/>
+  <circle cx="184" cy="480" r="2.5" fill="#1a6bc4" fill-opacity="0.20"/>
+  <circle cx="194" cy="480" r="2.5" fill="#b8d4ee" fill-opacity="0.28"/>
+  <!-- Price -->
+  <rect x="148" y="494" width="50" height="4" rx="2" fill="#1a6bc4" fill-opacity="0.25"/>
+
+  <!-- Divider between grid and cart -->
+  <line x1="10" y1="540" x2="200" y2="540" stroke="#31c7ff" stroke-width="0.6" stroke-opacity="0.15"/>
+
+
+  <!-- ===== BOTTOM-LEFT: Shopping Cart Sidebar ===== -->
+
+  <!-- Cart panel -->
+  <rect x="5" y="570" width="180" height="230" rx="12" fill="#d0e8f7" fill-opacity="0.55" stroke="#31c7ff" stroke-width="1" stroke-opacity="0.20"/>
+
+  <!-- Cart header line -->
+  <rect x="18" y="585" width="50" height="5" rx="2" fill="#91a3bd" fill-opacity="0.40"/>
+  <!-- Item count badge -->
+  <circle cx="80" cy="588" r="8" fill="#31c7ff" fill-opacity="0.18" stroke="#31c7ff" stroke-width="0.6" stroke-opacity="0.22"/>
+  <rect x="76" y="586" width="8" height="3" rx="1.5" fill="#91a3bd" fill-opacity="0.35"/>
+
+  <!-- Cart Item 1 -->
+  <!-- Thumbnail -->
+  <rect x="18" y="606" width="36" height="36" rx="5" fill="#b8d4ee" fill-opacity="0.45"/>
+  <!-- Name line -->
+  <rect x="62" y="610" width="80" height="3" rx="2" fill="#91a3bd" fill-opacity="0.32"/>
+  <!-- Sub line -->
+  <rect x="62" y="620" width="55" height="3" rx="2" fill="#91a3bd" fill-opacity="0.22"/>
+  <!-- Price -->
+  <rect x="62" y="632" width="40" height="4" rx="2" fill="#1a6bc4" fill-opacity="0.25"/>
+
+  <!-- Cart Item 2 -->
+  <rect x="18" y="652" width="36" height="36" rx="5" fill="#b8d4ee" fill-opacity="0.40"/>
+  <rect x="62" y="656" width="70" height="3" rx="2" fill="#91a3bd" fill-opacity="0.30"/>
+  <rect x="62" y="666" width="50" height="3" rx="2" fill="#91a3bd" fill-opacity="0.20"/>
+  <rect x="62" y="678" width="45" height="4" rx="2" fill="#1a6bc4" fill-opacity="0.25"/>
+
+  <!-- Cart Item 3 -->
+  <rect x="18" y="698" width="36" height="36" rx="5" fill="#b8d4ee" fill-opacity="0.35"/>
+  <rect x="62" y="702" width="75" height="3" rx="2" fill="#91a3bd" fill-opacity="0.28"/>
+  <rect x="62" y="712" width="48" height="3" rx="2" fill="#91a3bd" fill-opacity="0.18"/>
+  <rect x="62" y="724" width="38" height="4" rx="2" fill="#1a6bc4" fill-opacity="0.22"/>
+
+  <!-- Divider -->
+  <line x1="18" y1="746" x2="168" y2="746" stroke="#31c7ff" stroke-width="0.8" stroke-opacity="0.20"/>
+
+  <!-- Subtotal label -->
+  <rect x="18" y="756" width="45" height="3" rx="2" fill="#91a3bd" fill-opacity="0.30"/>
+  <!-- Subtotal amount -->
+  <rect x="120" y="755" width="48" height="4" rx="2" fill="#1a6bc4" fill-opacity="0.28"/>
+
+  <!-- Total line (bolder) -->
+  <rect x="18" y="770" width="35" height="5" rx="2" fill="#91a3bd" fill-opacity="0.38"/>
+  <rect x="110" y="769" width="58" height="5" rx="2" fill="#1a6bc4" fill-opacity="0.30"/>
+
+  <!-- Checkout button -->
+  <rect x="18" y="784" width="148" height="28" rx="7" fill="#31c7ff" fill-opacity="0.20" stroke="#31c7ff" stroke-width="0.8" stroke-opacity="0.25"/>
+  <rect x="55" y="794" width="74" height="4" rx="2" fill="#91a3bd" fill-opacity="0.32"/>
+
 </svg>
