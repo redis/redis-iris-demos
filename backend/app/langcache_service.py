@@ -35,19 +35,22 @@ class LangCacheService:
             self._client = httpx.AsyncClient(timeout=10.0)
         return self._client
 
-    async def search(self, prompt: str) -> dict[str, Any] | None:
+    async def search(self, prompt: str, attributes: dict[str, str] | None = None) -> dict[str, Any] | None:
         if not self.is_configured():
             return None
         client = await self._get_client()
+        body: dict[str, Any] = {
+            "prompt": prompt,
+            "similarityThreshold": self._threshold,
+            "searchStrategies": ["semantic"],
+        }
+        if attributes:
+            body["attributes"] = attributes
         try:
             resp = await client.post(
                 f"{self._base_url()}/entries/search",
                 headers=self._headers(),
-                json={
-                    "prompt": prompt,
-                    "similarityThreshold": self._threshold,
-                    "searchStrategies": ["semantic"],
-                },
+                json=body,
             )
             resp.raise_for_status()
             data = resp.json()

@@ -35,6 +35,7 @@ export default function App() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [threadId, setThreadId] = useState(() => crypto.randomUUID());
+  const [selectedDemoUserId, setSelectedDemoUserId] = useState<string | null>(null);
 
   const [activityPanelOpen, setActivityPanelOpen] = useState(false);
   const [contextView, setContextView] = useState<RedisContextView>("activity");
@@ -70,7 +71,12 @@ export default function App() {
         .then((p: DomainConfig) => {
           if (!cancelled) {
             setDomain(p);
-            void loadMemoryDashboard();
+            const users = p?.demo_users ?? [];
+            const nextDemoUserId = selectedDemoUserId && users.some((user) => user.id === selectedDemoUserId)
+              ? selectedDemoUserId
+              : users[0]?.id ?? null;
+            setSelectedDemoUserId(nextDemoUserId);
+            void loadMemoryDashboard({ demoUserId: nextDemoUserId });
             void loadTools();
           }
         })
@@ -109,6 +115,8 @@ export default function App() {
     };
   }, [domain]);
 
+  const selectedDemoUser = domain?.demo_users?.find((user) => user.id === selectedDemoUserId);
+
   useEffect(() => {
     if (autoOpenedRef.current || !hasMessages) return;
     let latest: ChatMessage | undefined;
@@ -122,11 +130,15 @@ export default function App() {
     }
   }, [messages]);
 
-  async function loadMemoryDashboard() {
+  async function loadMemoryDashboard(options?: { threadId?: string; demoUserId?: string | null }) {
+    const dashboardThreadId = options?.threadId ?? threadId;
+    const dashboardDemoUserId = options?.demoUserId ?? selectedDemoUserId;
     setMemoryLoading(true);
     try {
       const response = await fetch(
-        `${apiUrl("/api/memory/dashboard")}?thread_id=${encodeURIComponent(threadId)}`
+        `${apiUrl("/api/memory/dashboard")}?thread_id=${encodeURIComponent(dashboardThreadId)}${
+          dashboardDemoUserId ? `&demo_user_id=${encodeURIComponent(dashboardDemoUserId)}` : ""
+        }`
       );
       setMemoryData(await response.json());
     } catch {
@@ -173,11 +185,23 @@ export default function App() {
   }
 
   function handleModeChange(newMode: AgentMode) {
+    const nextThreadId = crypto.randomUUID();
     setMode(newMode);
     setMessages([]);
-    setThreadId(crypto.randomUUID());
+    setThreadId(nextThreadId);
     setActivityPanelOpen(false);
     autoOpenedRef.current = false;
+    void loadMemoryDashboard({ threadId: nextThreadId });
+  }
+
+  function handleDemoUserChange(userId: string) {
+    const nextThreadId = crypto.randomUUID();
+    setSelectedDemoUserId(userId);
+    setMessages([]);
+    setThreadId(nextThreadId);
+    setActivityPanelOpen(false);
+    autoOpenedRef.current = false;
+    void loadMemoryDashboard({ threadId: nextThreadId, demoUserId: userId });
   }
 
   async function submitPrompt(prompt: string, event?: FormEvent) {
@@ -206,6 +230,7 @@ export default function App() {
           messages: nextMessages.map(({ role, content }) => ({ role, content })),
           mode,
           thread_id: threadId,
+          demo_user_id: selectedDemoUserId,
         }),
       });
 
@@ -349,6 +374,25 @@ export default function App() {
           </div>
         </div>
         <div className="topbar-actions">
+          {domain?.demo_users && domain.demo_users.length > 0 && selectedDemoUser && (
+            <label className="topbar-demo-user">
+              <span>Customer</span>
+              <select
+                value={selectedDemoUserId ?? ""}
+                onChange={(event) => handleDemoUserChange(event.target.value)}
+                aria-label="Select demo customer"
+              >
+                {domain.demo_users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.label}{user.subtitle ? ` • ${user.subtitle}` : ""}
+                  </option>
+                ))}
+              </select>
+              {selectedDemoUser.cache_group_id && (
+                <span className="topbar-demo-user-badge">{selectedDemoUser.cache_group_id}</span>
+              )}
+            </label>
+          )}
           <button
             className={`topbar-context-btn ${activityPanelOpen ? "active" : ""}`}
             onClick={handleToggleRedisContext}
