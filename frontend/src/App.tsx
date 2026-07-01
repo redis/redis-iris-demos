@@ -71,13 +71,12 @@ export default function App() {
         .then((p: DomainConfig) => {
           if (!cancelled) {
             setDomain(p);
-            setSelectedDemoUserId((current) => {
-              const users = p?.demo_users ?? [];
-              return current && users.some((user) => user.id === current)
-                ? current
-                : users[0]?.id ?? null;
-            });
-            void loadMemoryDashboard();
+            const users = p?.demo_users ?? [];
+            const nextDemoUserId = selectedDemoUserId && users.some((user) => user.id === selectedDemoUserId)
+              ? selectedDemoUserId
+              : users[0]?.id ?? null;
+            setSelectedDemoUserId(nextDemoUserId);
+            void loadMemoryDashboard({ demoUserId: nextDemoUserId });
             void loadTools();
           }
         })
@@ -131,12 +130,14 @@ export default function App() {
     }
   }, [messages]);
 
-  async function loadMemoryDashboard() {
+  async function loadMemoryDashboard(options?: { threadId?: string; demoUserId?: string | null }) {
+    const dashboardThreadId = options?.threadId ?? threadId;
+    const dashboardDemoUserId = options?.demoUserId ?? selectedDemoUserId;
     setMemoryLoading(true);
     try {
       const response = await fetch(
-        `${apiUrl("/api/memory/dashboard")}?thread_id=${encodeURIComponent(threadId)}${
-          selectedDemoUserId ? `&demo_user_id=${encodeURIComponent(selectedDemoUserId)}` : ""
+        `${apiUrl("/api/memory/dashboard")}?thread_id=${encodeURIComponent(dashboardThreadId)}${
+          dashboardDemoUserId ? `&demo_user_id=${encodeURIComponent(dashboardDemoUserId)}` : ""
         }`
       );
       setMemoryData(await response.json());
@@ -184,19 +185,23 @@ export default function App() {
   }
 
   function handleModeChange(newMode: AgentMode) {
+    const nextThreadId = crypto.randomUUID();
     setMode(newMode);
     setMessages([]);
-    setThreadId(crypto.randomUUID());
+    setThreadId(nextThreadId);
     setActivityPanelOpen(false);
     autoOpenedRef.current = false;
+    void loadMemoryDashboard({ threadId: nextThreadId });
   }
 
   function handleDemoUserChange(userId: string) {
+    const nextThreadId = crypto.randomUUID();
     setSelectedDemoUserId(userId);
     setMessages([]);
-    setThreadId(crypto.randomUUID());
+    setThreadId(nextThreadId);
     setActivityPanelOpen(false);
     autoOpenedRef.current = false;
+    void loadMemoryDashboard({ threadId: nextThreadId, demoUserId: userId });
   }
 
   async function submitPrompt(prompt: string, event?: FormEvent) {

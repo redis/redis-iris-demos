@@ -11,8 +11,9 @@ semantic-cache behavior alongside Context Surfaces.
 
 > Tip: Run each opening question once in Context Surfaces mode and then repeat
 > it in Simple RAG mode to show the difference between record-backed trip data
-> and generic policy guidance. For semantic-cache paths, repeat the exact same
-> prompt on a fresh thread so the cache read behavior is visible in the trace.
+> and generic policy guidance. For semantic-cache paths, use the paired shortcut
+> prompts: run the first wording to populate LangCache, then run the varied
+> wording on a fresh thread to show semantic reuse in the trace.
 
 ## Path 1: Flagship Disruption Recovery
 
@@ -133,11 +134,14 @@ Simple RAG contrast:
 ## Path 4: Semantic Cache Showcase for Tier-Based Cancellation Help
 
 Goal:
-Show that entitlement-style guidance can be prepared as a cohort-scoped
-LangCache entry, with metadata that limits reuse to the eligible passenger group.
+Show that entitlement-style guidance can be cached after the first answer and
+then reused by semantically similar prompts within the eligible passenger group.
 
 Opening prompt:
 `What help do I usually get after a cancellation?`
+
+Suggested semantic-cache follow-up:
+`What support is available when my flight gets cancelled?`
 
 Suggested passenger order:
 1. `Mara Beck` (`Senator • EN`)
@@ -164,29 +168,30 @@ Expected assistant behavior:
 - Do not fetch bookings, itinerary segments, disruption records, or support cases.
 
 Expected semantic-cache behavior:
-- The seeded LangCache entry carries `access_class=group` and `cache_group_id=senator_en`.
+- The first prompt should miss LangCache, run the agent flow, and store the answer with `access_class=group` plus the active user's `cache_group_id`.
 - The runtime searches the active user's `cache_group_id` first, then public entries.
-- `Mara Beck` and `Lena Hartmann` can hit the same `senator_en` entry.
+- `Mara Beck` and `Lena Hartmann` can hit the same `senator_en` entry with the suggested follow-up wording.
 - `Jonas Klein` should not reuse the `senator_en` entry because his active cache group is `frequent_en`.
 
 Simple RAG contrast:
 - Simple RAG can summarize the same policy guidance.
-- It cannot expose the seeded cache metadata or enforce reuse by signed-in passenger cohort.
+- It cannot expose cache metadata or enforce reuse by signed-in passenger cohort.
 
 ## Path 5: Semantic Cache Showcase for Shared Flight Status
 
 Goal:
-Show that a shared flight-number question can be cached for anyone.
+Show that a shared flight-number question can be cached after the first answer
+and then reused by any passenger with semantically similar wording.
 
 Opening prompt:
 `What is the status of ZX018 today?`
 
-Suggested follow-up:
-- `Which terminal is ZX018 departing from?`
+Suggested semantic-cache follow-up:
+`Is ZX018 still on time today?`
 
 Suggested passenger order:
 1. Any passenger
-2. Any different passenger on a fresh thread with the exact same prompt
+2. Any different passenger on a fresh thread with the suggested follow-up prompt
 
 Expected tool sequence:
 1. `filter_operatingflight_by_flight_number`
@@ -201,8 +206,9 @@ Expected assistant behavior:
 - Avoid pulling booking or itinerary data unless the user pivots to their own trip.
 
 Expected semantic-cache behavior:
-- The seeded public LangCache entry should be eligible for any passenger because the runtime scopes reads to the active domain, not to a booking or user.
-- Repeat the exact same prompt on a fresh thread to show the domain-scoped cache hit in the trace.
+- The first prompt should miss LangCache, run the agent flow, and store the answer with `access_class=public`.
+- The public LangCache entry should be eligible for any passenger because the runtime scopes reads to the active domain, not to a booking or user.
+- Repeat with the suggested follow-up wording on a fresh thread to show the semantic cache hit in the trace.
 
 Simple RAG contrast:
 - Simple RAG can describe how to check flight status in general.

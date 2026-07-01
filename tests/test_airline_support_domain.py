@@ -15,12 +15,14 @@ def test_airline_support_domain_loads() -> None:
     assert domain.manifest.branding.theme.landing_bg
     assert domain.manifest.guardrail is not None
     assert domain.manifest.seed_memories
-    assert domain.manifest.seed_langcache
+    assert domain.manifest.seed_langcache == []
     assert [card.title for card in domain.manifest.branding.starter_prompts] == [
-        "Flight ZX018",
+        "ZX018 status",
+        "ZX018 on time?",
         "Delays and cancellations",
         "Rebooking",
-        "After-cancellation help",
+        "Cancellation help",
+        "Cancellation support?",
     ]
 
     tool_names = {tool.name for tool in domain.get_internal_tool_definitions(runtime_config={})}
@@ -56,9 +58,12 @@ def test_airline_support_domain_loads() -> None:
     assert "customer_id" not in tier_context
     assert "email" not in tier_context
 
-    seed_attributes = [entry.attributes for entry in domain.manifest.seed_langcache]
-    assert {"domain": "airline-support", "access_class": "public", "topic": "shared_flight_status"} in seed_attributes
-    assert any(attributes.get("cache_group_id") == "senator_en" for attributes in seed_attributes)
+    assert domain.classify_prompt_semantic_cache_access("What is the status of ZX018 today?") == "public"
+    assert (
+        domain.classify_prompt_semantic_cache_access("What support is available when my flight gets cancelled?")
+        == "group"
+    )
+    assert domain.classify_prompt_semantic_cache_access("My flight was disrupted. What happened?") == "non-cacheable"
 
     demo_users = domain.get_demo_users()
     assert [user for user in demo_users if user["cache_group_id"] == "senator_en"]
@@ -75,6 +80,7 @@ def test_airline_support_internal_tools_use_request_demo_user() -> None:
 
     assert identity["customer_id"] == "AIRCUST_003"
     assert identity["display_name"] == "Jonas Klein"
+    assert identity["email"] == "jonas.klein@example.com"
     assert identity["status_tier"] == "Frequent"
     assert identity["cache_group_id"] == "frequent_en"
     assert tier_context["status_tier"] == "Frequent"

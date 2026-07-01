@@ -7,15 +7,7 @@ class DomainWithDemoUsers:
     manifest = SimpleNamespace(
         id="airline-support",
         identity=SimpleNamespace(default_id="AIRCUST_001"),
-        seed_langcache=[
-            SimpleNamespace(
-                attributes={
-                    "domain": "airline-support",
-                    "access_class": "group",
-                    "cache_group_id": "senator_en",
-                }
-            )
-        ],
+        seed_langcache=[],
     )
 
     @staticmethod
@@ -25,6 +17,14 @@ class DomainWithDemoUsers:
         if user_id == "AIRCUST_003":
             return {"cache_group_id": "frequent_en"}
         return None
+
+    @staticmethod
+    def classify_prompt_semantic_cache_access(prompt: str):
+        if "ZX018" in prompt:
+            return "public"
+        if "cancellation" in prompt:
+            return "group"
+        return "non-cacheable"
 
 
 class DomainWithoutDemoUsers:
@@ -75,3 +75,18 @@ def test_langcache_scopes_keep_legacy_domain_fallback(monkeypatch) -> None:
         {"domain": "reddash", "access_class": "public"},
         {"domain": "reddash"},
     ]
+
+
+def test_langcache_store_attributes_use_prompt_classification(monkeypatch) -> None:
+    monkeypatch.setattr(app_main, "domain", DomainWithDemoUsers())
+
+    assert app_main._langcache_store_attributes("What help do I usually get after a cancellation?", "AIRCUST_003") == {
+        "domain": "airline-support",
+        "access_class": "group",
+        "cache_group_id": "frequent_en",
+    }
+    assert app_main._langcache_store_attributes("Is ZX018 still on time?", "AIRCUST_001") == {
+        "domain": "airline-support",
+        "access_class": "public",
+    }
+    assert app_main._langcache_store_attributes("My flight was disrupted. What happened?", "AIRCUST_001") is None

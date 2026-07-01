@@ -162,10 +162,10 @@ def _logo_src(path: Path) -> str:
 def _langcache_attribute_scopes(current_user_id: str) -> list[dict[str, str]]:
     public_scope = {"domain": domain.manifest.id, "access_class": "public"}
     legacy_scopes = []
-    if not any("access_class" in entry.attributes for entry in domain.manifest.seed_langcache):
+    resolve_demo_user = getattr(domain, "resolve_demo_user", None)
+    if not callable(resolve_demo_user) and not any("access_class" in entry.attributes for entry in domain.manifest.seed_langcache):
         legacy_scopes.append({"domain": domain.manifest.id})
 
-    resolve_demo_user = getattr(domain, "resolve_demo_user", None)
     if not callable(resolve_demo_user):
         return [public_scope, *legacy_scopes]
 
@@ -183,6 +183,32 @@ def _langcache_attribute_scopes(current_user_id: str) -> list[dict[str, str]]:
         public_scope,
         *legacy_scopes,
     ]
+
+
+def _langcache_store_attributes(prompt: str, current_user_id: str) -> dict[str, str] | None:
+    classify = getattr(domain, "classify_prompt_semantic_cache_access", None)
+    if not callable(classify):
+        return None
+
+    access = str(classify(prompt) or "").strip().lower()
+    if access == "public":
+        return {"domain": domain.manifest.id, "access_class": "public"}
+    if access != "group":
+        return None
+
+    resolve_demo_user = getattr(domain, "resolve_demo_user", None)
+    if not callable(resolve_demo_user):
+        return None
+
+    profile = resolve_demo_user(current_user_id) or resolve_demo_user(domain.manifest.identity.default_id) or {}
+    cache_group_id = str(profile.get("cache_group_id", "")).strip()
+    if not cache_group_id:
+        return None
+    return {
+        "domain": domain.manifest.id,
+        "access_class": "group",
+        "cache_group_id": cache_group_id,
+    }
 
 
 _INTERNAL_NAMES = {t.name for t in internal_tools.definitions}
@@ -757,6 +783,34 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
             log.warning("Assistant memory write failed: %s", exc)
             yield sse("status", text=f"Assistant memory logging unavailable: {exc}", ts=timer.elapsed_ms())
     phases.append(("memory_save", timer.phase("Assistant memory save")))
+
+    # ── Phase 8: Cache the answer when the domain marks this prompt as reusable ──
+    if langcache_service.is_configured() and final_text.strip():
+        store_attributes = _langcache_store_attributes(latest_message.strip(), current_user_id)
+        if store_attributes:
+            yield sse(
+                "tool-call",
+                toolName="semantic_cache_store",
+                toolKind="langcache",
+                payload={"prompt": latest_message.strip(), "attributes": store_attributes},
+                ts=timer.elapsed_ms(),
+            )
+            cache_store_start = perf_counter()
+            stored = await langcache_service.store(
+                latest_message.strip(),
+                final_text.strip(),
+                attributes=store_attributes,
+            )
+            cache_store_ms = max(round((perf_counter() - cache_store_start) * 1000), 1)
+            yield sse(
+                "tool-result",
+                toolName="semantic_cache_store",
+                toolKind="langcache",
+                payload={"stored": stored, "attributes": store_attributes},
+                durationMs=cache_store_ms,
+                ts=timer.elapsed_ms(),
+            )
+            log.info("  LangCache STORE %-26s %4dms", "OK" if stored else "FAILED", cache_store_ms)
 
     yield sse("done", totalElapsedMs=timer.elapsed_ms())
     reset_demo_user_id(demo_user_token)

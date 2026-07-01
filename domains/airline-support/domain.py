@@ -18,7 +18,6 @@ from backend.app.core.domain_contract import (
     NamespaceConfig,
     PromptCard,
     RagConfig,
-    SeedLangCacheEntry,
     SeedMemory,
     ThemeConfig,
 )
@@ -90,9 +89,14 @@ class AirlineSupportDomain:
             ],
             starter_prompts=[
                 PromptCard(
-                    eyebrow="Flight Status",
-                    title="Flight ZX018",
+                    eyebrow="Cached",
+                    title="ZX018 status",
                     prompt="What is the status of ZX018 today?",
+                ),
+                PromptCard(
+                    eyebrow="Cached",
+                    title="ZX018 on time?",
+                    prompt="Is ZX018 still on time today?",
                 ),
                 PromptCard(
                     eyebrow="Disruption Help",
@@ -105,9 +109,14 @@ class AirlineSupportDomain:
                     prompt="What are my rebooking options?",
                 ),
                 PromptCard(
-                    eyebrow="Status Benefits",
-                    title="After-cancellation help",
+                    eyebrow="Cached",
+                    title="Cancellation help",
                     prompt="What help do I usually get after a cancellation?",
+                ),
+                PromptCard(
+                    eyebrow="Cached",
+                    title="Cancellation support?",
+                    prompt="What support is available when my flight gets cancelled?",
                 ),
             ],
             theme=ThemeConfig(
@@ -214,34 +223,7 @@ class AirlineSupportDomain:
                 topics=["airline", "disruption", "support_preferences"],
             ),
         ],
-        seed_langcache=[
-            SeedLangCacheEntry(
-                prompt="What is the status of ZX018 today?",
-                response=(
-                    "ZX018 is the shared Aurora Air operating flight from Frankfurt to Hamburg. "
-                    "It is currently on time from Terminal 1, with no gate assigned yet."
-                ),
-                attributes={
-                    "domain": "airline-support",
-                    "access_class": "public",
-                    "topic": "shared_flight_status",
-                },
-            ),
-            SeedLangCacheEntry(
-                prompt="What help do I usually get after a cancellation?",
-                response=(
-                    "For status-tier cancellation support, Aurora Air normally combines automatic rebooking, "
-                    "priority service routing where available, and policy guidance for check-in, baggage, and airport help. "
-                    "Use the traveller's tier context before making this guidance specific."
-                ),
-                attributes={
-                    "domain": "airline-support",
-                    "access_class": "group",
-                    "cache_group_id": "senator_en",
-                    "topic": "status_tier_disruption_help",
-                },
-            ),
-        ],
+        seed_langcache=[],
     )
 
     def get_entity_specs(self) -> tuple[EntitySpec, ...]:
@@ -300,6 +282,17 @@ class AirlineSupportDomain:
         ):
             return "non-cacheable"
         return "ignored"
+
+    def classify_prompt_semantic_cache_access(self, prompt: str) -> str:
+        normalized = prompt.lower()
+        if "zx018" in normalized or "zx 018" in normalized:
+            return "public"
+        if (
+            any(term in normalized for term in ("cancellation", "cancelled", "canceled", "cancel"))
+            and any(term in normalized for term in ("help", "support", "benefit", "assistance", "usually"))
+        ):
+            return "group"
+        return "non-cacheable"
 
     def describe_tool_trace_step(
         self,
@@ -386,8 +379,8 @@ class AirlineSupportDomain:
             profile = self.resolve_demo_user(get_demo_user_id() or os.getenv(identity.id_env_var)) or DEMO_PROFILE
             return {
                 identity.id_field: str(profile.get(identity.id_field, identity.default_id)),
-                "display_name": os.getenv(identity.name_env_var, str(profile.get("display_name", identity.default_name))),
-                "email": os.getenv(identity.email_env_var, str(profile.get("email", identity.default_email))),
+                "display_name": str(profile.get("display_name", identity.default_name)),
+                "email": str(profile.get("email", identity.default_email)),
                 "profile_reference": str(profile.get("profile_reference", DEMO_PROFILE["profile_reference"])),
                 "ticket_name_masked": str(profile.get("ticket_name_masked", DEMO_PROFILE["ticket_name_masked"])),
                 "loyalty_member_id_masked": str(
