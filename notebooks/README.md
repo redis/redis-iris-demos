@@ -14,7 +14,11 @@ Hands-on notebooks for Redis Iris demos.
 | Where | How |
 |-------|-----|
 | **Colab** | Open a notebook badge → run all. Clone cell runs automatically. Paste keys into `WORKSHOP_CONFIG`. |
-| **Local** | Open notebook from `notebooks/`. Skip Colab clone cell. Paste keys into `WORKSHOP_CONFIG`. |
+| **Local** | Run `uv sync --extra notebook`, then `uv run --extra notebook jupyter notebook`. Open a notebook from `notebooks/`, skip the Colab clone cell, and paste keys into `WORKSHOP_CONFIG`. |
+
+For the Radish Bank MongoDB/RDI workshop, use the repo-managed `uv` Jupyter
+environment locally. Do not run it in a shared/global Python kernel; package
+versions from other notebooks can conflict with the demo stack.
 
 ## Files
 
