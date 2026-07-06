@@ -1,5 +1,6 @@
 # Environment & secrets
 .env
+notebooks/radish_bank_mongo_rdi/.env
 env.cloud-run.yaml
 
 # AI assistant config (local only)
