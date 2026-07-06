@@ -26,6 +26,7 @@ frontend/vite.config.d.ts
 
 # Generated data
 output/
+notebooks/generated_rdi_pipeline/
 
 # OS files
 .DS_Store
