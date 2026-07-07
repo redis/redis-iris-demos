@@ -8,8 +8,11 @@ From the repo root:
 uv sync --extra notebook
 cp notebooks/radish_bank_mongo_rdi/.env.example notebooks/radish_bank_mongo_rdi/.env
 # Fill notebooks/radish_bank_mongo_rdi/.env with Redis/OpenAI/Iris values.
+uv run --extra notebook python notebooks/radish_bank_mongo_rdi/seed_mongo.py
 uv run --extra notebook jupyter notebook notebooks/radish_bank_mongo_rdi/rdi_to_iris_workshop.ipynb
 ```
+
+Run `seed_mongo.py` before opening the notebook. It starts the local MongoDB replica set, regenerates the Radish Bank JSONL data, and replaces the MongoDB source collections that RDI will read.
 
 The local `.env` file is ignored by git. Keep real Redis Cloud, OpenAI, Context Retriever, Agent Memory, and LangCache secrets there.
 

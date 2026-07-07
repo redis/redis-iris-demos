@@ -173,24 +173,32 @@ For the current workshop database, `REDIS_SSL=false` is required because the end
 ## Setup Sequence
 
 1. Fill Redis, OpenAI, Memory, LangCache, and `CTX_ADMIN_KEY` in `notebooks/radish_bank_mongo_rdi/.env`.
-2. Leave these blank initially:
+2. Seed the local MongoDB source before opening the notebook:
+
+   ```bash
+   uv run --extra notebook python notebooks/radish_bank_mongo_rdi/seed_mongo.py
+   ```
+
+   This starts the bundled MongoDB replica set, regenerates Radish Bank JSONL data, and replaces the MongoDB source collections that RDI will read.
+
+3. Leave these blank initially:
 
    ```env
    CTX_SURFACE_ID=
    MCP_AGENT_KEY=
    ```
 
-3. Run the notebook through the Context Surface creation cell.
-4. The notebook creates or updates `radish_bank_mongo_to_redis_context_surface`.
-5. The notebook creates the `radish_bank_mongo_to_redis_agent` key if `MCP_AGENT_KEY` is blank.
-6. The notebook writes `CTX_SURFACE_ID` and `MCP_AGENT_KEY` back to the ignored `.env`.
-7. Run RDI so MongoDB records arrive in Redis as `radish_bank_*` JSON keys:
+4. Run the notebook through the Context Surface creation cell.
+5. The notebook creates or updates `radish_bank_mongo_to_redis_context_surface`.
+6. The notebook creates the `radish_bank_mongo_to_redis_agent` key if `MCP_AGENT_KEY` is blank.
+7. The notebook writes `CTX_SURFACE_ID` and `MCP_AGENT_KEY` back to the ignored `.env`.
+8. Run RDI so MongoDB records arrive in Redis as `radish_bank_*` JSON keys:
 
    ```bash
    redis-di deploy --dir notebooks/generated_rdi_pipeline/radish-bank-mongodb-local
    ```
 
-8. Start the demo UI with `DEMO_DOMAIN=radish-bank` and the same `.env` values.
+9. Start the demo UI with `DEMO_DOMAIN=radish-bank` and the same `.env` values.
 
 ## Current Verification Commands
 
