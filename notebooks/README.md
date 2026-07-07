@@ -39,6 +39,7 @@ uv run --extra notebook python notebooks/radish_bank_mongo_rdi/seed_mongo.py
 - `radish_bank_workshop.ipynb` — Radish Bank Iris workshop
 - `radish_bank_mongo_rdi/rdi_to_iris_workshop.ipynb` — Radish Bank local MongoDB RDI-to-Iris workshop
 - `radish_bank_mongo_rdi/seed_mongo.py` — pre-notebook local MongoDB source seeding script
+- `radish_bank_mongo_rdi/export_seed_inventory.py` — regenerates a readable Markdown inventory of the MongoDB seed records
 - `workshop_helpers.py` — setup, seeding, chat loop
 - `workshop_data/` — JSONL demo data
 - `mongo_local/docker-compose.yml` — local MongoDB replica set for RDI/change-stream demos

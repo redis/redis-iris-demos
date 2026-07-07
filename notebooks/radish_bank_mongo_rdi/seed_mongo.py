@@ -24,6 +24,11 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from backend.app.core.domain_loader import load_domain  # noqa: E402
+from export_seed_inventory import (  # noqa: E402
+    DEFAULT_INVENTORY_OUTPUT,
+    build_inventory_markdown,
+    write_inventory_file,
+)
 
 DOMAIN_ID = "radish-bank"
 DEFAULT_MONGODB_URI = "mongodb://localhost:27017/?replicaSet=rs0"
@@ -167,6 +172,12 @@ def main() -> None:
         action="store_true",
         help="Do not start the bundled local MongoDB container.",
     )
+    parser.add_argument(
+        "--inventory-output",
+        default=str(DEFAULT_INVENTORY_OUTPUT),
+        help="Markdown inventory path to write after seeding.",
+    )
+    parser.add_argument("--no-inventory", action="store_true", help="Do not write a Markdown seed inventory.")
     args = parser.parse_args()
 
     load_workshop_env()
@@ -188,6 +199,18 @@ def main() -> None:
     print(json.dumps(generated_summary, indent=2, sort_keys=True))
     print("MongoDB collection counts:")
     print(json.dumps(mongo_counts, indent=2, sort_keys=True))
+
+    if not args.no_inventory:
+        inventory_output = Path(args.inventory_output).expanduser()
+        if not inventory_output.is_absolute():
+            inventory_output = ROOT / inventory_output
+        markdown = build_inventory_markdown(
+            records_by_collection,
+            source_label="Radish Bank generator",
+            database_name=database_name,
+        )
+        write_inventory_file(inventory_output, markdown)
+        print(f"Wrote seed inventory: {inventory_output}")
 
 
 if __name__ == "__main__":
