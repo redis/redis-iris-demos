@@ -12,3 +12,5 @@ uv run --extra notebook jupyter notebook notebooks/radish_bank_mongo_rdi/rdi_to_
 ```
 
 The local `.env` file is ignored by git. Keep real Redis Cloud, OpenAI, Context Retriever, Agent Memory, and LangCache secrets there.
+
+See [context_surface_setup.md](context_surface_setup.md) for the Context Retriever admin key, surface ID, MCP agent key, and entity model setup flow.
