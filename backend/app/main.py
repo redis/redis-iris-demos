@@ -254,6 +254,61 @@ def _llm_phase_label(*, llm_call_index: int, tool_calls_seen: int) -> str:
     return "Reason about the request and decide the next step."
 
 
+def _parse_tool_output(raw_output: Any) -> dict[str, Any]:
+    """Normalize a tool's raw output into a JSON-serializable dict payload."""
+    if raw_output is None or raw_output == "":
+        return {}
+    if isinstance(raw_output, dict):
+        return raw_output
+    if hasattr(raw_output, "content") and isinstance(raw_output.content, str):
+        try:
+            parsed = json.loads(raw_output.content)
+        except (json.JSONDecodeError, TypeError):
+            return {"result": raw_output.content}
+        return parsed if isinstance(parsed, dict) else {"result": parsed}
+    try:
+        parsed = json.loads(str(raw_output))
+    except (json.JSONDecodeError, TypeError):
+        return {"result": str(raw_output)}
+    return parsed if isinstance(parsed, dict) else {"result": parsed}
+
+
+def _tool_error_payload(error: Any, *, fallback: str = "Tool failed.") -> dict[str, str]:
+    if error is None:
+        return {"error": fallback}
+    return {
+        "error": str(error) or fallback,
+        "type": error.__class__.__name__,
+    }
+
+
+def _tool_duration_ms(start: float | None) -> int:
+    if start is None:
+        return 1
+    return max(round((perf_counter() - start) * 1000), 1)
+
+
+def _pop_pending_tool(
+    pending_tools: dict[str, dict[str, Any]],
+    *,
+    run_id: str,
+    name: str,
+) -> dict[str, Any] | None:
+    """Match a tool end/error event back to its pending start.
+
+    LangGraph normally provides a stable ``run_id``; when it doesn't, fall back
+    to the oldest pending call with the same tool name so the trace still
+    resolves instead of stalling on "Running" forever.
+    """
+    if run_id and run_id in pending_tools:
+        return pending_tools.pop(run_id)
+    for pending_run_id, pending in list(pending_tools.items()):
+        if name and pending.get("name") != name:
+            continue
+        return pending_tools.pop(pending_run_id)
+    return None
+
+
 @app.get("/api/health")
 async def health() -> JSONResponse:
     return JSONResponse({
@@ -467,7 +522,7 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
     defer_final_answer = runtime_config.get("enable_post_model_verifier", False)
     config = {"configurable": {"thread_id": thread_id}}
 
-    tool_start_times: dict[str, float] = {}
+    pending_tools: dict[str, dict[str, Any]] = {}
     llm_start_times: dict[str, float] = {}
     llm_step_ids: dict[str, str] = {}
     llm_call_counter = 0
@@ -600,9 +655,11 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
 
             if kind == "on_tool_start":
                 name = event.get("name", "")
-                tool_input = event["data"].get("input", {})
-                tool_start_times[event["run_id"]] = perf_counter()
                 tool_calls_seen += 1
+                run_id = str(event.get("run_id") or f"{name}-{tool_calls_seen}")
+                data = event.get("data") or {}
+                tool_input = data.get("input", {}) if isinstance(data, dict) else {}
+                pending_tools[run_id] = {"name": name, "start": perf_counter()}
                 thinking_step = _thinking_step_for_tool(name, tool_input)
                 if thinking_step and thinking_step != last_thinking_step:
                     last_thinking_step = thinking_step
@@ -613,27 +670,33 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
 
             elif kind == "on_tool_end":
                 name = event.get("name", "")
-                raw_output = event["data"].get("output", "")
-                output: dict = {}
-                if raw_output:
-                    if isinstance(raw_output, dict):
-                        output = raw_output
-                    elif hasattr(raw_output, "content") and isinstance(raw_output.content, str):
-                        try:
-                            output = json.loads(raw_output.content)
-                        except (json.JSONDecodeError, TypeError):
-                            output = {"result": raw_output.content}
-                    else:
-                        try:
-                            output = json.loads(str(raw_output))
-                        except (json.JSONDecodeError, TypeError):
-                            output = {"result": str(raw_output)}
-                start = tool_start_times.pop(event["run_id"], perf_counter())
-                duration_ms = max(round((perf_counter() - start) * 1000), 1)
+                run_id = str(event.get("run_id") or "")
+                pending = _pop_pending_tool(pending_tools, run_id=run_id, name=name)
+                if pending and not name:
+                    name = str(pending.get("name", ""))
+                data = event.get("data") or {}
+                raw_output = data.get("output", "") if isinstance(data, dict) else ""
+                output = _parse_tool_output(raw_output)
+                duration_ms = _tool_duration_ms(pending.get("start") if pending else None)
                 tool_total_ms += duration_ms
                 log.info("  tool %-40s %4dms  [%s]", name, duration_ms, _tool_kind(name))
                 yield sse("tool-result", toolName=name, toolKind=_tool_kind(name),
                            payload=output, durationMs=duration_ms, ts=timer.elapsed_ms())
+
+            elif kind == "on_tool_error":
+                # Without a terminal event the trace stalls on "Running" forever.
+                name = event.get("name", "")
+                run_id = str(event.get("run_id") or "")
+                pending = _pop_pending_tool(pending_tools, run_id=run_id, name=name)
+                if pending and not name:
+                    name = str(pending.get("name", ""))
+                data = event.get("data") or {}
+                error = data.get("error") if isinstance(data, dict) else None
+                duration_ms = _tool_duration_ms(pending.get("start") if pending else None)
+                tool_total_ms += duration_ms
+                log.info("  tool %-40s %4dms  [%s] ERROR", name, duration_ms, _tool_kind(name))
+                yield sse("tool-result", toolName=name, toolKind=_tool_kind(name),
+                           payload=_tool_error_payload(error), durationMs=duration_ms, ts=timer.elapsed_ms())
 
             elif kind == "on_chat_model_start":
                 llm_call_counter += 1
@@ -680,6 +743,19 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
             log.warning("Connection error detected — will rebuild agent on next request")
             global _langgraph_agent
             _langgraph_agent = None
+
+        # Flush any in-flight tool calls so their traces don't stall on "Running".
+        for pending_run_id, pending in list(pending_tools.items()):
+            pending_name = str(pending.get("name", ""))
+            yield sse(
+                "tool-result",
+                toolName=pending_name,
+                toolKind=_tool_kind(pending_name),
+                payload={"error": short_msg, "type": error_type},
+                durationMs=_tool_duration_ms(pending.get("start")),
+                ts=timer.elapsed_ms(),
+            )
+        pending_tools.clear()
 
         yield sse("error", errorType=error_type, message=short_msg, ts=timer.elapsed_ms())
         yield sse("text-delta", delta=f"\n\n⚠️ {error_type}: {short_msg}")
