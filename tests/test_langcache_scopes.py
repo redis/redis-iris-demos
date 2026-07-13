@@ -6,7 +6,7 @@ import backend.app.main as app_main
 class DomainWithDemoUsers:
     manifest = SimpleNamespace(
         id="airline-support",
-        identity=SimpleNamespace(default_id="AIRCUST_001"),
+        identity=SimpleNamespace(default_id="AIRCUST_001", tool_name="get_current_user_profile"),
         seed_langcache=[],
     )
 
@@ -105,4 +105,23 @@ def test_langcache_store_attributes_skips_when_response_used_noncacheable_tool(m
         "What help do I usually get after a cancellation?",
         "AIRCUST_003",
         used_tool_names={"filter_booking_by_customer_id"},
+    ) is None
+
+
+def test_langcache_store_attributes_skips_when_identity_or_memory_tool_used(monkeypatch) -> None:
+    monkeypatch.setattr(app_main, "domain", DomainWithDemoUsers())
+
+    # The identity tool returns PII, so a group-cacheable prompt must not be
+    # stored once the reply consulted it.
+    assert app_main._langcache_store_attributes(
+        "What help do I usually get after a cancellation?",
+        "AIRCUST_003",
+        used_tool_names={"get_current_user_profile"},
+    ) is None
+
+    # Memory tools are per-user and must likewise keep answers out of the cache.
+    assert app_main._langcache_store_attributes(
+        "What help do I usually get after a cancellation?",
+        "AIRCUST_003",
+        used_tool_names={"search_long_term_memory"},
     ) is None

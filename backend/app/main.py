@@ -172,6 +172,9 @@ def _langcache_attribute_scopes(current_user_id: str) -> list[dict[str, str]]:
     if not callable(resolve_demo_user):
         return [public_scope, *legacy_scopes]
 
+    # Fall back to the default demo profile so an unrecognized current_user_id
+    # resolves the same identity the internal tools use — keeping group cache
+    # scope aligned with the traced traveller.
     profile = resolve_demo_user(current_user_id) or resolve_demo_user(domain.manifest.identity.default_id) or {}
     cache_group_id = str(profile.get("cache_group_id", "")).strip()
     if not cache_group_id:
@@ -189,10 +192,16 @@ def _langcache_attribute_scopes(current_user_id: str) -> list[dict[str, str]]:
 
 
 def _response_used_noncacheable_tool(used_tool_names: Iterable[str]) -> bool:
+    # User-specific internal tools (identity lookup, memory) must never seed a
+    # shared public/group cache, even though they aren't MCP tools.
+    identity_tool = getattr(getattr(domain.manifest, "identity", None), "tool_name", None)
     classify_tool = getattr(domain, "classify_mcp_semantic_cache_access", None)
-    if not callable(classify_tool):
-        return False
-    return any(str(classify_tool(name) or "").strip().lower() == "non-cacheable" for name in used_tool_names)
+    for name in used_tool_names:
+        if name == identity_tool or _is_memory_tool(name):
+            return True
+        if callable(classify_tool) and str(classify_tool(name) or "").strip().lower() == "non-cacheable":
+            return True
+    return False
 
 
 def _langcache_store_attributes(
@@ -537,9 +546,9 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
 
     # ── Phase 0: Semantic cache check ──
     if langcache_service.is_configured():
-        cache_result = None
-        cache_scope = None
-        cache_ms = 0
+        # Try each eligible scope in priority order, emitting a paired
+        # tool-call/tool-result trace per scope so the activity panel never
+        # shows more searches than results.
         for candidate_scope in _langcache_attribute_scopes(current_user_id):
             yield sse(
                 "tool-call",
@@ -549,37 +558,32 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
                 ts=timer.elapsed_ms(),
             )
             cache_start = perf_counter()
-            cache_result = await langcache_service.search(latest_message.strip(), attributes=candidate_scope)
+            scope_result = await langcache_service.search(latest_message.strip(), attributes=candidate_scope)
             cache_ms = max(round((perf_counter() - cache_start) * 1000), 1)
-            cache_scope = candidate_scope
-            if cache_result:
-                break
-
-        if cache_result:
+            if scope_result:
+                yield sse(
+                    "tool-result",
+                    toolName="semantic_cache_search",
+                    toolKind="langcache",
+                    payload={
+                        "hit": True,
+                        "similarity": scope_result.get("similarity", 0),
+                        "cached_prompt": scope_result.get("prompt", ""),
+                        "attributes": candidate_scope,
+                    },
+                    durationMs=cache_ms,
+                    ts=timer.elapsed_ms(),
+                )
+                cached_response = scope_result.get("response", "")
+                yield sse("text-delta", delta=cached_response, ts=timer.elapsed_ms())
+                yield sse("done", totalElapsedMs=timer.elapsed_ms(), cacheHit=True)
+                log.info("━━━ CACHE HIT in %dms (similarity=%.3f)", cache_ms, scope_result.get("similarity", 0))
+                return
             yield sse(
                 "tool-result",
                 toolName="semantic_cache_search",
                 toolKind="langcache",
-                payload={
-                    "hit": True,
-                    "similarity": cache_result.get("similarity", 0),
-                    "cached_prompt": cache_result.get("prompt", ""),
-                    "attributes": cache_scope,
-                },
-                durationMs=cache_ms,
-                ts=timer.elapsed_ms(),
-            )
-            cached_response = cache_result.get("response", "")
-            yield sse("text-delta", delta=cached_response, ts=timer.elapsed_ms())
-            yield sse("done", totalElapsedMs=timer.elapsed_ms(), cacheHit=True)
-            log.info("━━━ CACHE HIT in %dms (similarity=%.3f)", cache_ms, cache_result.get("similarity", 0))
-            return
-        else:
-            yield sse(
-                "tool-result",
-                toolName="semantic_cache_search",
-                toolKind="langcache",
-                payload={"hit": False, "attributes": cache_scope},
+                payload={"hit": False, "attributes": candidate_scope},
                 durationMs=cache_ms,
                 ts=timer.elapsed_ms(),
             )
