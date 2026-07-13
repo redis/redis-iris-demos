@@ -7,7 +7,7 @@ import logging
 import os
 from pathlib import Path
 from time import perf_counter
-from typing import Any, AsyncIterator
+from typing import Any, AsyncIterator, Iterable
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -185,16 +185,30 @@ def _langcache_attribute_scopes(current_user_id: str) -> list[dict[str, str]]:
     ]
 
 
-def _langcache_store_attributes(prompt: str, current_user_id: str) -> dict[str, str] | None:
+def _response_used_noncacheable_tool(used_tool_names: Iterable[str]) -> bool:
+    classify_tool = getattr(domain, "classify_mcp_semantic_cache_access", None)
+    if not callable(classify_tool):
+        return False
+    return any(str(classify_tool(name) or "").strip().lower() == "non-cacheable" for name in used_tool_names)
+
+
+def _langcache_store_attributes(
+    prompt: str,
+    current_user_id: str,
+    used_tool_names: Iterable[str] = (),
+) -> dict[str, str] | None:
     classify = getattr(domain, "classify_prompt_semantic_cache_access", None)
     if not callable(classify):
         return None
 
     access = str(classify(prompt) or "").strip().lower()
+    if access not in ("public", "group"):
+        return None
+    if _response_used_noncacheable_tool(used_tool_names):
+        return None
+
     if access == "public":
         return {"domain": domain.manifest.id, "access_class": "public"}
-    if access != "group":
-        return None
 
     resolve_demo_user = getattr(domain, "resolve_demo_user", None)
     if not callable(resolve_demo_user):
@@ -530,6 +544,7 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
     llm_step_ids: dict[str, str] = {}
     llm_call_counter = 0
     tool_calls_seen = 0
+    used_tool_names: set[str] = set()
     last_thinking_step: str | None = None
     final_text = ""
     thread_token = set_thread_id(thread_id)
@@ -662,6 +677,7 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
                 tool_input = event["data"].get("input", {})
                 tool_start_times[event["run_id"]] = perf_counter()
                 tool_calls_seen += 1
+                used_tool_names.add(name)
                 thinking_step = _thinking_step_for_tool(name, tool_input)
                 if thinking_step and thinking_step != last_thinking_step:
                     last_thinking_step = thinking_step
@@ -786,7 +802,7 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
 
     # ── Phase 8: Cache the answer when the domain marks this prompt as reusable ──
     if langcache_service.is_configured() and final_text.strip():
-        store_attributes = _langcache_store_attributes(latest_message.strip(), current_user_id)
+        store_attributes = _langcache_store_attributes(latest_message.strip(), current_user_id, used_tool_names)
         if store_attributes:
             yield sse(
                 "tool-call",

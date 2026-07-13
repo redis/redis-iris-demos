@@ -26,6 +26,12 @@ class DomainWithDemoUsers:
             return "group"
         return "non-cacheable"
 
+    @staticmethod
+    def classify_mcp_semantic_cache_access(tool_name: str):
+        if tool_name.startswith("filter_booking_by_"):
+            return "non-cacheable"
+        return "ignored"
+
 
 class DomainWithoutDemoUsers:
     manifest = SimpleNamespace(
@@ -90,3 +96,13 @@ def test_langcache_store_attributes_use_prompt_classification(monkeypatch) -> No
         "access_class": "public",
     }
     assert app_main._langcache_store_attributes("My flight was disrupted. What happened?", "AIRCUST_001") is None
+
+
+def test_langcache_store_attributes_skips_when_response_used_noncacheable_tool(monkeypatch) -> None:
+    monkeypatch.setattr(app_main, "domain", DomainWithDemoUsers())
+
+    assert app_main._langcache_store_attributes(
+        "What help do I usually get after a cancellation?",
+        "AIRCUST_003",
+        used_tool_names={"filter_booking_by_customer_id"},
+    ) is None
