@@ -125,3 +125,15 @@ def test_langcache_store_attributes_skips_when_identity_or_memory_tool_used(monk
         "AIRCUST_003",
         used_tool_names={"search_long_term_memory"},
     ) is None
+
+
+def test_langcache_store_attributes_skips_when_memory_context_used(monkeypatch) -> None:
+    monkeypatch.setattr(app_main, "domain", DomainWithDemoUsers())
+
+    # Short-/long-term memory injected into the prompt makes the answer
+    # user-specific even when no memory tool ran in the agent loop.
+    assert app_main._langcache_store_attributes(
+        "What help do I usually get after a cancellation?",
+        "AIRCUST_003",
+        memory_context_used=True,
+    ) is None

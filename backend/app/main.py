@@ -208,6 +208,7 @@ def _langcache_store_attributes(
     prompt: str,
     current_user_id: str,
     used_tool_names: Iterable[str] = (),
+    memory_context_used: bool = False,
 ) -> dict[str, str] | None:
     classify = getattr(domain, "classify_prompt_semantic_cache_access", None)
     if not callable(classify):
@@ -215,6 +216,10 @@ def _langcache_store_attributes(
 
     access = str(classify(prompt) or "").strip().lower()
     if access not in ("public", "group"):
+        return None
+    # Per-user memory injected into the prompt makes the answer user-specific,
+    # so it must not seed a shared public/group cache entry.
+    if memory_context_used:
         return None
     if _response_used_noncacheable_tool(used_tool_names):
         return None
@@ -885,7 +890,12 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
 
     # ── Phase 8: Cache the answer when the domain marks this prompt as reusable ──
     if langcache_service.is_configured() and final_text.strip():
-        store_attributes = _langcache_store_attributes(latest_message.strip(), current_user_id, used_tool_names)
+        store_attributes = _langcache_store_attributes(
+            latest_message.strip(),
+            current_user_id,
+            used_tool_names,
+            memory_context_used=bool(memory_context_sections),
+        )
         if store_attributes:
             yield sse(
                 "tool-call",
