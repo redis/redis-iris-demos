@@ -448,6 +448,7 @@ export default function App() {
         toolsLoading={toolsLoading}
         mode={mode}
         domain={domain}
+        isStreaming={isLoading}
       />
     </div>
   );

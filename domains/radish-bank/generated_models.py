@@ -263,7 +263,7 @@ class ProductHolding(ContextModel):
     )
 
     product_type: str = ContextField(
-        description="deposit_account, card, fixed_deposit, insurance",
+        description="card, fixed_deposit, insurance",
         index="tag",
     )
 

@@ -74,14 +74,14 @@ def generate_demo_data(
             "account_id": "ACC001",
             "customer_id": DEMO_CUSTOMER_ID,
             "account_type": "savings",
-            "balance_sgd": 18500.0,
+            "balance_sgd": 56500.0,
             "status": "active",
         },
         {
             "account_id": "ACC002",
             "customer_id": DEMO_CUSTOMER_ID,
             "account_type": "current",
-            "balance_sgd": 4200.0,
+            "balance_sgd": 22200.0,
             "status": "active",
         },
     ]
@@ -137,16 +137,11 @@ def generate_demo_data(
         {"branch_id": "BR002", "hours_summary": "Mon-Fri 09:30-16:00"},
         {"branch_id": "BR003", "hours_summary": "Daily 06:00-23:00"},
     ]
+    # Deposit accounts (savings/current) live in Account only — not ProductHolding.
+    # Holdings cover placed products: cards, FDs, insurance (FD/insurance added by demo tools).
     holdings = [
         {
             "holding_id": "HOLD001",
-            "customer_id": DEMO_CUSTOMER_ID,
-            "product_type": "deposit_account",
-            "product_name": "Savings Account",
-            "status": "active",
-        },
-        {
-            "holding_id": "HOLD002",
             "customer_id": DEMO_CUSTOMER_ID,
             "product_type": "card",
             "product_name": "Radish Cashback Card",

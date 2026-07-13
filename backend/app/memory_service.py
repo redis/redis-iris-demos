@@ -8,7 +8,7 @@ from typing import Any, Literal
 
 import httpx
 
-from backend.app.settings import Settings
+from backend.app.settings import DEFAULT_MEMORY_SIMILARITY_THRESHOLD, Settings
 
 MessageRole = Literal["USER", "ASSISTANT", "SYSTEM"]
 MemoryType = Literal["semantic", "episodic", "message"]
@@ -61,8 +61,9 @@ class MemoryConnection:
 
 
 class MemoryService:
-    def __init__(self, settings: Settings):
+    def __init__(self, settings: Settings, *, similarity_threshold: float | None = None):
         self.settings = settings
+        self.similarity_threshold = similarity_threshold
         self._async_client: httpx.AsyncClient | None = None
 
     def _get_async_client(self) -> httpx.AsyncClient:
@@ -82,6 +83,13 @@ class MemoryService:
             and self.settings.memory_api_key
         )
 
+    def _default_similarity_threshold(self) -> float:
+        if self.similarity_threshold is not None:
+            return float(self.similarity_threshold)
+        if self.settings.memory_similarity_threshold is not None:
+            return float(self.settings.memory_similarity_threshold)
+        return DEFAULT_MEMORY_SIMILARITY_THRESHOLD
+
     def connection(self, *, owner_id: str | None = None) -> MemoryConnection:
         return MemoryConnection(
             api_base_url=self.settings.memory_api_base_url.rstrip("/"),
@@ -90,7 +98,7 @@ class MemoryService:
             owner_id=sanitize_owner_id(owner_id or self.settings.memory_owner_id),
             actor_id=sanitize_actor_id(self.settings.memory_actor_id),
             namespace=self.settings.effective_memory_namespace,
-            similarity_threshold=float(self.settings.memory_similarity_threshold),
+            similarity_threshold=self._default_similarity_threshold(),
             limit=max(int(self.settings.memory_limit), 1),
         )
 
@@ -127,6 +135,15 @@ class MemoryService:
             filt["sessionId"] = {"eq": session_id}
         return filt
 
+    def _search_similarity_threshold(
+        self,
+        connection: MemoryConnection,
+        similarity_threshold: float | None,
+    ) -> float:
+        if similarity_threshold is not None:
+            return similarity_threshold
+        return connection.similarity_threshold
+
     def search_long_term_memory(
         self,
         *,
@@ -138,6 +155,10 @@ class MemoryService:
     ) -> list[dict[str, Any]]:
         connection = self.connection(owner_id=owner_id)
         payload: dict[str, Any] = {
+            "text": text,
+            "similarityThreshold": self._search_similarity_threshold(
+                connection, similarity_threshold
+            ),
             "filterOp": "all",
             "limit": limit or connection.limit,
             "filter": self._build_search_filter(connection, session_id),
@@ -164,6 +185,10 @@ class MemoryService:
     ) -> list[dict[str, Any]]:
         connection = self.connection(owner_id=owner_id)
         payload: dict[str, Any] = {
+            "text": text,
+            "similarityThreshold": self._search_similarity_threshold(
+                connection, similarity_threshold
+            ),
             "filterOp": "all",
             "limit": limit or connection.limit,
             "filter": self._build_search_filter(connection, session_id),

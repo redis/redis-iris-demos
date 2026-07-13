@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 import pytest
 from pydantic import ValidationError
 
@@ -8,6 +10,8 @@ from backend.app.context_surface_service import (
     _sanitize_tool_definition,
 )
 from backend.app.langgraph_agent import (
+    _format_tool_validation_error,
+    _make_mcp_tool,
     _pydantic_model_from_json_schema,
     _resolve_json_schema_variant,
 )
@@ -129,3 +133,26 @@ def test_pydantic_model_from_json_schema_supports_arrays_objects_and_nullable_va
 
     with pytest.raises(ValidationError):
         model(embedding=[0.1])
+
+
+def test_mcp_tool_wrapper_returns_structured_json_for_validation_errors() -> None:
+    tool = _make_mcp_tool(
+        {
+            "name": "filter_order_by_customer_id",
+            "description": "Find all orders for a customer",
+            "inputSchema": {
+                "type": "object",
+                "properties": {"value": {"type": "string"}},
+                "required": ["value"],
+            },
+        },
+        cs_service=object(),  # type: ignore[arg-type]
+    )
+
+    assert tool.handle_validation_error == _format_tool_validation_error
+
+    payload = json.loads(_format_tool_validation_error(ValueError("missing required field: value")))
+
+    assert payload["error"] == "Tool input validation failed."
+    assert payload["type"] == "ValueError"
+    assert payload["detail"] == "missing required field: value"

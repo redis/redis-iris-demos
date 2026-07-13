@@ -1,0 +1,2 @@
+{"account_id": "ACC001", "customer_id": "CUST001", "account_type": "savings", "balance_sgd": 42500.0, "status": "active"}
+{"account_id": "ACC002", "customer_id": "CUST001", "account_type": "current", "balance_sgd": 16200.0, "status": "active"}
