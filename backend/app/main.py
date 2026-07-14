@@ -890,11 +890,17 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
 
     # ── Phase 8: Cache the answer when the domain marks this prompt as reusable ──
     if langcache_service.is_configured() and final_text.strip():
+        # The current turn's own message is echoed back into short-term memory
+        # (Phase 2 logs it before Phase 3 reads it), so it must not block a
+        # first-turn cache write. Only genuinely prior/user-specific memory —
+        # multi-turn session history or retrieved long-term entries — makes the
+        # answer user-specific.
+        memory_influenced = bool(long_term_context) or len(short_term_events) > 1
         store_attributes = _langcache_store_attributes(
             latest_message.strip(),
             current_user_id,
             used_tool_names,
-            memory_context_used=bool(memory_context_sections),
+            memory_context_used=memory_influenced,
         )
         if store_attributes:
             yield sse(

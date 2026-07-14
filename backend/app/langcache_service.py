@@ -71,7 +71,18 @@ class LangCacheService:
             log.info("Cache MISS: %s", prompt[:60])
             return None
         except httpx.HTTPStatusError as exc:
-            if attributes and exc.response.status_code == 400 and "no attributes are configured" in exc.response.text:
+            # Only retry unscoped for non-cohort scopes. Retrying a group scope
+            # without attributes could return a global match and serve one
+            # cohort's entry to another cache_group_id.
+            cohort_scoped = bool(attributes) and (
+                attributes.get("access_class") == "group" or bool(attributes.get("cache_group_id"))
+            )
+            if (
+                attributes
+                and not cohort_scoped
+                and exc.response.status_code == 400
+                and "no attributes are configured" in exc.response.text
+            ):
                 log.info("LangCache cache has no attribute schema; retrying search without attributes")
                 return await self.search(prompt, attributes=None)
             log.warning("LangCache search failed: %s — body: %s", exc, exc.response.text)
