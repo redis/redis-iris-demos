@@ -7,7 +7,7 @@ import logging
 import os
 from pathlib import Path
 from time import perf_counter
-from typing import Any, AsyncIterator
+from typing import Any, AsyncIterator, Iterable
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,7 +23,7 @@ from backend.app.langcache_service import LangCacheService
 from backend.app.langgraph_agent import create_agent, create_checkpointer
 from backend.app.memory_service import MemoryService
 from backend.app.rag_service import SimpleRAGService
-from backend.app.request_context import reset_thread_id, set_thread_id
+from backend.app.request_context import reset_demo_user_id, reset_thread_id, set_demo_user_id, set_thread_id
 from backend.app.settings import get_settings
 
 logging.basicConfig(
@@ -160,6 +160,86 @@ def _logo_src(path: Path) -> str:
     }.get(suffix, "application/octet-stream")
     encoded = base64.b64encode(path.read_bytes()).decode("ascii")
     return f"data:{mime_type};base64,{encoded}"
+
+
+def _langcache_attribute_scopes(current_user_id: str) -> list[dict[str, str]]:
+    public_scope = {"domain": domain.manifest.id, "access_class": "public"}
+    legacy_scopes = []
+    resolve_demo_user = getattr(domain, "resolve_demo_user", None)
+    if not callable(resolve_demo_user) and not any("access_class" in entry.attributes for entry in domain.manifest.seed_langcache):
+        legacy_scopes.append({"domain": domain.manifest.id})
+
+    if not callable(resolve_demo_user):
+        return [public_scope, *legacy_scopes]
+
+    # Fall back to the default demo profile so an unrecognized current_user_id
+    # resolves the same identity the internal tools use — keeping group cache
+    # scope aligned with the traced traveller.
+    profile = resolve_demo_user(current_user_id) or resolve_demo_user(domain.manifest.identity.default_id) or {}
+    cache_group_id = str(profile.get("cache_group_id", "")).strip()
+    if not cache_group_id:
+        return [public_scope, *legacy_scopes]
+
+    return [
+        {
+            "domain": domain.manifest.id,
+            "access_class": "group",
+            "cache_group_id": cache_group_id,
+        },
+        public_scope,
+        *legacy_scopes,
+    ]
+
+
+def _response_used_noncacheable_tool(used_tool_names: Iterable[str]) -> bool:
+    # User-specific internal tools (identity lookup, memory) must never seed a
+    # shared public/group cache, even though they aren't MCP tools.
+    identity_tool = getattr(getattr(domain.manifest, "identity", None), "tool_name", None)
+    classify_tool = getattr(domain, "classify_mcp_semantic_cache_access", None)
+    for name in used_tool_names:
+        if name == identity_tool or _is_memory_tool(name):
+            return True
+        if callable(classify_tool) and str(classify_tool(name) or "").strip().lower() == "non-cacheable":
+            return True
+    return False
+
+
+def _langcache_store_attributes(
+    prompt: str,
+    current_user_id: str,
+    used_tool_names: Iterable[str] = (),
+    memory_context_used: bool = False,
+) -> dict[str, str] | None:
+    classify = getattr(domain, "classify_prompt_semantic_cache_access", None)
+    if not callable(classify):
+        return None
+
+    access = str(classify(prompt) or "").strip().lower()
+    if access not in ("public", "group"):
+        return None
+    # Per-user memory injected into the prompt makes the answer user-specific,
+    # so it must not seed a shared public/group cache entry.
+    if memory_context_used:
+        return None
+    if _response_used_noncacheable_tool(used_tool_names):
+        return None
+
+    if access == "public":
+        return {"domain": domain.manifest.id, "access_class": "public"}
+
+    resolve_demo_user = getattr(domain, "resolve_demo_user", None)
+    if not callable(resolve_demo_user):
+        return None
+
+    profile = resolve_demo_user(current_user_id) or resolve_demo_user(domain.manifest.identity.default_id) or {}
+    cache_group_id = str(profile.get("cache_group_id", "")).strip()
+    if not cache_group_id:
+        return None
+    return {
+        "domain": domain.manifest.id,
+        "access_class": "group",
+        "cache_group_id": cache_group_id,
+    }
 
 
 _INTERNAL_NAMES = {t.name for t in internal_tools.definitions}
@@ -340,13 +420,14 @@ async def domain_config() -> JSONResponse:
             {"prompt": e.prompt, "response": e.response}
             for e in domain.manifest.seed_langcache
         ],
+        "demo_users": domain.get_demo_users() if callable(getattr(domain, "get_demo_users", None)) else [],
     })
 
 
 @app.get("/api/memory/dashboard")
-async def memory_dashboard(thread_id: str | None = None) -> JSONResponse:
+async def memory_dashboard(thread_id: str | None = None, demo_user_id: str | None = None) -> JSONResponse:
     identity = domain.manifest.identity
-    current_user_id = os.getenv(identity.id_env_var, identity.default_id)
+    current_user_id = demo_user_id or os.getenv(identity.id_env_var, identity.default_id)
     if not memory_service.is_configured():
         return JSONResponse(
             {
@@ -418,7 +499,7 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
     thread_id = request.thread_id or "default"
     latest_message = request.messages[-1].content if request.messages else ""
     identity = domain.manifest.identity
-    current_user_id = os.getenv(identity.id_env_var, identity.default_id)
+    current_user_id = request.demo_user_id or os.getenv(identity.id_env_var, identity.default_id)
 
     log.info("━━━ REQUEST [thread=%s] %s", thread_id[:8], latest_message[:80])
 
@@ -470,41 +551,44 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
 
     # ── Phase 0: Semantic cache check ──
     if langcache_service.is_configured():
-        yield sse(
-            "tool-call",
-            toolName="semantic_cache_search",
-            toolKind="langcache",
-            payload={"query": latest_message.strip()},
-            ts=timer.elapsed_ms(),
-        )
-        cache_start = perf_counter()
-        cache_result = await langcache_service.search(latest_message.strip())
-        cache_ms = max(round((perf_counter() - cache_start) * 1000), 1)
-
-        if cache_result:
+        # Try each eligible scope in priority order, emitting a paired
+        # tool-call/tool-result trace per scope so the activity panel never
+        # shows more searches than results.
+        for candidate_scope in _langcache_attribute_scopes(current_user_id):
             yield sse(
-                "tool-result",
+                "tool-call",
                 toolName="semantic_cache_search",
                 toolKind="langcache",
-                payload={
-                    "hit": True,
-                    "similarity": cache_result.get("similarity", 0),
-                    "cached_prompt": cache_result.get("prompt", ""),
-                },
-                durationMs=cache_ms,
+                payload={"query": latest_message.strip(), "attributes": candidate_scope},
                 ts=timer.elapsed_ms(),
             )
-            cached_response = cache_result.get("response", "")
-            yield sse("text-delta", delta=cached_response, ts=timer.elapsed_ms())
-            yield sse("done", totalElapsedMs=timer.elapsed_ms(), cacheHit=True)
-            log.info("━━━ CACHE HIT in %dms (similarity=%.3f)", cache_ms, cache_result.get("similarity", 0))
-            return
-        else:
+            cache_start = perf_counter()
+            scope_result = await langcache_service.search(latest_message.strip(), attributes=candidate_scope)
+            cache_ms = max(round((perf_counter() - cache_start) * 1000), 1)
+            if scope_result:
+                yield sse(
+                    "tool-result",
+                    toolName="semantic_cache_search",
+                    toolKind="langcache",
+                    payload={
+                        "hit": True,
+                        "similarity": scope_result.get("similarity", 0),
+                        "cached_prompt": scope_result.get("prompt", ""),
+                        "attributes": candidate_scope,
+                    },
+                    durationMs=cache_ms,
+                    ts=timer.elapsed_ms(),
+                )
+                cached_response = scope_result.get("response", "")
+                yield sse("text-delta", delta=cached_response, ts=timer.elapsed_ms())
+                yield sse("done", totalElapsedMs=timer.elapsed_ms(), cacheHit=True)
+                log.info("━━━ CACHE HIT in %dms (similarity=%.3f)", cache_ms, scope_result.get("similarity", 0))
+                return
             yield sse(
                 "tool-result",
                 toolName="semantic_cache_search",
                 toolKind="langcache",
-                payload={"hit": False},
+                payload={"hit": False, "attributes": candidate_scope},
                 durationMs=cache_ms,
                 ts=timer.elapsed_ms(),
             )
@@ -527,9 +611,11 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
     llm_step_ids: dict[str, str] = {}
     llm_call_counter = 0
     tool_calls_seen = 0
+    used_tool_names: set[str] = set()
     last_thinking_step: str | None = None
     final_text = ""
     thread_token = set_thread_id(thread_id)
+    demo_user_token = set_demo_user_id(current_user_id)
 
     # ── Phase 2: Session memory write ──
     if memory_service.is_configured() and latest_message.strip():
@@ -656,6 +742,7 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
             if kind == "on_tool_start":
                 name = event.get("name", "")
                 tool_calls_seen += 1
+                used_tool_names.add(name)
                 run_id = str(event.get("run_id") or f"{name}-{tool_calls_seen}")
                 data = event.get("data") or {}
                 tool_input = data.get("input", {}) if isinstance(data, dict) else {}
@@ -760,6 +847,7 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
         yield sse("error", errorType=error_type, message=short_msg, ts=timer.elapsed_ms())
         yield sse("text-delta", delta=f"\n\n⚠️ {error_type}: {short_msg}")
         yield sse("done", totalElapsedMs=timer.elapsed_ms())
+        reset_demo_user_id(demo_user_token)
         reset_thread_id(thread_token)
         return
 
@@ -800,7 +888,47 @@ async def cs_event_stream(request: ChatRequest) -> AsyncIterator[str]:
             yield sse("status", text=f"Assistant memory logging unavailable: {exc}", ts=timer.elapsed_ms())
     phases.append(("memory_save", timer.phase("Assistant memory save")))
 
+    # ── Phase 8: Cache the answer when the domain marks this prompt as reusable ──
+    if langcache_service.is_configured() and final_text.strip():
+        # The current turn's own message is echoed back into short-term memory
+        # (Phase 2 logs it before Phase 3 reads it), so it must not block a
+        # first-turn cache write. Only genuinely prior/user-specific memory —
+        # multi-turn session history or retrieved long-term entries — makes the
+        # answer user-specific.
+        memory_influenced = bool(long_term_context) or len(short_term_events) > 1
+        store_attributes = _langcache_store_attributes(
+            latest_message.strip(),
+            current_user_id,
+            used_tool_names,
+            memory_context_used=memory_influenced,
+        )
+        if store_attributes:
+            yield sse(
+                "tool-call",
+                toolName="semantic_cache_store",
+                toolKind="langcache",
+                payload={"prompt": latest_message.strip(), "attributes": store_attributes},
+                ts=timer.elapsed_ms(),
+            )
+            cache_store_start = perf_counter()
+            stored = await langcache_service.store(
+                latest_message.strip(),
+                final_text.strip(),
+                attributes=store_attributes,
+            )
+            cache_store_ms = max(round((perf_counter() - cache_store_start) * 1000), 1)
+            yield sse(
+                "tool-result",
+                toolName="semantic_cache_store",
+                toolKind="langcache",
+                payload={"stored": stored, "attributes": store_attributes},
+                durationMs=cache_store_ms,
+                ts=timer.elapsed_ms(),
+            )
+            log.info("  LangCache STORE %-26s %4dms", "OK" if stored else "FAILED", cache_store_ms)
+
     yield sse("done", totalElapsedMs=timer.elapsed_ms())
+    reset_demo_user_id(demo_user_token)
     reset_thread_id(thread_token)
 
     # ── Request summary ──

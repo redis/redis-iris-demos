@@ -6,7 +6,7 @@
 
 Multi-domain AI agent demos for [Redis Iris](https://redis.io/iris/): Redis's unified context engine for AI agents.
 
-Every domain runs Context Retriever, Agent Memory, LangCache, and Semantic Routign.
+Every domain runs Context Retriever, Agent Memory, LangCache, and Semantic Routing.
 </div>
 
 ---
@@ -28,8 +28,9 @@ Every domain runs Context Retriever, Agent Memory, LangCache, and Semantic Routi
 | Financial research | ShiftIQ | <img src="docs/screenshots/Demo_ShiftIQ.png" width="300" /> |
 | Healthcare | RedHealthConnect | <img src="docs/screenshots/Demo_RedHealthConnect.png" width="300" /> |
 | Retail banking | Radish Bank | <img src="docs/screenshots/Demo_Radish_Bank.png" width="300" /> |
-| Telcp | R-Mobile | <img src="docs/screenshots/Demo_R-Mobile.png" width="300" /> |
+| Telecom | R-Mobile | <img src="docs/screenshots/Demo_R-Mobile.png" width="300" /> |
 | Sports betting | Sports Desk | <img src="docs/screenshots/Demo_Sports_Desk.png" width="300" /> |
+| Airline support | Aurora Air | <img src="docs/screenshots/Demo_Aurora_Air.png" width="300" /> |
 
 ## Legacy
 
@@ -100,7 +101,7 @@ override the Radish tuning.
 5. Creates a new Context Surface (writes `CTX_SURFACE_ID` + `MCP_AGENT_KEY` to `.env`)
 6. Loads data into Redis (creates search indexes)
 7. Seeds Agent Memory (clears existing, seeds 2 long-term memories per domain)
-8. Seeds LangCache (flushes cache, seeds 1 cached response per domain)
+8. Seeds LangCache entries defined by the active domain without flushing existing entries
 9. Semantic Routing initializes automatically when the server starts
 
 `make reset` does steps 4-9 only (faster — reuses existing models and data files).
@@ -152,6 +153,7 @@ backend/
 domains/
   reddash/                   # Food delivery
   electrohub/                # Electronics retail
+  airline-support/           # Airline disruption and trip support
   finance-researcher/        # Financial research
   healthcare/                # Patient portal
   radish-bank/               # Retail banking

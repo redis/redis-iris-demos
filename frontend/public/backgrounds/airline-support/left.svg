@@ -1,0 +1,51 @@
+<svg width="590" height="817" viewBox="0 0 590 817" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="590" height="817" fill="#EAF5FF"/>
+  <circle cx="98" cy="132" r="96" fill="#78C5FF" fill-opacity="0.18"/>
+  <circle cx="310" cy="640" r="168" fill="#FFD37A" fill-opacity="0.14"/>
+  <path d="M0 226C96 172 214 174 350 228C458 270 534 264 590 224V817H0V226Z" fill="#DDF0FF"/>
+
+  <g opacity="0.66" fill="none" stroke-linecap="round">
+    <path d="M-68 712C110 570 254 646 430 536" stroke="#FFC44F" stroke-width="28"/>
+    <path d="M-68 712C110 570 254 646 430 536" stroke="#FFF5D8" stroke-width="8"/>
+    <path d="M118 42C176 186 238 256 374 288" stroke="#FFC44F" stroke-width="24"/>
+    <path d="M118 42C176 186 238 256 374 288" stroke="#FFF5D8" stroke-width="7"/>
+  </g>
+
+  <g opacity="0.96">
+    <rect x="48" y="132" width="336" height="192" rx="28" transform="rotate(-7 48 132)" fill="#FFFFFF"/>
+    <rect x="48" y="132" width="336" height="192" rx="28" transform="rotate(-7 48 132)" stroke="#C7DFF6"/>
+    <path d="M268 112L291 301" stroke="#D8E8F7" stroke-width="3" stroke-dasharray="10 12"/>
+    <rect x="86" y="154" width="118" height="18" rx="9" transform="rotate(-7 86 154)" fill="#0B77D8" fill-opacity="0.2"/>
+    <rect x="88" y="200" width="176" height="14" rx="7" transform="rotate(-7 88 200)" fill="#D8E6F3"/>
+    <text x="96" y="270" transform="rotate(-7 96 270)" fill="#07111F" font-family="Inter, Arial, sans-serif" font-size="40" font-weight="800">FRA</text>
+    <path d="M188 246L288 246" stroke="#0B77D8" stroke-width="6" stroke-linecap="round"/>
+    <path d="M278 232L314 246L278 260L286 246L278 232Z" fill="#0B77D8"/>
+    <text x="322" y="242" transform="rotate(-7 322 242)" fill="#07111F" font-family="Inter, Arial, sans-serif" font-size="40" font-weight="800">JFK</text>
+    <rect x="304" y="128" width="86" height="26" rx="10" transform="rotate(-7 304 128)" fill="#FFE2A8"/>
+  </g>
+
+  <g opacity="0.96">
+    <rect x="96" y="544" width="184" height="244" rx="30" fill="#0B77D8"/>
+    <rect x="138" y="498" width="98" height="72" rx="24" fill="none" stroke="#0A5BA8" stroke-width="14"/>
+    <rect x="126" y="588" width="124" height="22" rx="11" fill="#69B8FF" fill-opacity="0.86"/>
+    <rect x="126" y="642" width="124" height="16" rx="8" fill="#9BD2FF" fill-opacity="0.64"/>
+    <circle cx="126" cy="800" r="14" fill="#06233F"/>
+    <circle cx="238" cy="800" r="14" fill="#06233F"/>
+    <path d="M270 604L382 536L458 652L340 724L270 604Z" fill="#FFCC66"/>
+    <path d="M302 612L388 560" stroke="#FF7B54" stroke-width="9"/>
+  </g>
+
+  <g opacity="0.72">
+    <path d="M350 416L492 362L554 520L410 574L350 416Z" fill="#FFFFFF" stroke="#C7DFF6"/>
+    <path d="M382 438L488 398M394 470L508 428M408 504L516 464" stroke="#0B77D8" stroke-width="8" stroke-linecap="round" opacity="0.5"/>
+    <circle cx="498" cy="520" r="16" fill="#FFC44F"/>
+  </g>
+
+  <rect x="430" width="160" height="817" fill="url(#fadeLeft)"/>
+  <defs>
+    <linearGradient id="fadeLeft" x1="430" y1="408.5" x2="590" y2="408.5" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EAF5FF" stop-opacity="0"/>
+      <stop offset="1" stop-color="#EAF5FF"/>
+    </linearGradient>
+  </defs>
+</svg>
