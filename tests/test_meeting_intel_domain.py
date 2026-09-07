@@ -46,6 +46,7 @@ def test_meeting_intel_prompt_mentions_value_parameter() -> None:
     prompt = domain.build_system_prompt(mcp_tools=[])
     assert "value" in prompt
     assert "filter_*" in prompt or "filter_" in prompt
+    assert "tag_conditions" in prompt
     assert "get_current_user_profile" in prompt
     assert "superseded" in prompt.lower()
     assert "leadership" in prompt.lower()

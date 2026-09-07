@@ -155,9 +155,12 @@ class MeetingIntelDomain:
                     name="in_scope",
                     references=[
                         "generate the agenda for the platform migration sync",
+                        "show me that agenda",
+                        "show me the saved ai agenda for the platform meeting",
                         "which action items are overdue",
                         "did we decide to delay the mobile launch",
                         "what is blocking customer portal",
+                        "and is that blocked",
                         "show me decisions and risks from last steering meeting",
                         "who owns the incomplete platform cutover runbook",
                         "extract follow-ups from this transcript",

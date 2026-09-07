@@ -11,6 +11,7 @@ from backend.app.context_surface_service import (
 )
 from backend.app.langgraph_agent import (
     _format_tool_validation_error,
+    _jsonable,
     _make_mcp_tool,
     _pydantic_model_from_json_schema,
     _resolve_json_schema_variant,
@@ -133,6 +134,69 @@ def test_pydantic_model_from_json_schema_supports_arrays_objects_and_nullable_va
 
     with pytest.raises(ValidationError):
         model(embedding=[0.1])
+
+
+def test_jsonable_dumps_nested_tag_condition_models() -> None:
+    model = _pydantic_model_from_json_schema(
+        "filter_actionitem",
+        {
+            "type": "object",
+            "properties": {
+                "tag_conditions": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "field": {"type": "string"},
+                            "value": {"type": "string"},
+                            "exclude": {"type": "boolean"},
+                        },
+                        "required": ["field", "value"],
+                    },
+                }
+            },
+        },
+    )
+    instance = model(tag_conditions=[{"field": "status", "value": "overdue"}])
+    payload = _jsonable({"tag_conditions": instance.tag_conditions})
+    assert payload == {"tag_conditions": [{"field": "status", "value": "overdue"}]}
+    json.dumps(payload)
+
+
+def test_single_property_tool_accepts_a_differently_named_lone_argument() -> None:
+    tool = _make_mcp_tool(
+        {
+            "name": "get_project_by_id",
+            "description": "Fetch one project",
+            "inputSchema": {
+                "type": "object",
+                "properties": {"id": {"type": "string"}},
+                "required": ["id"],
+            },
+        },
+        cs_service=object(),  # type: ignore[arg-type]
+    )
+
+    assert tool.args_schema(project_id="proj-platform").id == "proj-platform"
+    assert tool.args_schema(id="proj-platform").id == "proj-platform"
+
+
+def test_multi_property_tool_still_rejects_unknown_arguments() -> None:
+    tool = _make_mcp_tool(
+        {
+            "name": "search_decision_by_text",
+            "description": "Search decisions",
+            "inputSchema": {
+                "type": "object",
+                "properties": {"query": {"type": "string"}, "limit": {"type": "number"}},
+                "required": ["query"],
+            },
+        },
+        cs_service=object(),  # type: ignore[arg-type]
+    )
+
+    with pytest.raises(ValidationError):
+        tool.args_schema(value="mobile launch delay")
 
 
 def test_mcp_tool_wrapper_returns_structured_json_for_validation_errors() -> None:

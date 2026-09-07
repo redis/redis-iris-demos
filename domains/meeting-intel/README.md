@@ -31,7 +31,7 @@ DEMO_DOMAIN=meeting-intel make dev
 
 ## Scripted paths
 
-See [`docs/demo_paths.md`](docs/demo_paths.md).
+See [`docs/demo_paths.md`](docs/demo_paths.md) for chat paths and [`docs/workshop_script.md`](docs/workshop_script.md) for a timed presenter walkthrough.
 
 ## RDI / GKE
 

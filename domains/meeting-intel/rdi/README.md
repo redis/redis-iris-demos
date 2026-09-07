@@ -138,6 +138,7 @@ psql "host=127.0.0.1 user=postgres dbname=postgres" \
 
 | Symptom | Likely cause |
 |---|---|
+| RDI pods timeout on `rdidb:<port>` | Redis Enterprise recreated the DB on a new random port while Helm still holds the old one. Run **`make mi-rdi-fix-port`**, which compares `secret/redb-rdidb` against Helm `connection.port` and upgrades if they differ. `k8s/rdi-db.yaml` now pins `databasePort` so fresh installs stop drifting. |
 | RDI pods crash-loop | Cluster too small. Need ≥ 4 CPU / 8 GB dedicated; GKE default here is 3×e2-standard-4. |
 | Snapshot stuck | Source host wrong. From GKE use `postgres.meeting-intel.svc.cluster.local`, not `localhost`. Publication must include all 10 tables. |
 | Pipeline deploy 401 | `api.jwtKey` is not the Bearer token. `POST /api/v1/login` with `RDI_PASSWORD` from secret `rdi-sys-config`. |

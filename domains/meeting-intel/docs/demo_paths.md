@@ -2,6 +2,8 @@
 
 Four chat paths plus live CDC beats. Dates are relative to **2026-09-07**. Signed-in user is Maya Chen (`person-maya`, Platform eng lead, `access_role=team`).
 
+Timed presenter walkthrough (architecture → Redis Insight → UI paths 1–4 → live CDC): [`workshop_script.md`](workshop_script.md).
+
 Toggle `DEMO_USER_ROLE=leadership` (and `DEMO_USER_ID=person-dana`) to replay path 1 as an exec.
 
 ## Path 1 — Generate the Platform Migration agenda ⭐
@@ -23,7 +25,7 @@ Expected:
 7. Every bullet cites ids.
 8. `save_ai_agenda` for `mtg-2026-09-09-platform`.
 
-Follow-up: **Show me that agenda.** After RDI catches up, `filter_agenda_by_meeting_id` value=`mtg-2026-09-09-platform` returns the AI agenda next to the human three-liner ("Migration status, Q4 dates, hiring coverage.").
+Follow-up: **Show me that agenda.** After RDI catches up, `filter_agenda` with `tag_conditions=[{field: meeting_id, value: mtg-2026-09-09-platform}]` returns the AI agenda next to the human three-liner ("Migration status, Q4 dates, hiring coverage.").
 
 Team vs leadership: a team-role agenda must **not** include `dec-lead-freeze`, `dec-lead-nimbus`, `risk-nimbus`, or `act-lead-*`. Replay with `DEMO_USER_ROLE=leadership` to see the freeze / Nimbus Auth fallback.
 
@@ -31,7 +33,9 @@ Team vs leadership: a team-role agenda must **not** include `dec-lead-freeze`, `
 
 Ask: **Which action items are overdue across all projects, grouped by owner?**
 
-Expected: `filter_actionitem_by_status` value=`overdue`. Group by `owner_person_id`. Platform overdues belong to Maya, Priya, and Jordan and explain the Mobile block. Portal has `act-portal-wait-tag` (Riley). Do not list `status=open` items that are not overdue.
+Expected: `filter_actionitem` with `tag_conditions=[{field: status, value: overdue}]`. Group by `owner_person_id`. Platform overdues belong to Maya, Priya, and Jordan and explain the Mobile block. Portal has `act-portal-wait-tag` (Riley). Do not list `status=open` items that are not overdue.
+
+If LangCache returns only the three Platform items immediately, that is the Fast beat (seeded FAQ). Follow with **Include Portal and every overdue, not just Platform** so retrieval runs.
 
 ## Path 3 — Latest valid information (mobile launch)
 
@@ -50,11 +54,11 @@ Never present the July delay as current.
 
 Ask: **What's blocking Customer Portal?**
 
-Expected first hop: `filter_projectdependency_by_project_id` value=`proj-portal` → Mobile App Relaunch (`dep-portal-mobile`, blocking=false).
+Expected first hop: `filter_projectdependency` with `tag_conditions=[{field: project_id, value: proj-portal}]` → Mobile App Relaunch (`dep-portal-mobile`, blocking=false).
 
 Follow-up: **And is that blocked?**
 
-Second hop: `filter_projectdependency_by_project_id` value=`proj-mobile` → Platform Migration (`dep-mobile-platform`, blocking=true), then Platform overdue actions.
+Second hop: `filter_projectdependency` with `tag_conditions=[{field: project_id, value: proj-mobile}]` → Platform Migration (`dep-mobile-platform`, blocking=true), then Platform overdue actions.
 
 The agent should say the second question needed a second call. This is the honest single-hop vs graph point.
 
@@ -78,3 +82,5 @@ psql "$MEETING_INTEL_PG" -f domains/meeting-intel/rdi/source-db/scripts/demo/mar
 psql "$MEETING_INTEL_PG" -f domains/meeting-intel/rdi/source-db/scripts/extra/transcript-05.sql
 # In chat: extract follow-ups from meeting mtg-2026-09-01-pipeline-extra
 ```
+
+**Reset between runs:** `make mi-demo-reset` deletes what a run added (`act-cdc-live-overdue`, `act-live-*`, the `*-x-*` extraction rows) and clears saved AI agendas, using row-level SQL so RDI removes the Redis keys. Preview with `make mi-demo-reset-check`. Run it before Path 5 so the CDC key genuinely appears for the first time. `make mi-reset` re-snapshots but leaves those keys, because Debezium emits no row deletes for `TRUNCATE`.

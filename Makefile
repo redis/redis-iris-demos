@@ -213,6 +213,17 @@ mi-reset:
 	@uv run python domains/meeting-intel/rdi/reset_pipeline.py
 	@$(MAKE) mi-verify
 
+# Between demo runs: undo demo writes via row-level CDC. Needs mi-pg-forward.
+mi-demo-reset:
+	@uv run python domains/meeting-intel/rdi/reset_demo_state.py $(ARGS)
+
+mi-demo-reset-check:
+	@uv run python domains/meeting-intel/rdi/reset_demo_state.py --dry-run --skip-generate
+
+# rdidb gets a new random port whenever Redis Enterprise recreates it.
+mi-rdi-fix-port:
+	@KUBECONFIG=$(MI_RDI)/terraform/generated/kubeconfig bash $(MI_RDI)/terraform/scripts/fix-rdi-port.sh
+
 mi-embed-sidecar:
 	@uv run python domains/meeting-intel/rdi/embed_sidecar.py
 
