@@ -1,0 +1,22 @@
+name: meetings to meeting JSON
+source:
+  schema: public
+  table: meetings
+transform:
+  - uses: add_field
+    with:
+      field: meeting_date
+      language: sql
+      expression: >-
+        CASE WHEN typeof(meeting_date) = 'integer'
+             THEN date(meeting_date * 86400, 'unixepoch')
+             ELSE substr(CAST(meeting_date AS TEXT), 1, 10) END
+output:
+  - uses: redis.write
+    with:
+      connection: target
+      data_type: json
+      on_update: merge
+      key:
+        expression: concat(['meeting:', meeting_id])
+        language: jmespath

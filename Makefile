@@ -6,7 +6,9 @@ EXTRA_ENV_FILE ?=
 
 .PHONY: help install backend-install frontend-install dev backend frontend \
 	generate-data generate-models load-data setup-surface validate-domain smoke-domain create-domain flush-redis reset \
-	publish-domain-event cache-domain-price-csvs
+	publish-domain-event cache-domain-price-csvs setup \
+	mi-pg-up mi-pg-down mi-pg-forward mi-generate-seed mi-rdi-deploy mi-rdi-undeploy mi-rdi-pipeline \
+	mi-verify mi-reset mi-embed-sidecar
 
 help:
 	@echo "Targets:"
@@ -23,6 +25,13 @@ help:
 	@echo "    Optional: EXTRA_ENV_FILE=/path/to/shared.env"
 	@echo "  make flush-redis      Flush the Redis database (FLUSHDB)"
 	@echo "  make reset [DOMAIN=...]  Flush Redis + recreate surface + reload data (DOMAIN defaults to reddash)"
+	@echo "  make setup [DOMAIN=...]  Full domain bring-up (RDI path for meeting-intel; JSONL path otherwise)"
+	@echo "  make mi-pg-up         Start local meeting-intel Postgres + pgAdmin (optional; GKE has in-cluster Postgres)"
+	@echo "  make mi-pg-forward    Port-forward in-cluster Postgres to localhost:5432"
+	@echo "  make mi-rdi-deploy    Apply GKE+RDI terraform (requires gcloud)"
+	@echo "  make mi-rdi-pipeline  Deploy RDI jobs against the Redis Cloud target"
+	@echo "  make mi-verify        Assert Redis key counts match Postgres"
+	@echo "  make mi-reset         Re-seed Postgres, reset RDI snapshot, re-verify"
 	@echo "  make backend          Start FastAPI backend"
 	@echo "  make frontend         Start Vite frontend"
 	@echo "  make dev              Run backend and frontend together"
@@ -87,6 +96,11 @@ frontend:
 	@cd frontend && npm run dev -- --host 0.0.0.0 --port $(FRONTEND_PORT)
 
 flush-redis:
+	@if [ "$(DOMAIN)" = "meeting-intel" ]; then \
+		echo "Refusing to FLUSHDB for meeting-intel: that would wipe RDI-owned keys."; \
+		echo "Use 'make mi-reset' (re-seed Postgres + RDI snapshot) instead."; \
+		exit 1; \
+	fi
 	@uv run python -c "\
 	from backend.app.settings import get_settings; \
 	from backend.app.redis_connection import create_redis_client; \
@@ -97,14 +111,78 @@ flush-redis:
 	@echo "⚠️  Redis flushed. Context Surface indexes are gone."
 	@echo "   Run 'make reset' or 'make setup-surface && make load-data' to recover."
 
-reset: flush-redis
-	@echo "Clearing old surface credentials..."
-	@perl -i -pe 's/^CTX_SURFACE_ID=.*/CTX_SURFACE_ID=/' .env
-	@perl -i -pe 's/^MCP_AGENT_KEY=.*/MCP_AGENT_KEY=/' .env
-	@$(MAKE) setup-surface
-	@$(MAKE) load-data
-	@echo ""
-	@echo "✅ Reset complete. Run 'make dev' to start."
+reset:
+	@if [ "$(DOMAIN)" = "meeting-intel" ]; then \
+		$(MAKE) mi-reset; \
+	else \
+		$(MAKE) flush-redis DOMAIN=$(DOMAIN); \
+		echo "Clearing old surface credentials..."; \
+		perl -i -pe 's/^CTX_SURFACE_ID=.*/CTX_SURFACE_ID=/' .env; \
+		perl -i -pe 's/^MCP_AGENT_KEY=.*/MCP_AGENT_KEY=/' .env; \
+		$(MAKE) setup-surface DOMAIN=$(DOMAIN); \
+		$(MAKE) load-data DOMAIN=$(DOMAIN); \
+		echo ""; \
+		echo "✅ Reset complete. Run 'make dev' to start."; \
+	fi
+
+setup:
+	@if [ "$(DOMAIN)" = "meeting-intel" ]; then \
+		$(MAKE) validate-domain DOMAIN=meeting-intel; \
+		$(MAKE) generate-models DOMAIN=meeting-intel; \
+		$(MAKE) generate-data DOMAIN=meeting-intel; \
+		$(MAKE) mi-rdi-deploy; \
+		$(MAKE) mi-rdi-pipeline; \
+		$(MAKE) mi-verify; \
+		$(MAKE) setup-surface DOMAIN=meeting-intel; \
+		uv run python -m scripts.seed_memories; \
+		uv run python -m scripts.seed_langcache; \
+		echo ""; \
+		echo "✅ meeting-intel setup complete. Port-forward Postgres (make mi-pg-forward) so write tools can reach it, then run 'make dev' with DEMO_DOMAIN=meeting-intel."; \
+	else \
+		$(MAKE) validate-domain DOMAIN=$(DOMAIN); \
+		$(MAKE) generate-models DOMAIN=$(DOMAIN); \
+		$(MAKE) generate-data DOMAIN=$(DOMAIN); \
+		$(MAKE) setup-surface DOMAIN=$(DOMAIN); \
+		$(MAKE) load-data DOMAIN=$(DOMAIN); \
+		echo ""; \
+		echo "✅ Setup complete for DOMAIN=$(DOMAIN). Run 'make dev' to start."; \
+	fi
+
+MI_RDI := domains/meeting-intel/rdi
+MI_COMPOSE := $(MI_RDI)/source-db/docker-compose.yaml
+
+mi-generate-seed:
+	@$(MAKE) generate-data DOMAIN=meeting-intel
+
+mi-pg-up: mi-generate-seed
+	@docker compose -f $(MI_COMPOSE) up -d
+	@echo "Postgres (Debezium-ready) on localhost:5432  pgAdmin on localhost:8888"
+
+mi-pg-down:
+	@docker compose -f $(MI_COMPOSE) down
+
+mi-pg-forward:
+	@kubectl --kubeconfig $(MI_RDI)/terraform/generated/kubeconfig -n meeting-intel port-forward svc/postgres 5432:5432
+
+mi-rdi-deploy:
+	@cd $(MI_RDI)/terraform && $(MAKE) apply
+
+mi-rdi-undeploy:
+	@cd $(MI_RDI)/terraform && $(MAKE) destroy
+
+mi-rdi-pipeline:
+	@uv run python domains/meeting-intel/rdi/deploy_pipeline.py
+
+mi-verify:
+	@uv run python domains/meeting-intel/rdi/verify.py
+
+mi-reset:
+	@$(MAKE) generate-data DOMAIN=meeting-intel
+	@uv run python domains/meeting-intel/rdi/reset_pipeline.py
+	@$(MAKE) mi-verify
+
+mi-embed-sidecar:
+	@uv run python domains/meeting-intel/rdi/embed_sidecar.py
 
 dev:
 	@trap 'kill 0' EXIT; $(MAKE) backend & $(MAKE) frontend & wait

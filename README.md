@@ -24,6 +24,7 @@ The repo currently includes built-in demo domains for:
 - `finance-researcher` — ShiftIQ watchlist research across filings, metrics, prices, and live updates
 - `healthcare` — RedHealthConnect patient success portal (appointments, referrals, providers)
 - `radish-bank` — Radish Bank retail demo (accounts, FDs, insurance, branches, fee waivers + policy docs)
+- `meeting-intel` — Minutes / Harborline meeting intelligence (Postgres + RDI → Redis, agenda generation, CDC write-back)
 
 **Two modes, same UI:**
 
@@ -136,6 +137,9 @@ Open http://localhost:3040 and try:
 - In `radish-bank`:
   - *"What accounts do I have and what are my balances?"*
   - *"Place 2000 SGD into the 6-month fixed deposit from my savings account."*
+- In `meeting-intel` (after GKE + RDI; see `domains/meeting-intel/README.md`):
+  - *"Generate the agenda for next week's Platform Migration sync."*
+  - *"Did we decide to delay the mobile launch or not?"*
 
 ---
 
@@ -206,6 +210,7 @@ See:
 - [`domains/finance-researcher/docs/demo_paths.md`](domains/finance-researcher/docs/demo_paths.md)
 - [`domains/healthcare/docs/demo_paths.md`](domains/healthcare/docs/demo_paths.md)
 - [`domains/radish-bank/docs/demo_paths.md`](domains/radish-bank/docs/demo_paths.md)
+- [`domains/meeting-intel/docs/demo_paths.md`](domains/meeting-intel/docs/demo_paths.md)
 
 Reddash includes four scripted conversation flows:
 
@@ -254,8 +259,15 @@ Example:
 | `make backend` | Start FastAPI backend only |
 | `make frontend` | Start Vite frontend only |
 | `make dev` | Run backend + frontend together |
-| `make flush-redis` | Flush the Redis database |
-| `make reset` | Flush Redis + recreate surface + reload data |
+| `make flush-redis` | Flush the Redis database (refused for `meeting-intel`) |
+| `make reset` | Flush Redis + recreate surface + reload data (`mi-reset` when `DOMAIN=meeting-intel`) |
+| `make setup DOMAIN=meeting-intel` | RDI path: generate models/data, GKE+RDI terraform, pipeline, verify, surface |
+| `make mi-pg-up` | Optional local Debezium Postgres + pgAdmin |
+| `make mi-pg-forward` | Port-forward in-cluster Postgres to localhost:5432 |
+| `make mi-rdi-deploy` | Apply GKE cluster + install RDI (requires gcloud) |
+| `make mi-rdi-pipeline` | Deploy pipeline + jobs to RDI via API |
+| `make mi-verify` | Assert Redis key counts match Postgres |
+| `make mi-reset` | Re-seed Postgres, reset RDI snapshot, re-verify |
 
 ---
 
@@ -275,15 +287,12 @@ context-engine-demos/
 │   ├── electrohub/          # Electronics retail reference domain
 │   ├── finance-researcher/  # ShiftIQ watchlist research domain
 │   ├── healthcare/          # Patient success portal domain
-│   └── radish-bank/          # Retail banking + policy-doc RAG demo
-│       ├── domain.py        # DOMAIN export implementing the contract
-│       ├── schema.py        # Entity definitions
-│       ├── prompt.py        # Domain prompt/playbooks
-│       ├── data_generator.py
-│       ├── generated_models.py
-│       ├── assets/logo.(svg|png|jpg|webp)
+│   ├── radish-bank/          # Retail banking + policy-doc RAG demo
+│   └── meeting-intel/        # Minutes / Harborline (Postgres + RDI → Redis)
+│       ├── domain.py
+│       ├── schema.py
+│       ├── rdi/              # Source Postgres, jobs, GKE terraform
 │       ├── docs/demo_paths.md
-│       └── presentations/   # Domain-specific decks and assets
 ├── frontend/src/            # React + Vite chat UI
 │   ├── App.tsx              # Shared chat UI shell
 │   └── styles.css           # Theme-driven styles

@@ -1,0 +1,13 @@
+name: transcripts to transcript JSON
+source:
+  schema: public
+  table: transcripts
+output:
+  - uses: redis.write
+    with:
+      connection: target
+      data_type: json
+      on_update: merge
+      key:
+        expression: concat(['transcript:', transcript_id])
+        language: jmespath

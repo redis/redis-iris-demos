@@ -1,0 +1,23 @@
+name: projects to project JSON
+source:
+  schema: public
+  table: projects
+transform:
+  # DATE → ISO-8601 string so Context Surface TAG/sortable fields stay strings.
+  - uses: add_field
+    with:
+      field: target_date
+      language: sql
+      expression: >-
+        CASE WHEN typeof(target_date) = 'integer'
+             THEN date(target_date * 86400, 'unixepoch')
+             ELSE substr(CAST(target_date AS TEXT), 1, 10) END
+output:
+  - uses: redis.write
+    with:
+      connection: target
+      data_type: json
+      on_update: merge
+      key:
+        expression: concat(['project:', project_id])
+        language: jmespath

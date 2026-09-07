@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Protocol, Sequence
+from typing import Any, Literal, Protocol, Sequence
 
 from pydantic import BaseModel, Field
 
@@ -120,6 +120,9 @@ class DomainManifest(BaseModel):
     generated_models_module: str
     generated_models_path: str
     output_dir: str
+    # jsonl: generate JSONL and load via Context Surfaces (default).
+    # rdi: Postgres is the system of record; RDI owns Redis keys. Skip JSONL import/flush.
+    data_plane: Literal["jsonl", "rdi"] = "jsonl"
     branding: BrandingConfig
     namespace: NamespaceConfig
     rag: RagConfig

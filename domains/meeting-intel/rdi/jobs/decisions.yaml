@@ -1,0 +1,22 @@
+name: decisions to decision JSON
+source:
+  schema: public
+  table: decisions
+transform:
+  - uses: add_field
+    with:
+      field: decided_at
+      language: sql
+      expression: >-
+        CASE WHEN typeof(decided_at) = 'integer'
+             THEN date(decided_at * 86400, 'unixepoch')
+             ELSE substr(CAST(decided_at AS TEXT), 1, 10) END
+output:
+  - uses: redis.write
+    with:
+      connection: target
+      data_type: json
+      on_update: merge
+      key:
+        expression: concat(['decision:', decision_id])
+        language: jmespath

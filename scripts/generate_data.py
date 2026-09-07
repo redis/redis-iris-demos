@@ -26,6 +26,7 @@ def main() -> None:
     result = domain.generate_demo_data(
         output_dir=ROOT / domain.manifest.output_dir,
         seed=args.seed,
+        update_env_file=True,
     )
     print(f"Generated data in {result.output_dir}")
     if result.env_updates:

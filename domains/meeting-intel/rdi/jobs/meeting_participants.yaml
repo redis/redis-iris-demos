@@ -1,0 +1,13 @@
+name: meeting_participants to participant JSON
+source:
+  schema: public
+  table: meeting_participants
+output:
+  - uses: redis.write
+    with:
+      connection: target
+      data_type: json
+      on_update: merge
+      key:
+        expression: concat(['participant:', participant_id])
+        language: jmespath

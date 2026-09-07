@@ -11,7 +11,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from backend.app.core.domain_loader import load_domain
-from backend.app.core.domain_schema import FieldSpec, _base_type_name
+from backend.app.core.domain_schema import FieldSpec
 
 
 def render_field(field: FieldSpec) -> str:
@@ -46,8 +46,6 @@ def render(domain_id: str) -> str:
         "",
         "from __future__ import annotations",
         "",
-        "from typing import Any",
-        "",
         "from context_surfaces.context_model import ContextField, ContextModel, ContextRelationship",
         "",
         "",
@@ -63,15 +61,13 @@ def render(domain_id: str) -> str:
             chunks.append(render_field(field))
             chunks.append("")
         for rel in entity.relationships:
+            rel_type = (rel.target_type or "").strip() or "Any"
             rel_lines = [
-                f"    {rel.name}: Any = ContextRelationship(",
+                f"    {rel.name}: {rel_type} = ContextRelationship(",
                 f'        description="{rel.description}",',
+                f'        source_field="{rel.source_field}",',
+                "    )",
             ]
-            if rel.target_type:
-                target_name = _base_type_name(rel.target_type)
-                rel_lines.append(f'        target="{target_name}",')
-            rel_lines.append(f'        source_field="{rel.source_field}",')
-            rel_lines.append("    )")
             chunks.append("\n".join(rel_lines))
             chunks.append("")
         chunks.append("")
