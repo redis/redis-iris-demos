@@ -57,11 +57,22 @@ When RDI runs on GKE, the pipeline source host must be `postgres.meeting-intel.s
 
 Terraform lives in `terraform/`. It sizes a **3 × e2-standard-4** zonal GKE cluster (~12 vCPU / 48 GB / 100 GB disk per node), installs Redis Enterprise as RDI's backend DB, Helm-installs RDI, and stands up in-cluster Postgres seeded from `00-schema.sql` + `01-seed.sql`. The pipeline **target** is the Redis Cloud DB from `.env`.
 
-This Cloud Agent **does not have gcloud / GCP credentials**. Apply from a machine that does:
+Credentials and CLIs can be present and `terraform plan` can still succeed while **`terraform apply` fails closed on IAM**. A follow-up Cloud Agent with a project-scoped service account stopped here:
+
+```
+Error: Error when reading or editing Project Service : Request `List Project Services` returned error: ...
+googleapi: Error 403: Permission denied to list services for consumer container
+permission: serviceusage.services.list
+reason: AUTH_PERMISSION_DENIED
+  with google_project_service.container (gke.tf)
+  with google_project_service.compute (gke.tf)
+```
+
+The same identity also lacks `container.clusters.list`, `compute.zones.get`, and `resourcemanager.projects.get`. Grant at least `roles/serviceusage.serviceUsageAdmin` (or Viewer + Consumer), `roles/container.admin`, `roles/compute.admin`, and `roles/iam.serviceAccountUser` on that project, then re-run:
 
 ```bash
 export TF_VAR_project_id=your-gcp-project
-# ADC: gcloud auth application-default login
+# GOOGLE_APPLICATION_CREDENTIALS must be a key *file path*, not JSON contents
 make generate-data DOMAIN=meeting-intel
 make mi-rdi-deploy     # terraform apply + install-rdi.sh
 export RDI_API_URL=... # rdi-api ingress
@@ -70,7 +81,9 @@ make mi-rdi-pipeline
 make mi-verify
 ```
 
-Required secrets / identity for a follow-up agent are listed at the bottom of `domains/meeting-intel/README.md`.
+Helm provider is pinned to `>= 2.14.0, < 3.0.0` (`terraform/versions.tf`). Helm 3.x rejects the nested `kubernetes { }` block in `providers.tf`.
+
+Required secrets / identity are also listed at the bottom of `domains/meeting-intel/README.md`. Do not commit `terraform.tfstate`, `generated/kubeconfig`, or `generated/rdi-values.yaml`.
 
 ## Makefile
 
@@ -107,7 +120,7 @@ Required secrets / identity for a follow-up agent are listed at the bottom of `d
 Recorded by `make mi-verify` (insert `act-verify-latency` → wait for `action:act-verify-latency`). Write the number here after the first successful GKE run:
 
 ```
-CDC insert → Redis key: (not yet measured — GKE apply blocked on GCP credentials)
+CDC insert → Redis key: (not yet measured — GKE apply blocked on IAM: serviceusage.services.list 403)
 ```
 
 ## References vendored from
