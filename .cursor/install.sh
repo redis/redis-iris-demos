@@ -28,17 +28,33 @@ echo "==> Installing frontend dependencies (npm install)"
 (cd frontend && npm install)
 
 if [ ! -f .env ]; then
-  echo "==> Creating baseline .env (local Redis; blank cloud credentials)"
+  echo "==> Creating baseline .env"
   cp .env.example .env
-  # Point at the local Redis started by .cursor/start.sh.
-  sed -i 's/^REDIS_HOST=.*/REDIS_HOST=127.0.0.1/' .env
-  sed -i 's/^REDIS_PORT=.*/REDIS_PORT=6379/' .env
-  sed -i 's/^REDIS_SSL=.*/REDIS_SSL=false/' .env
-  # The OpenAI SDK requires a non-empty key just to construct its client, so the
-  # backend cannot import with a blank key. Provide a harmless placeholder; a real
-  # OPENAI_API_KEY set as a Cloud Agent secret is injected as an env var and takes
-  # precedence over this .env value at runtime.
-  sed -i 's/^OPENAI_API_KEY=.*/OPENAI_API_KEY=sk-local-placeholder-not-a-real-key/' .env
+
+  # If no Redis host is provided via a Cloud Agent secret, fall back to the local
+  # redis-server that .cursor/start.sh launches. When REDIS_* secrets are present
+  # they are injected as env vars and take precedence over these .env values at
+  # runtime (load_dotenv does not override existing env vars, and pydantic-settings
+  # ranks env vars above the dotenv file), so the app will use Redis Cloud instead.
+  if [ -z "${REDIS_HOST:-}" ]; then
+    echo "    - no REDIS_HOST secret found; defaulting to local Redis"
+    sed -i 's/^REDIS_HOST=.*/REDIS_HOST=127.0.0.1/' .env
+    sed -i 's/^REDIS_PORT=.*/REDIS_PORT=6379/' .env
+    sed -i 's/^REDIS_SSL=.*/REDIS_SSL=false/' .env
+  else
+    echo "    - REDIS_HOST secret present; app will use it (local Redis stays idle)"
+  fi
+
+  # The OpenAI SDK requires a non-empty key just to *construct* its client, so the
+  # backend cannot even import with a blank key. When no OPENAI_API_KEY secret is
+  # present, write a harmless placeholder so the app still boots in degraded mode.
+  # When the secret is present it is injected as an env var and wins at runtime.
+  if [ -z "${OPENAI_API_KEY:-}" ]; then
+    echo "    - no OPENAI_API_KEY secret found; writing placeholder (degraded mode)"
+    sed -i 's/^OPENAI_API_KEY=.*/OPENAI_API_KEY=sk-local-placeholder-not-a-real-key/' .env
+  else
+    echo "    - OPENAI_API_KEY secret present; app will use it"
+  fi
 else
   echo "==> .env already exists; leaving it untouched"
 fi
