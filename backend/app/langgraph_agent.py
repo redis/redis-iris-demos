@@ -20,7 +20,7 @@ from langchain_core.tools import StructuredTool
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.redis.aio import AsyncRedisSaver
 from langgraph.prebuilt import create_react_agent
-from pydantic import BaseModel, Field, create_model
+from pydantic import BaseModel, Field, create_model, model_validator
 
 from backend.app.context_surface_service import ContextSurfaceService
 from backend.app.core.domain_loader import get_active_domain
@@ -355,6 +355,35 @@ def _pydantic_model_from_json_schema(name: str, schema: dict) -> type[BaseModel]
     return create_model(f"Schema_{name}", **fields)
 
 
+def _with_single_arg_alias(args_model: type[BaseModel], input_schema: dict[str, Any]) -> type[BaseModel]:
+    """Accept a differently named lone argument for single-parameter tools.
+
+    ``get_*_by_id`` declares one property, ``id``. Models routinely send the
+    entity-specific name instead (``project_id``), which fails validation before
+    the tool body runs. Renaming the sole argument keeps the tool trace clean
+    without loosening multi-parameter schemas.
+    """
+    properties = input_schema.get("properties")
+    if not isinstance(properties, dict) or len(properties) != 1:
+        return args_model
+    (target,) = properties
+
+    @model_validator(mode="before")
+    @classmethod
+    def _rename_lone_argument(cls, data: Any) -> Any:
+        if isinstance(data, dict) and target not in data and len(data) == 1:
+            ((_, value),) = data.items()
+            if isinstance(value, (str, int, float, bool)):
+                return {target: value}
+        return data
+
+    return create_model(
+        args_model.__name__,
+        __base__=args_model,
+        __validators__={"_rename_lone_argument": _rename_lone_argument},
+    )
+
+
 def _make_mcp_tool(
     tool_def: dict[str, Any],
     cs_service: ContextSurfaceService,
@@ -363,7 +392,10 @@ def _make_mcp_tool(
     name = tool_def["name"]
     description = tool_def.get("description", name)
     input_schema = tool_def.get("inputSchema", {"type": "object", "properties": {}})
-    args_model = _pydantic_model_from_json_schema(name, input_schema)
+    args_model = _with_single_arg_alias(
+        _pydantic_model_from_json_schema(name, input_schema),
+        input_schema,
+    )
 
     async def fn(**kwargs: Any) -> str:
         # Strip None values — MCP server rejects null for optional numeric params

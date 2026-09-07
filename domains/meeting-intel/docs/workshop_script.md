@@ -1,18 +1,22 @@
 # Minutes workshop script (15–25 min)
 
-Presenter notes for Harborline **Minutes**. Chat paths live in [`demo_paths.md`](demo_paths.md). Dates are relative to **2026-09-07**. Signed-in user is Maya Chen (`person-maya`, `access_role=team`).
+Presenter notes for Harborline **Minutes**. Chat paths live in `[demo_paths.md](demo_paths.md)`. Dates are relative to **2026-09-07**. Signed-in user is Maya Chen (`person-maya`, `access_role=team`).
 
 Do **not** `FLUSHDB` the iris-demos Redis Cloud target. Do **not** create another Cloud DB. RDI's backend is in-cluster Redis Enterprise `rdidb`. Leave GKE `meeting-intel-rdi` running unless the owner asks to destroy it.
 
-| Clock | Beat |
-|---|---|
-| 0:00–3:00 | Architecture |
-| 3:00–7:00 | Redis Insight |
-| 7:00–18:00 | UI paths 1–4 |
-| 18:00–22:00 | Live CDC |
+
+| Clock       | Beat                         |
+| ----------- | ---------------------------- |
+| 0:00–3:00   | Architecture                 |
+| 3:00–7:00   | Redis Insight                |
+| 7:00–18:00  | UI paths 1–4                 |
+| 18:00–22:00 | Live CDC                     |
 | 22:00–25:00 | Optional YAML/code (or skip) |
 
+
 ---
+
+
 
 ## Beat 0 — Setup (before the room)
 
@@ -32,11 +36,13 @@ make mi-verify
 DEMO_DOMAIN=meeting-intel make dev
 ```
 
-UI: `http://127.0.0.1:3040` (backend `8040`). Confirm landing **Minutes** / Harborline, hero **What should we cover in the next meeting?**, mode toggle **Real-time Context** vs **Simple RAG**.
+UI:   `` (backend `8040`). Confirm landing **Minutes** / Harborline, hero **What should we cover in the next meeting?**, mode toggle **Real-time Context** vs **Simple RAG**.
 
 Redis Insight: same Cloud DB as `.env` `REDIS_*`. RDI API (if you show pipeline): ingress `http://34.172.4.76` (re-check `kubectl -n rdi get ingress`). Login is `POST /api/v1/login` with `RDI_PASSWORD` from secret `rdi-sys-config` (`RDI_REDIS_PASSWORD`), **not** Helm `api.jwtKey`.
 
 ---
+
+
 
 ## Beat 1 — Architecture (3 min)
 
@@ -56,22 +62,28 @@ What **not** to say: this is not JSONL `import_data`. Other packs in this repo l
 
 ---
 
+
+
 ## Beat 2 — Redis Insight (4 min)
 
 Browser: Redis Insight → the iris-demos Cloud DB. Browser search by prefix, then **JSON** view (not Hash).
 
-| Click this key | Say this |
-|---|---|
-| `project:proj-platform` | Platform Migration. `status=at_risk`. This is a document, not a chunk. |
+
+| Click this key                    | Say this                                                                                          |
+| --------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `project:proj-platform`           | Platform Migration. `status=at_risk`. This is a document, not a chunk.                            |
 | `meeting:mtg-2026-09-09-platform` | Next week's Platform weekly, `status=upcoming`. Path 1 writes the AI agenda for **this** meeting. |
-| `action:act-platform-runbook` | Maya's overdue cutover runbook. Context Retriever filters `status=overdue`. |
-| `decision:dec-mobile-delay-jul` | July delay to November. `status=superseded`, `superseded_by_decision_id=dec-mobile-keep-aug`. |
-| `decision:dec-mobile-keep-aug` | Current truth: keep **October 15**. Path 3 must not treat July as current. |
-| `action:act-cdc-live-overdue` | May be missing until Beat 5. After SQL insert it appears here without a flush. |
+| `action:act-platform-runbook`     | Maya's overdue cutover runbook. Context Retriever filters `status=overdue`.                       |
+| `decision:dec-mobile-delay-jul`   | July delay to November. `status=superseded`, `superseded_by_decision_id=dec-mobile-keep-aug`.     |
+| `decision:dec-mobile-keep-aug`    | Current truth: keep **October 15**. Path 3 must not treat July as current.                        |
+| `action:act-cdc-live-overdue`     | May be missing until Beat 5. After SQL insert it appears here without a flush.                    |
+
 
 Leave Insight open on `action:*` so the CDC key pop is visible later.
 
 ---
+
+
 
 ## Beat 3 — UI paths 1–4 (11 min)
 
@@ -85,17 +97,17 @@ Prompt (or starter card):
 
 Audience should see:
 
-1. Tools: `get_current_user_profile`, `get_current_time`, then `filter_meeting` / `filter_decision` / `filter_actionitem` / `filter_risk` / `filter_projectdependency` with **tag_conditions** (not the old `filter_*_by_*` names).
+1. Tools: `get_current_user_profile`, `get_current_time`, then `filter_meeting` / `filter_decision` / `filter_actionitem` / `filter_risk` / `filter_projectdependency` with **tag_conditions** (not the old `filter_*_by_`* names).
 2. Overdue first, grouped by owner: Maya `act-platform-runbook`, Priya `act-platform-dualwrite`, Jordan `act-platform-sla`, plus `act-plat-lag-repro`, `act-plat-rollback-script`, `act-plat-sre-page`.
 3. Active decisions only (not superseded Auth0 / schema-freeze).
 4. Reverse hop: Mobile is blocked on Platform (`dep-mobile-platform`, `blocking=true`).
-5. Ids on every bullet. **No** `dec-lead-freeze`, `dec-lead-nimbus`, `risk-nimbus`, `act-lead-*`.
+5. Ids on every bullet. **No** `dec-lead-freeze`, `dec-lead-nimbus`, `risk-nimbus`, `act-lead-`*.
 
 If the model drafts but does not persist, second prompt:
 
 > Save that agenda with save_ai_agenda for mtg-2026-09-09-platform.
 
-Trace should show `save_ai_agenda`. Tool result note: wrote **Postgres**; RDI will copy. That is not `JSON.SET` on `agenda:*`.
+Trace should show `save_ai_agenda`. Tool result note: wrote **Postgres**; RDI will copy. That is not `JSON.SET` on `agenda:`*.
 
 Follow-up (wait ~3s):
 
@@ -115,13 +127,15 @@ If LangCache answers immediately with only the three Platform items, say **"that
 
 > Include Portal and every overdue, not just Platform.
 
+
+
 ### Path 3 — Latest valid decision (2 min)
 
-> Did we decide to delay the mobile launch or not?
+> x
 
 Expected: July `dec-mobile-delay-jul` is superseded; current is `dec-mobile-keep-aug` (October 15). Point back at Insight.
 
-**Simple RAG contrast (30s):** toggle **Simple RAG**, same prompt. Vector search over transcript text can get the reversal right but cites chunk ids (`transcript_id: 3`) instead of navigable `decision:*` keys. Toggle back to Real-time Context.
+**Simple RAG contrast (30s):** toggle **Simple RAG**, same prompt. Vector search over transcript text can get the reversal right but cites chunk ids (`transcript_id: 3`) instead of navigable `decision:`* keys. Toggle back to Real-time Context.
 
 ### Path 4 — Single hop vs two hops (3 min)
 
@@ -136,6 +150,8 @@ If the model walks both hops in one turn, say so — then still ask:
 Second hop: `project_id=proj-mobile` → Platform (`dep-mobile-platform`, `blocking=true`). The point is **one hop per call**, not a graph database.
 
 ---
+
+
 
 ## Beat 4 — Live CDC (4 min)
 
@@ -162,6 +178,8 @@ Ask overdue again; that id drops. Snapshot replay (if someone asks "how did the 
 This session's `make mi-verify` CDC probe was **3479 ms** (earlier GKE bring-up recorded 4475 ms).
 
 ---
+
+
 
 ## Beat 5 — Optional YAML/code (3 min)
 
@@ -231,25 +249,30 @@ flush-redis:
    - access_role=leadership → may read every visibility.
 ```
 
-Context Retriever 2.0 filter tools take `tag_conditions` (`field` + `value`). Nested Pydantic args are JSON-encoded in `backend/app/langgraph_agent.py` `_jsonable` (lines 41–56) before the MCP call.
+Context Retriever 2.0 filter tools take `tag_conditions` (`field` + `value`). Nested Pydantic args are JSON-encoded in `backend/app/langgraph_agent.py` `_jsonable` (lines 41–56) before the MCP call. Single-parameter tools such as `get_project_by_id` declare only `id`; `_with_single_arg_alias` (lines 358–385) renames a lone mismatched argument (`project_id`) so the trace stays green.
 
 ---
 
+
+
 ## Appendix — If something is down
 
-| Symptom | What to do |
-|---|---|
-| `gcloud` reauth failed | `gcloud auth login` and `gcloud auth application-default login`. Do not fake kubectl. |
-| Cluster / IAM / API gone | Stop. Do not recreate unless asked. |
-| Postgres CrashLoop `lost+found` | `PGDATA=/var/lib/postgresql/data/pgdata` in `rdi/terraform/k8s/postgres.yaml`. |
-| `make mi-pg-forward` fails | Need kubeconfig (`gcloud container clusters get-credentials …`). |
-| Write tools "Postgres write failed" | Port-forward died. Restart `make mi-pg-forward`. |
-| `mi-verify` CDC timeout | Processor/collector crash-loop. Check `rdidb` **port**: Helm `connection.port` vs `secret/redb-rdidb`. See `rdi/README.md` known failure modes. |
-| RDI API 401 | Password from `rdi-sys-config` / `RDI_REDIS_PASSWORD`, not `jwtKey`. Ingress IP may have changed. |
-| Context surface 404 | `uv run python scripts/setup_surface.py --domain meeting-intel --force-create` (reuses the same Cloud DB). |
-| `make flush-redis DOMAIN=meeting-intel` | Expected refusal. Snapshot = `make mi-reset`. Deltas = SQL under `rdi/source-db/scripts/demo/`. |
-| Landing is another domain | `.env` `DEMO_DOMAIN=meeting-intel`, then restart `make dev`. |
-| Guardrail blocks "Show me that agenda." | Domain pack includes that phrase as in-scope; restart backend after pulling. |
-| Filter tools JSON-serialize errors | Need the `_jsonable` MCP wrapper on this branch. |
+
+| Symptom                                 | What to do                                                                                                                                      |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `gcloud` reauth failed                  | `gcloud auth login` and `gcloud auth application-default login`. Do not fake kubectl.                                                           |
+| Cluster / IAM / API gone                | Stop. Do not recreate unless asked.                                                                                                             |
+| Postgres CrashLoop `lost+found`         | `PGDATA=/var/lib/postgresql/data/pgdata` in `rdi/terraform/k8s/postgres.yaml`.                                                                  |
+| `make mi-pg-forward` fails              | Need kubeconfig (`gcloud container clusters get-credentials …`).                                                                                |
+| Write tools "Postgres write failed"     | Port-forward died. Restart `make mi-pg-forward`.                                                                                                |
+| `mi-verify` CDC timeout                 | Processor/collector crash-loop. Check `rdidb` **port**: Helm `connection.port` vs `secret/redb-rdidb`. See `rdi/README.md` known failure modes. |
+| RDI API 401                             | Password from `rdi-sys-config` / `RDI_REDIS_PASSWORD`, not `jwtKey`. Ingress IP may have changed.                                               |
+| Context surface 404                     | `uv run python scripts/setup_surface.py --domain meeting-intel --force-create` (reuses the same Cloud DB).                                      |
+| `make flush-redis DOMAIN=meeting-intel` | Expected refusal. Snapshot = `make mi-reset`. Deltas = SQL under `rdi/source-db/scripts/demo/`.                                                 |
+| Landing is another domain               | `.env` `DEMO_DOMAIN=meeting-intel`, then restart `make dev`.                                                                                    |
+| Guardrail blocks "Show me that agenda." | Domain pack includes that phrase as in-scope; restart backend after pulling.                                                                    |
+| Filter tools JSON-serialize errors      | Need the `_jsonable` MCP wrapper on this branch.                                                                                                |
+| `get_project_by_id` "Tool input validation failed" (`id` Field required) | Model sent `project_id`. Needs the `_with_single_arg_alias` wrapper and the `id=` prompt hint on this branch; the agent recovers either way, but the trace shows red. |
+
 
 **Snapshot vs CDC:** first pipeline deploy used `snapshot.mode: initial`. Replay bulk load with `make mi-reset` (re-seed Postgres + RDI `/pipelines/reset`). Live demo uses SQL deltas. Neither needs an empty Redis.

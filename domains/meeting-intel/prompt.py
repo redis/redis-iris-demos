@@ -20,11 +20,12 @@ def build_system_prompt(*, mcp_tools: Sequence[dict[str, Any]], runtime_config: 
         ("search_meeting_by_text", "search meeting titles and summaries"),
         ("search_transcriptsegment_by_text", "search transcript wording"),
         ("search_risk_by_text", "search risks"),
-        ("get_project_by_id", "fetch one project"),
-        ("get_meeting_by_id", "fetch one meeting"),
-        ("get_decision_by_id", "fetch one decision"),
-        ("get_actionitem_by_id", "fetch one action item"),
-        ("get_agenda_by_id", "fetch a saved agenda"),
+        ("get_project_by_id", "fetch one project; id=\"proj-platform\""),
+        ("get_meeting_by_id", "fetch one meeting; id=\"mtg-2026-09-09-platform\""),
+        ("get_decision_by_id", "fetch one decision; id=\"dec-mobile-keep-aug\""),
+        ("get_actionitem_by_id", "fetch one action item; id=\"act-platform-runbook\""),
+        ("get_person_by_id", "fetch one person; id=\"person-maya\""),
+        ("get_agenda_by_id", "fetch a saved agenda; id=\"ag-mtg-2026-09-09-platform\""),
     ]
     hints = [f"  • {name} — {desc}" for name, desc in preferred if name in tool_names]
     tool_hint_block = "\n".join(hints) if hints else "  • Use the available MCP tools to inspect meetings, decisions, actions, and risks."
@@ -61,6 +62,9 @@ Context Surface tools (query Redis via MCP):
    Also valid: AND two conditions, e.g. project_id=proj-platform AND status=overdue.
    Wrong:   filter_actionitem_by_status(value="overdue") — that per-field tool name is gone.
    search_*_by_text still takes a text query (parameter name is usually **query** or **text**).
+   get_*_by_id takes exactly one parameter named **id**, holding the bare id.
+   Correct: get_project_by_id with id="proj-platform"
+   Wrong:   get_project_by_id(project_id="proj-platform") or id="project:proj-platform"
 3. ALWAYS FETCH FRESH DATA. After any write tool, re-read through Context Retriever
    (wait a moment if needed) rather than assuming Redis already matches Postgres.
    Write tools return the id and a note that RDI will propagate the change.
@@ -82,7 +86,7 @@ Context Surface tools (query Redis via MCP):
 Generate the agenda for next week's Platform Migration sync:
   1. get_current_user_profile
   2. get_current_time
-  3. get_project_by_id value="proj-platform" (or filter_project)
+  3. get_project_by_id id="proj-platform" (or filter_project)
   4. filter_meeting tag_conditions field=project_id value=proj-platform
   5. filter_decision tag_conditions field=project_id value=proj-platform (keep status=active)
   6. filter_actionitem tag_conditions field=project_id value=proj-platform
@@ -99,11 +103,11 @@ Overdue actions grouped by owner:
   3. Group by owner_person_id; resolve names via get_person_by_id
 
 Did we decide to delay the mobile launch?:
-  1. search_decision_by_text value="mobile launch delay"
+  1. search_decision_by_text query="mobile launch delay"
   2. Keep the active decision; cite the superseded one and superseded_by_decision_id
 
 What's blocking Customer Portal?:
-  1. get_project_by_id value="proj-portal"
+  1. get_project_by_id id="proj-portal"
   2. filter_projectdependency tag_conditions field=project_id value=proj-portal
      → Mobile App (single hop)
   3. Follow-up "and is that blocked?" → filter_projectdependency

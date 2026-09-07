@@ -163,6 +163,42 @@ def test_jsonable_dumps_nested_tag_condition_models() -> None:
     json.dumps(payload)
 
 
+def test_single_property_tool_accepts_a_differently_named_lone_argument() -> None:
+    tool = _make_mcp_tool(
+        {
+            "name": "get_project_by_id",
+            "description": "Fetch one project",
+            "inputSchema": {
+                "type": "object",
+                "properties": {"id": {"type": "string"}},
+                "required": ["id"],
+            },
+        },
+        cs_service=object(),  # type: ignore[arg-type]
+    )
+
+    assert tool.args_schema(project_id="proj-platform").id == "proj-platform"
+    assert tool.args_schema(id="proj-platform").id == "proj-platform"
+
+
+def test_multi_property_tool_still_rejects_unknown_arguments() -> None:
+    tool = _make_mcp_tool(
+        {
+            "name": "search_decision_by_text",
+            "description": "Search decisions",
+            "inputSchema": {
+                "type": "object",
+                "properties": {"query": {"type": "string"}, "limit": {"type": "number"}},
+                "required": ["query"],
+            },
+        },
+        cs_service=object(),  # type: ignore[arg-type]
+    )
+
+    with pytest.raises(ValidationError):
+        tool.args_schema(value="mobile launch delay")
+
+
 def test_mcp_tool_wrapper_returns_structured_json_for_validation_errors() -> None:
     tool = _make_mcp_tool(
         {
