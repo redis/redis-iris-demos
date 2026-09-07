@@ -11,7 +11,8 @@ terraform {
     }
     helm = {
       source  = "hashicorp/helm"
-      version = ">= 2.14"
+      # 3.x requires `kubernetes = { ... }` and other breaking changes; stay on 2.x for this demo.
+      version = ">= 2.14.0, < 3.0.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
