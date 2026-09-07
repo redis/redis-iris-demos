@@ -30,6 +30,7 @@ Every domain runs Context Retriever, Agent Memory, LangCache, and Semantic Routi
 | Retail banking | Radish Bank | <img src="docs/screenshots/Demo_Radish_Bank.png" width="300" /> |
 | Telcp | R-Mobile | <img src="docs/screenshots/Demo_R-Mobile.png" width="300" /> |
 | Sports betting | Sports Desk | <img src="docs/screenshots/Demo_Sports_Desk.png" width="300" /> |
+| Meeting intelligence | Minutes | Harborline / `meeting-intel` (Postgres + RDI → Redis) |
 
 ## Legacy
 
@@ -81,9 +82,11 @@ make dev
 
 ```bash
  # Update the DEMO_DOMAIN in .env
-make setup      
+make setup
 make dev
 ```
+
+`meeting-intel` (Minutes) uses Postgres + RDI instead of JSONL import. See `domains/meeting-intel/README.md`. After GKE + RDI: *"Generate the agenda for next week's Platform Migration sync."*
 
 When switching to `radish-bank`, leave `MEMORY_SIMILARITY_THRESHOLD` unset or commented out
 to use the Radish Bank Agent Memory default of `0.5`. Older local `.env` files may still
@@ -133,6 +136,8 @@ The fastest way to create a new vertical is with an AI coding assistant. Detaile
 
 Just ask: *"Create a new domain for [your vertical]"* — the skill guides the agent through the full process: entity design, branding, realistic guardrail routes, seed data, prompts, and demo scenarios.
 
+Scripted paths live in each pack, including [`domains/meeting-intel/docs/demo_paths.md`](domains/meeting-intel/docs/demo_paths.md).
+
 ## Project Structure
 
 ```
@@ -157,6 +162,7 @@ domains/
   radish-bank/               # Retail banking
   rmobile/                   # Wireless telecom
   sports-betting/            # Sports betting
+  meeting-intel/             # Minutes / Harborline (Postgres + RDI → Redis)
 
 frontend/
   src/
@@ -181,7 +187,9 @@ scripts/                     # Setup, data loading, seeding, validation
 | `make create-domain DOMAIN=X` | Scaffold a new domain |
 | `make seed-memories` | Re-seed long-term memories for current domain |
 | `make seed-langcache` | Re-seed LangCache entries for current domain |
-| `make flush-redis` | Wipe Redis database |
+| `make flush-redis` | Wipe Redis database (refused for `meeting-intel`) |
+| `make mi-rdi-deploy` | Apply Minutes GKE + RDI terraform |
+| `make mi-verify` | Postgres vs Redis counts + CDC probe |
 
 All targets read `DEMO_DOMAIN` from `.env` — no need to pass `DOMAIN=` unless switching.
 
