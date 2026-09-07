@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib.util
 import os
 import sys
 from pathlib import Path
@@ -11,8 +12,6 @@ import httpx
 ROOT = Path(__file__).resolve().parents[3]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-
-import importlib.util
 
 _dg = Path(__file__).resolve().parents[1] / "data_generator.py"
 _spec = importlib.util.spec_from_file_location("meeting_intel_data_generator", _dg)

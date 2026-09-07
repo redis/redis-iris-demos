@@ -10,8 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from backend.app.core.domain_loader import load_domain
-from backend.app.core.domain_schema import FieldSpec
+from backend.app.core.domain_loader import load_domain  # noqa: E402
+from backend.app.core.domain_schema import FieldSpec  # noqa: E402
 
 
 def render_field(field: FieldSpec) -> str:

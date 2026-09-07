@@ -17,10 +17,10 @@ ROOT = Path(__file__).resolve().parents[3]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from openai import OpenAI
+from openai import OpenAI  # noqa: E402
 
-from backend.app.redis_connection import create_redis_client
-from backend.app.settings import get_settings
+from backend.app.redis_connection import create_redis_client  # noqa: E402
+from backend.app.settings import get_settings  # noqa: E402
 
 TARGETS = (
     ("meeting:*", "$.summary", "$.summary_embedding"),

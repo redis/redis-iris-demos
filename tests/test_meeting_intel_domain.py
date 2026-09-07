@@ -18,7 +18,11 @@ def test_meeting_intel_domain_loads() -> None:
     assert domain.validate() == []
 
 
-def test_meeting_intel_internal_tools() -> None:
+def test_meeting_intel_internal_tools(monkeypatch) -> None:
+    monkeypatch.setenv("DEMO_USER_ID", "person-maya")
+    monkeypatch.setenv("DEMO_USER_NAME", "Maya Chen")
+    monkeypatch.setenv("DEMO_USER_EMAIL", "maya.chen@harborline.example")
+    monkeypatch.setenv("DEMO_USER_ROLE", "team")
     domain = load_domain("meeting-intel")
     names = {t.name for t in domain.get_internal_tool_definitions()}
     assert "get_current_user_profile" in names

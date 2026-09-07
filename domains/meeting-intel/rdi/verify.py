@@ -3,21 +3,19 @@
 from __future__ import annotations
 
 import json
-import os
 import sys
 import time
 from pathlib import Path
+import importlib.util
 
 ROOT = Path(__file__).resolve().parents[3]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from backend.app.redis_connection import create_redis_client
-from backend.app.settings import get_settings
+from backend.app.redis_connection import create_redis_client  # noqa: E402
+from backend.app.settings import get_settings  # noqa: E402
 
 _pg_path = Path(__file__).resolve().parents[1] / "postgres.py"
-import importlib.util
-
 _spec = importlib.util.spec_from_file_location("meeting_intel_postgres", _pg_path)
 _pg = importlib.util.module_from_spec(_spec)
 assert _spec and _spec.loader
