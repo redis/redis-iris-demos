@@ -2,6 +2,9 @@ BACKEND_HOST ?= 127.0.0.1
 BACKEND_PORT ?= 8040
 FRONTEND_PORT ?= 3040
 
+# GNU sed rejects `sed -i ''`; BSD sed requires it. Both accept `-i.bak`.
+SED_INPLACE = sed -i.bak
+
 # Active domain: reads DEMO_DOMAIN from .env automatically.
 # Override with: make <target> DOMAIN=electrohub
 DOMAIN ?= $(or $(shell grep -s '^DEMO_DOMAIN=' .env | cut -d= -f2),reddash)
@@ -47,12 +50,12 @@ setup:
 	@if [ ! -f .env ]; then echo "No .env file. Run: cp .env.example .env"; exit 1; fi
 	@echo "Setting up $(DOMAIN)..."
 	@echo ""
-	@sed -i '' 's/^DEMO_DOMAIN=.*/DEMO_DOMAIN=$(DOMAIN)/' .env
+	@$(SED_INPLACE) 's/^DEMO_DOMAIN=.*/DEMO_DOMAIN=$(DOMAIN)/' .env && rm -f .env.bak
 	@uv run python scripts/generate_models.py --domain $(DOMAIN)
 	@uv run python scripts/generate_data.py --domain $(DOMAIN)
 	@uv run python scripts/flush_redis.py
-	@sed -i '' 's/^CTX_SURFACE_ID=.*/CTX_SURFACE_ID=/' .env
-	@sed -i '' 's/^MCP_AGENT_KEY=.*/MCP_AGENT_KEY=/' .env
+	@$(SED_INPLACE) 's/^CTX_SURFACE_ID=.*/CTX_SURFACE_ID=/' .env && rm -f .env.bak
+	@$(SED_INPLACE) 's/^MCP_AGENT_KEY=.*/MCP_AGENT_KEY=/' .env && rm -f .env.bak
 	@uv run python scripts/setup_surface.py --domain $(DOMAIN)
 	@uv run python scripts/load_data.py --domain $(DOMAIN)
 	@DEMO_DOMAIN=$(DOMAIN) uv run python -m scripts.seed_memories
@@ -65,8 +68,8 @@ reset:
 	@echo ""
 	@uv run python scripts/generate_data.py --domain $(DOMAIN)
 	@uv run python scripts/flush_redis.py
-	@sed -i '' 's/^CTX_SURFACE_ID=.*/CTX_SURFACE_ID=/' .env
-	@sed -i '' 's/^MCP_AGENT_KEY=.*/MCP_AGENT_KEY=/' .env
+	@$(SED_INPLACE) 's/^CTX_SURFACE_ID=.*/CTX_SURFACE_ID=/' .env && rm -f .env.bak
+	@$(SED_INPLACE) 's/^MCP_AGENT_KEY=.*/MCP_AGENT_KEY=/' .env && rm -f .env.bak
 	@uv run python scripts/setup_surface.py --domain $(DOMAIN)
 	@uv run python scripts/load_data.py --domain $(DOMAIN)
 	@DEMO_DOMAIN=$(DOMAIN) uv run python -m scripts.seed_memories
