@@ -1,4 +1,4 @@
-name: meetings to meeting JSON
+name: meetings
 source:
   schema: public
   table: meetings

@@ -37,16 +37,7 @@ See [`docs/demo_paths.md`](docs/demo_paths.md).
 
 See [`rdi/README.md`](rdi/README.md). Terraform: [`rdi/terraform/`](rdi/terraform/).
 
-### Checkpoint — apply blocked on IAM (credentials are not enough)
-
-A follow-up agent **did** have `GOOGLE_CREDENTIALS`, `TF_VAR_project_id`, `REDIS_*`, plus `gcloud` / `terraform` / `kubectl` / `helm`. `GOOGLE_APPLICATION_CREDENTIALS` was a file path. `terraform plan` succeeded. **`make mi-rdi-deploy` / `terraform apply` was not faked** — it failed on the first resources:
-
-- `google_project_service.container` and `google_project_service.compute`
-- HTTP 403 `AUTH_PERMISSION_DENIED` for `serviceusage.services.list`
-
-The same service account also cannot `container.clusters.list`, `compute.zones.get`, or `resourcemanager.projects.get`. No GKE cluster was created. Local terraform state has only `data.google_client_config.default`.
-
-Grant these roles on the project in `TF_VAR_project_id` (then re-run `make mi-rdi-deploy`):
+A Cloud Agent SA could plan but could not apply (`serviceusage.services.list` 403). Laptop user ADC created cluster `meeting-intel-rdi`; first CDC probe was **4475 ms**. Do not `FLUSHDB` the iris-demos Redis Cloud target — replay snapshot with `make mi-reset`, then show deltas with the SQL under Path 5 in `docs/demo_paths.md`.
 
 | Name | Why |
 |---|---|
@@ -56,7 +47,7 @@ Grant these roles on the project in `TF_VAR_project_id` (then re-run `make mi-rd
 | APIs: `container.googleapis.com`, `compute.googleapis.com` | Terraform enables if `serviceusage` is allowed |
 | `kubectl` + `helm` + `gke-gcloud-auth-plugin` | `install-rdi.sh` |
 | `REDIS_HOST` `REDIS_PORT` `REDIS_USERNAME` `REDIS_PASSWORD` `REDIS_SSL` | Pipeline **target** |
-| `RDI_API_URL` + `RDI_API_TOKEN` after install | Non-interactive pipeline deploy |
+| `RDI_API_URL` + `RDI_PASSWORD` (rdi-sys-config) after install | Login + pipeline deploy (`jwtKey` is not the Bearer token) |
 | Optional: `MEETING_INTEL_PG_*` if Postgres is port-forwarded for write tools | Agent writes |
 
 Do **not** create a second Redis Cloud DB for application data. RDI's **backend** DB is Redis Enterprise inside GKE (`rdidb`). The **target** is the existing iris-demos Redis Cloud instance.

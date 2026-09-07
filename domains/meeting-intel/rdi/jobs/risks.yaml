@@ -1,4 +1,4 @@
-name: risks to risk JSON
+name: risks
 source:
   schema: public
   table: risks

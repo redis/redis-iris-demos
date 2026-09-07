@@ -1,4 +1,4 @@
-name: people to person JSON
+name: people
 source:
   schema: public
   table: people

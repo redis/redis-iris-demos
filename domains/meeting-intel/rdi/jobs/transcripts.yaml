@@ -1,4 +1,4 @@
-name: transcripts to transcript JSON
+name: transcripts
 source:
   schema: public
   table: transcripts

@@ -1,4 +1,4 @@
-name: action_items to action JSON
+name: action_items
 source:
   schema: public
   table: action_items

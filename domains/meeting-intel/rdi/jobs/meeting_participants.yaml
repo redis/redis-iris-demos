@@ -1,4 +1,4 @@
-name: meeting_participants to participant JSON
+name: meeting_participants
 source:
   schema: public
   table: meeting_participants

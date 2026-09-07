@@ -58,7 +58,13 @@ Second hop: `filter_projectdependency_by_project_id` value=`proj-mobile` → Pla
 
 The agent should say the second question needed a second call. This is the honest single-hop vs graph point.
 
-## Path 5 — Live CDC beats (not a chat path)
+## Path 5 — Snapshot vs live CDC (not a chat path)
+
+Do **not** `FLUSHDB`. The Cloud DB already has (or will have) Context Surface indexes. RDI upserts by key.
+
+**Snapshot (initial load replay):** `make mi-reset` re-seeds Postgres and POSTs RDI `/pipelines/reset`. Watch existing keys such as `project:proj-platform` get rewritten; then `make mi-verify`.
+
+**Deltas:** with `make mi-pg-forward` running:
 
 ```bash
 # Insert an overdue action in Postgres → Redis key action:act-cdc-live-overdue

@@ -1,4 +1,4 @@
-name: agendas to agenda JSON
+name: agendas
 source:
   schema: public
   table: agendas

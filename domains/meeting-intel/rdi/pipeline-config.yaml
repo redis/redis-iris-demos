@@ -41,7 +41,4 @@ targets:
       # requires TLS, set cacert via RDI secrets (TARGET_DB_CACERT) rather than
       # a boolean ssl flag — see RDI pipeline-config docs.
 
-processors:
-  type: classic
-  target_data_type: json
-  json_update_strategy: merge
+# Processor knobs are optional; job output.redis.write sets data_type/on_update.

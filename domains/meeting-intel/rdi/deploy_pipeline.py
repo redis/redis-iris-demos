@@ -56,33 +56,77 @@ def _rdi_base() -> str:
     return (_env("RDI_API_URL") or "http://127.0.0.1:8080").rstrip("/")
 
 
+def _load_dotenv() -> None:
+    env_path = RDI_DIR.parents[2] / ".env"
+    if not env_path.exists():
+        return
+    for line in env_path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or "=" not in stripped:
+            continue
+        key, _, value = stripped.partition("=")
+        key = key.strip()
+        if key in os.environ:
+            continue
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+            value = value[1:-1]
+        os.environ[key] = value
+
+
+def _rdi_access_token(client: httpx.Client, api: str) -> str:
+    """jwtKey signs tokens; login with the RDI backend Redis user/password."""
+    existing = _env("RDI_API_TOKEN")
+    if existing:
+        probe = client.get(f"{api}/api/v1/pipelines", headers={"Authorization": f"Bearer {existing}"})
+        if probe.status_code < 400:
+            return existing
+    username = _env("RDI_USERNAME")
+    password = _env("RDI_PASSWORD")
+    if not password:
+        raise SystemExit(
+            "RDI_PASSWORD is required to POST /api/v1/login (RDI backend Redis password, "
+            "not api.jwtKey). kubectl: secret rdi-sys-config key RDI_REDIS_PASSWORD."
+        )
+    response = client.post(f"{api}/api/v1/login", json={"username": username or None, "password": password})
+    if response.status_code >= 400:
+        raise SystemExit(f"RDI login failed ({response.status_code}): {response.text[:300]}")
+    token = response.json().get("access_token")
+    if not token:
+        raise SystemExit("RDI login succeeded but access_token was missing.")
+    return token
+
+
 def deploy() -> None:
+    _load_dotenv()
     api = _rdi_base()
-    token = _env("RDI_API_TOKEN")
-    headers = {"Content-Type": "application/json"}
-    if token:
-        headers["Authorization"] = f"Bearer {token}"
+    config = yaml.safe_load(_render_pipeline())
+    if not config.get("processors"):
+        config.pop("processors", None)
+    jobs = []
+    for path in sorted(JOBS_DIR.glob("*.yaml")):
+        job = yaml.safe_load(path.read_text(encoding="utf-8"))
+        job["name"] = path.stem
+        jobs.append(job)
+    # RDI config schema: jobs is an array on the same document as sources/targets.
+    payload = {**config, "jobs": jobs}
 
-    config_text = _render_pipeline()
-    jobs = {path.stem: path.read_text(encoding="utf-8") for path in sorted(JOBS_DIR.glob("*.yaml"))}
-    payload = {"config": config_text, "jobs": jobs}
-
-    # RDI 1.8+ Kubernetes API: POST /api/v1/pipelines
-    url = f"{api}/api/v1/pipelines"
-    print(f"Deploying pipeline to {url}")
+    print(f"Deploying pipeline to {api}/api/v1/pipelines")
     print("Prefix map:")
     for table, prefix in PREFIX_MAP.items():
         print(f"  {table:24} {prefix}")
-    with httpx.Client(timeout=60.0) as client:
-        response = client.post(url, headers=headers, json=payload)
+    with httpx.Client(timeout=180.0) as client:
+        token = _rdi_access_token(client, api)
+        headers = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
+        response = client.post(f"{api}/api/v1/pipelines", headers=headers, json=payload)
         if response.status_code >= 400:
-            # Fallback used by some rdi-api builds
             alt = client.put(f"{api}/pipelines/deploy", headers=headers, json=payload)
             if alt.status_code >= 400:
                 raise SystemExit(
                     f"RDI deploy failed ({response.status_code}): {response.text[:500]}\n"
                     f"Fallback PUT /pipelines/deploy failed ({alt.status_code}): {alt.text[:500]}\n"
-                    "Set RDI_API_URL to the RDI API ingress and RDI_API_TOKEN from helm values api.jwtKey."
+                    "Set RDI_API_URL to the RDI API ingress. Authenticate via /api/v1/login "
+                    "(RDI backend user/password), not helm api.jwtKey."
                 )
             response = alt
         print(f"Deploy accepted: HTTP {response.status_code}")

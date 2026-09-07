@@ -1,4 +1,4 @@
-name: project_dependencies to dependency JSON
+name: project_dependencies
 source:
   schema: public
   table: project_dependencies

@@ -31,6 +31,10 @@ spec:
           envFrom:
             - secretRef:
                 name: meeting-intel-postgres
+          env:
+            # GKE PD mounts include lost+found; Postgres refuses a non-empty data dir.
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
           volumeMounts:
             - name: data
               mountPath: /var/lib/postgresql/data

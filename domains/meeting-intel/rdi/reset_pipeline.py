@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import importlib.util
-import os
 import sys
 from pathlib import Path
 
@@ -38,12 +37,16 @@ def _apply_sql(path: Path) -> None:
 
 
 def _reset_rdi() -> None:
-    api = (os.getenv("RDI_API_URL") or "http://127.0.0.1:8080").rstrip("/")
-    token = os.getenv("RDI_API_TOKEN", "")
-    headers = {"Content-Type": "application/json"}
-    if token:
-        headers["Authorization"] = f"Bearer {token}"
+    _dp_path = Path(__file__).resolve().parent / "deploy_pipeline.py"
+    spec = importlib.util.spec_from_file_location("meeting_intel_deploy_pipeline", _dp_path)
+    deploy = importlib.util.module_from_spec(spec)
+    assert spec and spec.loader
+    spec.loader.exec_module(deploy)
+    deploy._load_dotenv()
+    api = deploy._rdi_base()
     with httpx.Client(timeout=60.0) as client:
+        token = deploy._rdi_access_token(client, api)
+        headers = {"Content-Type": "application/json", "Authorization": f"Bearer {token}"}
         for url in (f"{api}/api/v1/pipelines/reset", f"{api}/pipelines/reset"):
             response = client.post(url, headers=headers, json={})
             if response.status_code < 400:
@@ -52,7 +55,7 @@ def _reset_rdi() -> None:
             last = response
         raise SystemExit(
             f"RDI reset failed. Last status {last.status_code}: {last.text[:400]}\n"
-            "Set RDI_API_URL / RDI_API_TOKEN, or reset the pipeline from Redis Insight."
+            "Set RDI_API_URL and RDI_PASSWORD (RDI backend Redis password), or reset from Redis Insight."
         )
 
 

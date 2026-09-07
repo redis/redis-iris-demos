@@ -1,4 +1,4 @@
-name: projects to project JSON
+name: projects
 source:
   schema: public
   table: projects

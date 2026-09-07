@@ -57,7 +57,7 @@ When RDI runs on GKE, the pipeline source host must be `postgres.meeting-intel.s
 
 Terraform lives in `terraform/`. It sizes a **3 × e2-standard-4** zonal GKE cluster (~12 vCPU / 48 GB / 100 GB disk per node), installs Redis Enterprise as RDI's backend DB, Helm-installs RDI, and stands up in-cluster Postgres seeded from `00-schema.sql` + `01-seed.sql`. The pipeline **target** is the Redis Cloud DB from `.env`.
 
-Credentials and CLIs can be present and `terraform plan` can still succeed while **`terraform apply` fails closed on IAM**. A follow-up Cloud Agent with a project-scoped service account stopped here:
+A Cloud Agent with a project-scoped service account could `terraform plan` but **`apply` failed closed on IAM**. User Application Default Credentials on a laptop succeeded (cluster `meeting-intel-rdi`, CDC measured below). The Cloud Agent error was:
 
 ```
 Error: Error when reading or editing Project Service : Request `List Project Services` returned error: ...
@@ -68,22 +68,26 @@ reason: AUTH_PERMISSION_DENIED
   with google_project_service.compute (gke.tf)
 ```
 
-The same identity also lacks `container.clusters.list`, `compute.zones.get`, and `resourcemanager.projects.get`. Grant at least `roles/serviceusage.serviceUsageAdmin` (or Viewer + Consumer), `roles/container.admin`, `roles/compute.admin`, and `roles/iam.serviceAccountUser` on that project, then re-run:
+Prefer user ADC (`gcloud auth application-default login`) over that SA unless those roles are granted. Optional GCS backend: copy `terraform/backend.tf.example` to `backend.tf` (gitignored) and `terraform init -reconfigure`. Then:
 
 ```bash
 export TF_VAR_project_id=your-gcp-project
 # GOOGLE_APPLICATION_CREDENTIALS must be a key *file path*, not JSON contents
 make generate-data DOMAIN=meeting-intel
 make mi-rdi-deploy     # terraform apply + install-rdi.sh
-export RDI_API_URL=... # rdi-api ingress
-export RDI_API_TOKEN=...
+export RDI_API_URL=http://<rdi-api-ingress-ip>
+# jwtKey in generated/rdi-values.yaml signs JWTs; it is not the Bearer token.
+# Login with the RDI backend Redis password (secret rdi-sys-config / RDI_REDIS_PASSWORD):
+export RDI_PASSWORD=...   # then deploy_pipeline.py POSTs /api/v1/login
 make mi-rdi-pipeline
 make mi-verify
 ```
 
 Helm provider is pinned to `>= 2.14.0, < 3.0.0` (`terraform/versions.tf`). Helm 3.x rejects the nested `kubernetes { }` block in `providers.tf`.
 
-Required secrets / identity are also listed at the bottom of `domains/meeting-intel/README.md`. Do not commit `terraform.tfstate`, `generated/kubeconfig`, or `generated/rdi-values.yaml`.
+GKE Postgres must set `PGDATA` to a subdirectory: a zonal PD mount includes `lost+found`, and `initdb` refuses a non-empty data dir.
+
+Required secrets / identity are also listed at the bottom of `domains/meeting-intel/README.md`. Do not commit `terraform.tfstate`, `backend.tf`, `generated/kubeconfig`, or `generated/rdi-values.yaml`.
 
 ## Makefile
 
@@ -97,9 +101,38 @@ Required secrets / identity are also listed at the bottom of `domains/meeting-in
 | `make mi-embed-sidecar` | Fill vector fields on RDI JSON docs |
 | `make setup DOMAIN=meeting-intel` | Full path (skips JSONL load and Redis flush) |
 
+## Demo: initial load vs deltas (do not FLUSHDB)
+
+The iris-demos Redis Cloud DB is the **target**. It may already hold other demo keys, Context Surface indexes, LangCache, and memory. `FLUSHDB` would wipe all of that. RDI does not need an empty database: it upserts JSON at known prefixes (`project:`, `meeting:`, `action:`, …).
+
+**Initial load (snapshot).** First pipeline deploy already ran `snapshot.mode: initial`. To *re-show* a bulk load without flushing Redis:
+
+```bash
+make mi-pg-forward          # another terminal; write path to in-cluster Postgres
+export RDI_API_URL=http://<rdi-api-ingress-ip>
+export RDI_PASSWORD=...     # rdi-sys-config RDI_REDIS_PASSWORD, not jwtKey
+make mi-reset               # re-apply 00-schema.sql + 01-seed.sql, then POST /pipelines/reset
+make mi-verify              # wait until prefix counts match again
+```
+
+Watch Redis: the same ids (`project:proj-platform`, `meeting:mtg-2026-09-09-platform`, …) are rewritten from Postgres. That is the snapshot. RDI will not snapshot again until you reset.
+
+**Deltas (CDC).** Leave the pipeline in `state: cdc`. Change only Postgres:
+
+```bash
+psql "host=127.0.0.1 user=postgres dbname=postgres" \
+  -f domains/meeting-intel/rdi/source-db/scripts/demo/add-overdue-action.sql
+# Redis: JSON.GET action:act-cdc-live-overdue
+psql "host=127.0.0.1 user=postgres dbname=postgres" \
+  -f domains/meeting-intel/rdi/source-db/scripts/demo/mark-action-done.sql
+# same key, status becomes done
+```
+
+`make mi-verify` also inserts `act-verify-latency` and waits for `action:act-verify-latency` (then deletes the Postgres row).
+
 ## Reset
 
-`make mi-reset` re-applies schema+seed and POSTs RDI `/pipelines/reset`. RDI will not re-send a snapshot unless you reset. Do not `FLUSHDB` the target.
+`make mi-reset` is the snapshot replay above. Do not `FLUSHDB` the target.
 
 ## Known failure modes
 
@@ -107,7 +140,8 @@ Required secrets / identity are also listed at the bottom of `domains/meeting-in
 |---|---|
 | RDI pods crash-loop | Cluster too small. Need ≥ 4 CPU / 8 GB dedicated; GKE default here is 3×e2-standard-4. |
 | Snapshot stuck | Source host wrong. From GKE use `postgres.meeting-intel.svc.cluster.local`, not `localhost`. Publication must include all 10 tables. |
-| Pipeline deploy needs Insight clicks | Set `RDI_API_URL` / `RDI_API_TOKEN` and use `make mi-rdi-pipeline`. |
+| Pipeline deploy 401 | `api.jwtKey` is not the Bearer token. `POST /api/v1/login` with `RDI_PASSWORD` from secret `rdi-sys-config`. |
+| Postgres CrashLoop `lost+found` | Set `PGDATA=/var/lib/postgresql/data/pgdata` (see `terraform/k8s/postgres.yaml`). |
 | Redis keys exist as Hash | Job missing `data_type: json`. Context Surface indexes JSON only. |
 | Keys look like `public.meetings.pk` | Job missing explicit key expression. |
 | Counts mismatch after flush | `FLUSHDB` wiped RDI keys; run `make mi-reset`. |
@@ -120,7 +154,7 @@ Required secrets / identity are also listed at the bottom of `domains/meeting-in
 Recorded by `make mi-verify` (insert `act-verify-latency` → wait for `action:act-verify-latency`). Write the number here after the first successful GKE run:
 
 ```
-CDC insert → Redis key: (not yet measured — GKE apply blocked on IAM: serviceusage.services.list 403)
+CDC insert → Redis key: 4475 ms (2026-09-07, GKE meeting-intel-rdi / us-central1-a, first successful laptop apply)
 ```
 
 ## References vendored from

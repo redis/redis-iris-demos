@@ -1,4 +1,4 @@
-name: decisions to decision JSON
+name: decisions
 source:
   schema: public
   table: decisions
