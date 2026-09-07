@@ -37,7 +37,7 @@ make mi-verify
 DEMO_DOMAIN=meeting-intel make dev
 ```
 
-**Resetting between runs.** `make mi-demo-reset` diffs Postgres against the generated seed and issues row-level `DELETE`/`UPDATE` statements, so RDI carries every change into Redis on the normal CDC path. It removes what a run leaves behind — `act-cdc-live-overdue`, `act-live-*` from `create_action_item`, the `*-x-*` rows from `extract_from_transcript` — and clears AI agendas written by `save_ai_agenda` while keeping the human three-liner. It is idempotent and takes about 10s. Preview with `make mi-demo-reset-check` (runs in a transaction and rolls back, so RDI sees nothing).
+**Resetting between runs.** `make mi-demo-reset` diffs Postgres against the generated seed and issues row-level `DELETE`/`UPDATE` statements, so RDI carries every change into Redis on the normal CDC path. It removes what a run leaves behind — `act-cdc-live-overdue` from Beat 4, plus `act-live-*` and `*-x-*` rows if you ran the write-tool paths in [`demo_paths.md`](demo_paths.md) — and clears AI agendas written by `save_ai_agenda` while keeping the human three-liner. It is idempotent and takes about 10s. Preview with `make mi-demo-reset-check` (runs in a transaction and rolls back, so RDI sees nothing).
 
 Use `make mi-reset` only when you want a full re-snapshot. It re-seeds with `TRUNCATE`, and Debezium does **not** emit row deletes for `TRUNCATE`, so demo keys survive in Redis. Neither target needs `FLUSHDB`.
 
