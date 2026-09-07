@@ -8,22 +8,15 @@ def build_system_prompt(*, mcp_tools: Sequence[dict[str, Any]], runtime_config: 
     tool_names = {tool.get("name", "") for tool in mcp_tools}
 
     preferred = [
-        ("filter_project_by_status", "list projects by status (at_risk, blocked, in_progress)"),
-        ("filter_meeting_by_project_id", "list meetings for a project"),
-        ("filter_meeting_by_status", "held vs upcoming meetings"),
-        ("filter_meeting_by_visibility", "ACL: team, leadership, or all"),
-        ("filter_decision_by_project_id", "decisions for a project"),
-        ("filter_decision_by_status", "active vs superseded"),
-        ("filter_actionitem_by_status", "open / done / overdue actions"),
-        ("filter_actionitem_by_project_id", "actions for a project"),
-        ("filter_actionitem_by_owner_person_id", "actions for an owner"),
-        ("filter_risk_by_project_id", "risks for a project"),
-        ("filter_risk_by_status", "open vs mitigated risks"),
-        ("filter_projectdependency_by_project_id", "what a project depends on (single hop)"),
-        ("filter_projectdependency_by_depends_on_project_id", "what depends on a project (single hop reverse)"),
-        ("filter_transcriptsegment_by_meeting_id", "full transcript for a meeting"),
-        ("filter_agenda_by_meeting_id", "human + AI agenda for a meeting"),
-        ("search_decision_by_text", "semantic/text search over decisions"),
+        ("filter_project", "list projects; tag_conditions field=status|team"),
+        ("filter_meeting", "list meetings; tag_conditions field=project_id|status|visibility"),
+        ("filter_decision", "list decisions; tag_conditions field=project_id|status|visibility"),
+        ("filter_actionitem", "list actions; tag_conditions field=status|project_id|owner_person_id"),
+        ("filter_risk", "list risks; tag_conditions field=project_id|status|visibility"),
+        ("filter_projectdependency", "single-hop deps; tag_conditions field=project_id or depends_on_project_id"),
+        ("filter_transcriptsegment", "transcript rows; tag_conditions field=meeting_id"),
+        ("filter_agenda", "human + AI agenda; tag_conditions field=meeting_id"),
+        ("search_decision_by_text", "full-text search over decisions"),
         ("search_meeting_by_text", "search meeting titles and summaries"),
         ("search_transcriptsegment_by_text", "search transcript wording"),
         ("search_risk_by_text", "search risks"),
@@ -63,9 +56,11 @@ Context Surface tools (query Redis via MCP):
    - access_role=team → NEVER return or cite records whose visibility is "leadership".
      Filter meetings, decisions, actions, risks, and agendas with visibility team or all.
    - access_role=leadership → may read every visibility.
-2. ALL filter_* and search_* MCP tools take a single parameter named **value** (a string).
-   Correct: filter_actionitem_by_status with value="overdue"
-   Wrong:   filter_actionitem_by_status(status="overdue") — the MCP server rejects this silently.
+2. FILTER TOOLS take **tag_conditions**: a list of {{field, value}} objects (optional exclude).
+   Correct: filter_actionitem with tag_conditions=[{{"field":"status","value":"overdue"}}]
+   Also valid: AND two conditions, e.g. project_id=proj-platform AND status=overdue.
+   Wrong:   filter_actionitem_by_status(value="overdue") — that per-field tool name is gone.
+   search_*_by_text still takes a text query (parameter name is usually **query** or **text**).
 3. ALWAYS FETCH FRESH DATA. After any write tool, re-read through Context Retriever
    (wait a moment if needed) rather than assuming Redis already matches Postgres.
    Write tools return the id and a note that RDI will propagate the change.
@@ -75,7 +70,8 @@ Context Surface tools (query Redis via MCP):
 5. SUPERSESSION. When two decisions conflict, return only status=active. If a decision
    is superseded, cite superseded_by_decision_id and summarize the current decision.
    Never present a superseded decision as current.
-6. SINGLE-HOP RELATIONSHIPS. filter_projectdependency_by_project_id answers "what does
+6. SINGLE-HOP RELATIONSHIPS. filter_projectdependency with
+   tag_conditions=[{{"field":"project_id","value":"proj-portal"}}] answers "what does
    X depend on?" It does NOT walk further. If the user asks whether that upstream
    project is itself blocked, make a SECOND call. Say so out loud — this demo is honest
    about single-hop vs graph.
@@ -86,20 +82,20 @@ Context Surface tools (query Redis via MCP):
 Generate the agenda for next week's Platform Migration sync:
   1. get_current_user_profile
   2. get_current_time
-  3. filter_project_by_status / get_project_by_id value="proj-platform"
-  4. filter_meeting_by_project_id value="proj-platform" (find upcoming + recent held)
-  5. filter_decision_by_project_id value="proj-platform" (keep status=active)
-  6. filter_actionitem_by_project_id value="proj-platform" (open + overdue)
-  7. filter_risk_by_project_id value="proj-platform" (open)
-  8. filter_projectdependency_by_depends_on_project_id value="proj-platform"
+  3. get_project_by_id value="proj-platform" (or filter_project)
+  4. filter_meeting tag_conditions field=project_id value=proj-platform
+  5. filter_decision tag_conditions field=project_id value=proj-platform (keep status=active)
+  6. filter_actionitem tag_conditions field=project_id value=proj-platform
+  7. filter_risk tag_conditions field=project_id value=proj-platform (open)
+  8. filter_projectdependency tag_conditions field=depends_on_project_id value=proj-platform
   9. Draft a structured agenda (topics, overdue with owners, decisions to confirm,
      risks, dependency status) with ids on every bullet.
   10. save_ai_agenda(meeting_id, ai_agenda, sources)
-  11. Later "show me that agenda" → filter_agenda_by_meeting_id
+  11. Later "show me that agenda" → filter_agenda tag_conditions field=meeting_id
 
 Overdue actions grouped by owner:
   1. get_current_user_profile + get_current_time
-  2. filter_actionitem_by_status value="overdue"
+  2. filter_actionitem tag_conditions=[{{"field":"status","value":"overdue"}}]
   3. Group by owner_person_id; resolve names via get_person_by_id
 
 Did we decide to delay the mobile launch?:
@@ -108,9 +104,11 @@ Did we decide to delay the mobile launch?:
 
 What's blocking Customer Portal?:
   1. get_project_by_id value="proj-portal"
-  2. filter_projectdependency_by_project_id value="proj-portal"  → Mobile App (single hop)
-  3. Follow-up "and is that blocked?" → filter_projectdependency_by_project_id
-     value="proj-mobile" → Platform Migration, then overdue actions on proj-platform.
+  2. filter_projectdependency tag_conditions field=project_id value=proj-portal
+     → Mobile App (single hop)
+  3. Follow-up "and is that blocked?" → filter_projectdependency
+     tag_conditions field=project_id value=proj-mobile → Platform Migration,
+     then overdue actions on proj-platform.
 
 ═══ RESPONSE STYLE ═══
 

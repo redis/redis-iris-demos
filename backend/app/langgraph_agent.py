@@ -38,6 +38,24 @@ _REDIS_KEY_PREFIX_RE = re.compile(
 )
 
 
+def _jsonable(value: Any) -> Any:
+    """Convert nested Pydantic models so MCP HTTP bodies can JSON-encode them.
+
+    Context Retriever 2.0 filter tools take ``tag_conditions`` objects. LangChain
+    materializes those as Pydantic models; passing them through unchanged raises
+    ``Object of type Schema_<tool>_tag_conditionsItem is not JSON serializable``.
+    """
+    if value is None:
+        return None
+    if isinstance(value, BaseModel):
+        return _jsonable(value.model_dump(mode="json", exclude_none=True))
+    if isinstance(value, dict):
+        return {key: _jsonable(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_jsonable(item) for item in value]
+    return value
+
+
 def _build_prompt_factory(system_prompt: str) -> Callable[[dict], list]:
     """Build the message list for the LLM, trimming stale tool results.
 
@@ -354,6 +372,7 @@ def _make_mcp_tool(
         for k, v in clean_args.items():
             if isinstance(v, str) and (m := _REDIS_KEY_PREFIX_RE.search(v)):
                 clean_args[k] = m.group(1)
+        clean_args = _jsonable(clean_args)
         try:
             result = await cs_service.call_tool(name, clean_args)
             return json.dumps(result or {}, default=str)

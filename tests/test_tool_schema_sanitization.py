@@ -11,6 +11,7 @@ from backend.app.context_surface_service import (
 )
 from backend.app.langgraph_agent import (
     _format_tool_validation_error,
+    _jsonable,
     _make_mcp_tool,
     _pydantic_model_from_json_schema,
     _resolve_json_schema_variant,
@@ -133,6 +134,33 @@ def test_pydantic_model_from_json_schema_supports_arrays_objects_and_nullable_va
 
     with pytest.raises(ValidationError):
         model(embedding=[0.1])
+
+
+def test_jsonable_dumps_nested_tag_condition_models() -> None:
+    model = _pydantic_model_from_json_schema(
+        "filter_actionitem",
+        {
+            "type": "object",
+            "properties": {
+                "tag_conditions": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "field": {"type": "string"},
+                            "value": {"type": "string"},
+                            "exclude": {"type": "boolean"},
+                        },
+                        "required": ["field", "value"],
+                    },
+                }
+            },
+        },
+    )
+    instance = model(tag_conditions=[{"field": "status", "value": "overdue"}])
+    payload = _jsonable({"tag_conditions": instance.tag_conditions})
+    assert payload == {"tag_conditions": [{"field": "status", "value": "overdue"}]}
+    json.dumps(payload)
 
 
 def test_mcp_tool_wrapper_returns_structured_json_for_validation_errors() -> None:
