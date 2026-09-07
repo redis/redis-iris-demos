@@ -54,6 +54,14 @@ async def main() -> None:
 
     settings = get_settings()
     domain = load_domain(args.domain or settings.demo_domain)
+    if getattr(domain.manifest, "data_plane", "jsonl") == "rdi":
+        print(
+            f"Domain '{domain.manifest.id}' uses the RDI data plane. "
+            "Skipping JSONL import so RDI remains the only writer of Redis keys."
+        )
+        print("Apply Postgres seed + the RDI pipeline, then run make mi-verify.")
+        print("Dataset metadata is written by make mi-verify after key counts match.")
+        return
     admin_key = settings.ctx_admin_key
     surface_id = settings.ctx_surface_id
 
