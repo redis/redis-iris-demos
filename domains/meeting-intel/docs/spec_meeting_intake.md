@@ -1,22 +1,23 @@
 # Spec: `meeting-intel` — a reusable meeting-intelligence demo domain (RDI + Redis Iris)
 
-**Audience:** a coding agent with access to (a) the RDI Postgres/Chinook demo repo and
-(b) `redis/redis-iris-demos`.
-**Owner:** Jeremy Plichta. **Target first use:** technical workshop, Sept 8 (Tokyo).
+**Audience:** a coding agent extending `redis/redis-iris-demos`.
+This pack is a **fictional** Harborline / Minutes dataset. It is not a customer
+engagement dump and does not describe any real company.
 
 ---
 
 ## 1. Why this exists
 
-A customer asked for a hands-on comparison of retrieval approaches using this use case:
+The demo needs a meetings-and-projects corpus so three Iris stories share one dataset:
 
 > Create the agenda for the next meeting based on previous meeting information. Retrieve
 > previous decisions, actions, and risks. Identify incomplete and overdue actions. Identify
 > dependencies between projects. Trace generated content back to the relevant meeting
 > information and memory.
 
-Their evaluation criteria: setup/dev time · semantic relevance · filtering by date/project/
-access permissions/metadata · relationship & dependency identification · response quality.
+Useful retrieval checks on that corpus: setup/dev time · semantic relevance · filtering by
+date/project/access permissions/metadata · relationship and dependency identification ·
+response quality.
 
 Today the RDI demos ship with the Chinook music dataset (Artist/Album/Track). That proves CDC
 works but says nothing about the use case above. This spec replaces it with a **meetings /
