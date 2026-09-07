@@ -32,9 +32,14 @@ DEMO_DOMAIN=meeting-intel uv run python -m scripts.seed_memories
 DEMO_DOMAIN=meeting-intel uv run python -m scripts.seed_langcache
 # optional, for Simple RAG contrast:
 make mi-embed-sidecar
+make mi-demo-reset          # undo the last run's demo writes (see below)
 make mi-verify
 DEMO_DOMAIN=meeting-intel make dev
 ```
+
+**Resetting between runs.** `make mi-demo-reset` diffs Postgres against the generated seed and issues row-level `DELETE`/`UPDATE` statements, so RDI carries every change into Redis on the normal CDC path. It removes what a run leaves behind — `act-cdc-live-overdue`, `act-live-*` from `create_action_item`, the `*-x-*` rows from `extract_from_transcript` — and clears AI agendas written by `save_ai_agenda` while keeping the human three-liner. It is idempotent and takes about 10s. Preview with `make mi-demo-reset-check` (runs in a transaction and rolls back, so RDI sees nothing).
+
+Use `make mi-reset` only when you want a full re-snapshot. It re-seeds with `TRUNCATE`, and Debezium does **not** emit row deletes for `TRUNCATE`, so demo keys survive in Redis. Neither target needs `FLUSHDB`.
 
 UI:   `` (backend `8040`). Confirm landing **Minutes** / Harborline, hero **What should we cover in the next meeting?**, mode toggle **Real-time Context** vs **Simple RAG**.
 
@@ -80,6 +85,26 @@ Browser: Redis Insight → the iris-demos Cloud DB. Browser search by prefix, th
 
 
 Leave Insight open on `action:*` so the CDC key pop is visible later.
+
+### Optional — wire Insight to RDI itself (2 min)
+
+Redis Insight 2.54+ manages RDI from the **Redis Data Integration** tab, so you can show the pipeline definition and CDC status without a terminal. Add this endpoint **before** the room arrives; Insight downloads the deployed pipeline on first connect.
+
+| Field    | Value                                                                                 |
+| -------- | ------------------------------------------------------------------------------------- |
+| Alias    | `meeting-intel-rdi`                                                                   |
+| URL      | `https://34.172.4.76` — **https**, and re-check `kubectl -n rdi get ingress`           |
+| Username | `default`                                                                             |
+| Password | `kubectl -n rdi get secret rdi-sys-config -o jsonpath='{.data.RDI_REDIS_PASSWORD}' \| base64 -d` |
+
+The ingress uses a self-signed cert, so accept the TLS warning. The password is the RDI **backend Redis** password, not Helm `api.jwtKey`. Same credential as `POST /api/v1/login`.
+
+Two things worth showing:
+
+- **Pipeline Management** — the deployed `config.yaml` (Postgres source host, tables) next to the per-table job YAMLs. This is the "no code, just config" claim, in the room, from the live server.
+- **Pipeline Status** — engine state plus per-stream counters and processing performance. Leave this open in a second tab during Beat 4: the insert shows up as a counter tick on the `action_items` stream, which is the CDC story told in numbers rather than by refreshing a key.
+
+If you skip this, Beat 4 still works. The Insight key pop is the more visceral demo; the status window is for the architect who asks "how do I operate this?"
 
 ---
 
@@ -157,10 +182,14 @@ Second hop: `project_id=proj-mobile` → Platform (`dep-mobile-platform`, `block
 
 Same session. Insight still filtered on `action:`. Port-forward still up.
 
+**Check first:** `action:act-cdc-live-overdue` must **not** exist yet. If a previous run left it there, the reveal is spoiled — run `make mi-demo-reset` (see Beat 0) and refresh Insight.
+
 ```bash
 psql "host=127.0.0.1 user=postgres dbname=postgres" \
   -f domains/meeting-intel/rdi/source-db/scripts/demo/add-overdue-action.sql
 ```
+
+The script is an upsert, so re-running it on an existing row still bumps `updated_at` and still produces a CDC event. If neither the key nor `updated_at` changes in Insight within ~5s, RDI is down rather than slow: check `kubectl -n rdi get pods` and see the appendix.
 
 Click `action:act-cdc-live-overdue` in Insight (JSON, `status=overdue`). Then in chat:
 
@@ -265,7 +294,9 @@ Context Retriever 2.0 filter tools take `tag_conditions` (`field` + `value`). Ne
 | Postgres CrashLoop `lost+found`         | `PGDATA=/var/lib/postgresql/data/pgdata` in `rdi/terraform/k8s/postgres.yaml`.                                                                  |
 | `make mi-pg-forward` fails              | Need kubeconfig (`gcloud container clusters get-credentials …`).                                                                                |
 | Write tools "Postgres write failed"     | Port-forward died. Restart `make mi-pg-forward`.                                                                                                |
-| `mi-verify` CDC timeout                 | Processor/collector crash-loop. Check `rdidb` **port**: Helm `connection.port` vs `secret/redb-rdidb`. See `rdi/README.md` known failure modes. |
+| Redis does not change after demo SQL    | RDI is down, not slow. `kubectl -n rdi get pods`; if `processor`/`collector-source` are `CrashLoopBackOff`, run `make mi-rdi-fix-port` (~90s), then re-run the SQL. |
+| `mi-verify` CDC timeout                 | Processor/collector crash-loop. Check `rdidb` **port**: Helm `connection.port` vs `secret/redb-rdidb`. `make mi-rdi-fix-port` does this. See `rdi/README.md`. |
+| Demo keys already in Redis before Beat 4 | Previous run's leftovers. `make mi-demo-reset` (row-level CDC deletes), then refresh Insight.                                                   |
 | RDI API 401                             | Password from `rdi-sys-config` / `RDI_REDIS_PASSWORD`, not `jwtKey`. Ingress IP may have changed.                                               |
 | Context surface 404                     | `uv run python scripts/setup_surface.py --domain meeting-intel --force-create` (reuses the same Cloud DB).                                      |
 | `make flush-redis DOMAIN=meeting-intel` | Expected refusal. Snapshot = `make mi-reset`. Deltas = SQL under `rdi/source-db/scripts/demo/`.                                                 |

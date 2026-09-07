@@ -82,3 +82,5 @@ psql "$MEETING_INTEL_PG" -f domains/meeting-intel/rdi/source-db/scripts/demo/mar
 psql "$MEETING_INTEL_PG" -f domains/meeting-intel/rdi/source-db/scripts/extra/transcript-05.sql
 # In chat: extract follow-ups from meeting mtg-2026-09-01-pipeline-extra
 ```
+
+**Reset between runs:** `make mi-demo-reset` deletes what a run added (`act-cdc-live-overdue`, `act-live-*`, the `*-x-*` extraction rows) and clears saved AI agendas, using row-level SQL so RDI removes the Redis keys. Preview with `make mi-demo-reset-check`. Run it before Path 5 so the CDC key genuinely appears for the first time. `make mi-reset` re-snapshots but leaves those keys, because Debezium emits no row deletes for `TRUNCATE`.

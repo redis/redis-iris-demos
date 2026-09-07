@@ -7,3 +7,10 @@ spec:
   memorySize: 250MB
   persistence: aofEverySecond
   evictionPolicy: noeviction
+  # Pinned on purpose. Without this, Redis Enterprise picks a random port and picks a
+  # NEW one every time the database is recreated, while install-rdi.sh has already
+  # baked the old port into Helm values. The processor and collector then crash-loop
+  # with "Timeout connecting to server on rdidb.rdi.svc.cluster.local:<old port>".
+  # Matches the port on the current cluster, so re-applying this file changes nothing.
+  # If it ever drifts again: make mi-rdi-fix-port
+  databasePort: 13885
