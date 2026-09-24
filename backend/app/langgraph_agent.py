@@ -34,7 +34,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 log = logging.getLogger(__name__)
 
 _REDIS_KEY_PREFIX_RE = re.compile(
-    r"^(?:reddash|electrohub|healthcare|radish_bank|finance_researcher)_\w+:(.+)$"
+    r"^(?:reddash|electrohub|crafthub|healthcare|radish_bank|finance_researcher)_\w+:(.+)$"
 )
 
 

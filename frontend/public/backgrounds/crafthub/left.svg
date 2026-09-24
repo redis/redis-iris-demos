@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 817" fill="none">
+
+  <!-- ============================================= -->
+  <!-- CraftHub Left Background                      -->
+  <!-- Flat craft supplies: yarn + needles, paint    -->
+  <!-- palette, brushes, thread spool, buttons       -->
+  <!-- All elements x < 240, fading toward center    -->
+  <!-- ============================================= -->
+
+  <defs>
+    <linearGradient id="fadeL" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0.35"/>
+    </linearGradient>
+    <mask id="maskL">
+      <rect x="0" y="0" width="600" height="817" fill="url(#fadeL)"/>
+    </mask>
+  </defs>
+
+  <g mask="url(#maskL)">
+
+    <!-- ===== TOP: Ball of yarn with knitting needles ===== -->
+    <g transform="translate(95,150)">
+      <circle r="78" fill="#e0262b" fill-opacity="0.22"/>
+      <circle r="78" stroke="#e0262b" stroke-opacity="0.30" stroke-width="2"/>
+      <path d="M-70 -30 C-20 -60 30 -60 72 -22" stroke="#b81d22" stroke-opacity="0.30" stroke-width="3" stroke-linecap="round"/>
+      <path d="M-76 -2 C-24 -34 34 -34 78 4" stroke="#b81d22" stroke-opacity="0.28" stroke-width="3" stroke-linecap="round"/>
+      <path d="M-72 26 C-22 -4 30 -4 72 30" stroke="#b81d22" stroke-opacity="0.26" stroke-width="3" stroke-linecap="round"/>
+      <path d="M-58 50 C-18 26 22 26 56 54" stroke="#b81d22" stroke-opacity="0.24" stroke-width="3" stroke-linecap="round"/>
+      <path d="M-30 -72 C-50 -20 -50 30 -26 74" stroke="#b81d22" stroke-opacity="0.20" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M20 -76 C0 -24 2 28 26 74" stroke="#b81d22" stroke-opacity="0.20" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Needles -->
+      <line x1="-40" y1="-120" x2="60" y2="40" stroke="#c9a27a" stroke-opacity="0.55" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="-42" cy="-123" r="8" fill="#c9a27a" fill-opacity="0.55"/>
+      <line x1="40" y1="-125" x2="-30" y2="45" stroke="#c9a27a" stroke-opacity="0.50" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="42" cy="-128" r="8" fill="#c9a27a" fill-opacity="0.50"/>
+      <!-- Loose strand -->
+      <path d="M60 60 C110 90 90 150 150 170 C190 184 200 220 180 250" stroke="#e0262b" stroke-opacity="0.28" stroke-width="3" stroke-linecap="round"/>
+    </g>
+
+    <!-- ===== MID: Paint palette ===== -->
+    <g transform="translate(95,440) rotate(-12)">
+      <path d="M-95 0 C-95 -62 -30 -92 30 -84 C92 -76 112 -26 98 12 C88 40 52 34 44 56 C36 80 60 96 30 104 C-30 118 -95 72 -95 0 Z" fill="#f3d6b8" fill-opacity="0.65" stroke="#c9a27a" stroke-opacity="0.40" stroke-width="2"/>
+      <circle cx="20" cy="46" r="13" fill="#fff5f0" fill-opacity="0.9"/>
+      <circle cx="-52" cy="-18" r="15" fill="#e0262b" fill-opacity="0.45"/>
+      <circle cx="-18" cy="-50" r="14" fill="#ff9933" fill-opacity="0.45"/>
+      <circle cx="26" cy="-52" r="14" fill="#ffd166" fill-opacity="0.55"/>
+      <circle cx="62" cy="-24" r="13" fill="#4caf7d" fill-opacity="0.40"/>
+      <circle cx="-56" cy="30" r="14" fill="#4a7bd0" fill-opacity="0.38"/>
+      <circle cx="-22" cy="66" r="12" fill="#8e5bc4" fill-opacity="0.35"/>
+    </g>
+
+    <!-- Brushes -->
+    <g transform="translate(190,520) rotate(28)">
+      <rect x="-5" y="-110" width="10" height="120" rx="5" fill="#b81d22" fill-opacity="0.35"/>
+      <rect x="-7" y="10" width="14" height="22" fill="#b8b8b8" fill-opacity="0.45"/>
+      <path d="M-7 32 L7 32 L3 62 Q0 70 -3 62 Z" fill="#6b4a33" fill-opacity="0.45"/>
+    </g>
+    <g transform="translate(215,500) rotate(40)">
+      <rect x="-4" y="-90" width="8" height="100" rx="4" fill="#ff9933" fill-opacity="0.32"/>
+      <rect x="-6" y="10" width="12" height="18" fill="#b8b8b8" fill-opacity="0.40"/>
+      <path d="M-6 28 L6 28 L2 52 Q0 58 -2 52 Z" fill="#e0262b" fill-opacity="0.35"/>
+    </g>
+
+    <!-- ===== BOTTOM: Thread spool ===== -->
+    <g transform="translate(70,690)">
+      <rect x="-40" y="-60" width="80" height="14" rx="4" fill="#c9a27a" fill-opacity="0.55"/>
+      <rect x="-40" y="46" width="80" height="14" rx="4" fill="#c9a27a" fill-opacity="0.55"/>
+      <rect x="-30" y="-46" width="60" height="92" fill="#4caf7d" fill-opacity="0.32"/>
+      <line x1="-30" y1="-34" x2="30" y2="-30" stroke="#2f8a5b" stroke-opacity="0.30" stroke-width="2"/>
+      <line x1="-30" y1="-18" x2="30" y2="-14" stroke="#2f8a5b" stroke-opacity="0.30" stroke-width="2"/>
+      <line x1="-30" y1="-2" x2="30" y2="2" stroke="#2f8a5b" stroke-opacity="0.30" stroke-width="2"/>
+      <line x1="-30" y1="14" x2="30" y2="18" stroke="#2f8a5b" stroke-opacity="0.30" stroke-width="2"/>
+      <line x1="-30" y1="30" x2="30" y2="34" stroke="#2f8a5b" stroke-opacity="0.30" stroke-width="2"/>
+      <path d="M30 10 C70 20 60 70 110 70" stroke="#4caf7d" stroke-opacity="0.30" stroke-width="2" stroke-linecap="round"/>
+    </g>
+
+    <!-- Buttons -->
+    <g transform="translate(175,640)">
+      <circle r="18" fill="#ffd166" fill-opacity="0.50"/>
+      <circle cx="-5" cy="-5" r="3" fill="#fff5f0"/>
+      <circle cx="5" cy="-5" r="3" fill="#fff5f0"/>
+      <circle cx="-5" cy="5" r="3" fill="#fff5f0"/>
+      <circle cx="5" cy="5" r="3" fill="#fff5f0"/>
+    </g>
+    <g transform="translate(205,720)">
+      <circle r="13" fill="#e0262b" fill-opacity="0.32"/>
+      <circle cx="-4" cy="0" r="2.4" fill="#fff5f0"/>
+      <circle cx="4" cy="0" r="2.4" fill="#fff5f0"/>
+    </g>
+
+    <!-- Sparkles -->
+    <path d="M200 70 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z" fill="#ffd166" fill-opacity="0.55"/>
+    <path d="M30 330 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" fill="#e0262b" fill-opacity="0.35"/>
+    <path d="M225 300 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" fill="#ff9933" fill-opacity="0.35"/>
+  </g>
+</svg>

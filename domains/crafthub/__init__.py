@@ -1,0 +1,1 @@
+"""CraftHub domain."""
