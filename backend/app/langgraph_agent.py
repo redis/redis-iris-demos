@@ -337,6 +337,17 @@ def _pydantic_model_from_json_schema(name: str, schema: dict) -> type[BaseModel]
     return create_model(f"Schema_{name}", **fields)
 
 
+def _to_plain(value: Any) -> Any:
+    """Convert nested Pydantic arg models (e.g. tag_conditions items) to JSON-safe dicts."""
+    if isinstance(value, BaseModel):
+        return value.model_dump(exclude_none=True)
+    if isinstance(value, list):
+        return [_to_plain(v) for v in value]
+    if isinstance(value, dict):
+        return {k: _to_plain(v) for k, v in value.items()}
+    return value
+
+
 def _make_mcp_tool(
     tool_def: dict[str, Any],
     cs_service: ContextSurfaceService,
@@ -349,7 +360,7 @@ def _make_mcp_tool(
 
     async def fn(**kwargs: Any) -> str:
         # Strip None values — MCP server rejects null for optional numeric params
-        clean_args = {k: v for k, v in kwargs.items() if v is not None}
+        clean_args = {k: _to_plain(v) for k, v in kwargs.items() if v is not None}
         # Strip Redis key prefixes the LLM sometimes adds (e.g. "reddash_order:ORD_001" → "ORD_001")
         for k, v in clean_args.items():
             if isinstance(v, str) and (m := _REDIS_KEY_PREFIX_RE.search(v)):
