@@ -6,7 +6,7 @@
 
 Multi-domain AI agent demos for [Redis Iris](https://redis.io/iris/): Redis's unified context engine for AI agents.
 
-Every domain runs Context Retriever, Agent Memory, LangCache, and Semantic Routign.
+Every domain runs Context Retriever, Agent Memory, LangCache, and Semantic Routing.
 </div>
 
 ---
@@ -28,7 +28,7 @@ Every domain runs Context Retriever, Agent Memory, LangCache, and Semantic Routi
 | Financial research | ShiftIQ | <img src="docs/screenshots/Demo_ShiftIQ.png" width="300" /> |
 | Healthcare | RedHealthConnect | <img src="docs/screenshots/Demo_RedHealthConnect.png" width="300" /> |
 | Retail banking | Radish Bank | <img src="docs/screenshots/Demo_Radish_Bank.png" width="300" /> |
-| Telcp | R-Mobile | <img src="docs/screenshots/Demo_R-Mobile.png" width="300" /> |
+| Telco | R-Mobile | <img src="docs/screenshots/Demo_R-Mobile.png" width="300" /> |
 | Sports betting | Sports Desk | <img src="docs/screenshots/Demo_Sports_Desk.png" width="300" /> |
 
 ## Legacy
