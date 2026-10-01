@@ -336,6 +336,165 @@ class Waitlist(ContextModel):
     )
 
 
+class LabResult(ContextModel):
+    """LabResult entity for the RedHealthConnect domain."""
+
+    __redis_key_template__ = "healthcare_labresult:{id}"
+
+    id: str = ContextField(
+        description="Lab result ID",
+        is_key_component=True,
+    )
+
+    patient_id: str = ContextField(
+        description="Patient",
+        index="tag",
+    )
+
+    provider_id: str = ContextField(
+        description="Ordering provider",
+        index="tag",
+    )
+
+    appointment_id: str = ContextField(
+        description="Associated appointment",
+        index="tag",
+    )
+
+    test_name: str = ContextField(
+        description="Test name",
+        index="text",
+        weight=2.0,
+    )
+
+    result_value: str = ContextField(
+        description="Result value",
+        index="text",
+    )
+
+    reference_range: str = ContextField(
+        description="Normal reference range",
+        index="text",
+    )
+
+    flag: str = ContextField(
+        description="Flag: normal, high, low, abnormal",
+        index="tag",
+    )
+
+    status: str = ContextField(
+        description="Status: final, preliminary, pending",
+        index="tag",
+    )
+
+    collected_date: str = ContextField(
+        description="Date specimen collected",
+        index="tag",
+    )
+
+    resulted_date: str = ContextField(
+        description="Date result reported",
+        index="tag",
+    )
+
+    notes: str = ContextField(
+        description="Result notes",
+        index="text",
+    )
+
+    patient: Any = ContextRelationship(
+        description="Patient",
+        target="Patient",
+        source_field="patient_id",
+    )
+
+    provider: Any = ContextRelationship(
+        description="Ordering provider",
+        target="Provider",
+        source_field="provider_id",
+    )
+
+    appointment: Any = ContextRelationship(
+        description="Associated appointment",
+        target="Appointment",
+        source_field="appointment_id",
+    )
+
+
+class Prescription(ContextModel):
+    """Prescription entity for the RedHealthConnect domain."""
+
+    __redis_key_template__ = "healthcare_prescription:{id}"
+
+    id: str = ContextField(
+        description="Prescription ID",
+        is_key_component=True,
+    )
+
+    patient_id: str = ContextField(
+        description="Patient",
+        index="tag",
+    )
+
+    provider_id: str = ContextField(
+        description="Prescribing provider",
+        index="tag",
+    )
+
+    medication: str = ContextField(
+        description="Medication name",
+        index="text",
+        weight=2.0,
+    )
+
+    dosage: str = ContextField(
+        description="Dosage",
+        index="tag",
+    )
+
+    frequency: str = ContextField(
+        description="Frequency / directions",
+        index="text",
+    )
+
+    status: str = ContextField(
+        description="Status: active, completed, discontinued, expired",
+        index="tag",
+    )
+
+    prescribed_date: str = ContextField(
+        description="Date prescribed",
+        index="tag",
+    )
+
+    refills_remaining: str = ContextField(
+        description="Refills remaining",
+        index="tag",
+    )
+
+    pharmacy: str = ContextField(
+        description="Dispensing pharmacy",
+        index="text",
+    )
+
+    notes: str = ContextField(
+        description="Prescription notes",
+        index="text",
+    )
+
+    patient: Any = ContextRelationship(
+        description="Patient",
+        target="Patient",
+        source_field="patient_id",
+    )
+
+    provider: Any = ContextRelationship(
+        description="Prescribing provider",
+        target="Provider",
+        source_field="provider_id",
+    )
+
+
 class HealthDoc(ContextModel):
     """HealthDoc entity for the RedHealthConnect domain."""
 

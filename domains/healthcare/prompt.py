@@ -18,6 +18,10 @@ def build_system_prompt(
         ("filter_appointment_by_provider_id", "find appointments for a specific provider"),
         ("filter_referral_by_patient_id", "find referrals for a patient"),
         ("filter_referral_by_urgency", "find referrals by urgency level"),
+        ("filter_labresult_by_patient_id", "find a patient's lab results"),
+        ("filter_labresult_by_flag", "find lab results by flag (normal, high, low, abnormal)"),
+        ("filter_prescription_by_patient_id", "find a patient's prescriptions"),
+        ("filter_prescription_by_status", "find prescriptions by status (active, completed, discontinued, expired)"),
         ("filter_provider_by_specialty", "find providers by medical specialty"),
         ("filter_provider_by_accepting_new_patients", "find providers accepting new patients"),
         ("filter_waitlist_by_patient_id", "find waitlist entries for a patient"),
@@ -102,6 +106,15 @@ Referral status:
 Waitlist status:
   1. get_current_user_profile
   2. filter_waitlist_by_patient_id
+
+Lab results / medical history:
+  1. get_current_user_profile
+  2. filter_labresult_by_patient_id
+  3. get_current_time (to order results from most recent to oldest)
+
+Prescriptions / refills:
+  1. get_current_user_profile
+  2. filter_prescription_by_patient_id (filter_prescription_by_status for active meds)
 
 No-show follow-up:
   1. filter_appointment_by_status("no_show")

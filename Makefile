@@ -63,6 +63,7 @@ setup:
 reset:
 	@echo "Reloading $(DOMAIN)..."
 	@echo ""
+	@uv run python scripts/generate_data.py --domain $(DOMAIN)
 	@uv run python scripts/flush_redis.py
 	@sed -i '' 's/^CTX_SURFACE_ID=.*/CTX_SURFACE_ID=/' .env
 	@sed -i '' 's/^MCP_AGENT_KEY=.*/MCP_AGENT_KEY=/' .env

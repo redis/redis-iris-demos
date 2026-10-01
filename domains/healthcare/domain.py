@@ -50,13 +50,18 @@ class HealthcareDomain:
             starter_prompts=[
                 PromptCard(
                     eyebrow="Context",
-                    title="Do I have any upcoming appointments?",
+                    title="Future appointments",
                     prompt="Do I have any upcoming appointments?",
                 ),
                 PromptCard(
                     eyebrow="Context",
-                    title="What's the status of my referrals?",
+                    title="Referral status",
                     prompt="What's the status of my referrals?",
+                ),
+                PromptCard(
+                    eyebrow="Context",
+                    title="Lab results",
+                    prompt="How are my cholesterol levels?",
                 ),
                 PromptCard(
                     eyebrow="Memory",
@@ -69,8 +74,13 @@ class HealthcareDomain:
                     prompt="Based on what you know about my preferences, what kind of appointment should I schedule?",
                 ),
                 PromptCard(
+                    eyebrow="Memory",
+                    title="Update pharmacy",
+                    prompt="Update my pharmacy to CVS 1234 main st",
+                ),
+                PromptCard(
                     eyebrow="Cached",
-                    title="Schedule a follow-up",
+                    title="Schedule follow-up",
                     prompt="How do I schedule a follow-up appointment?",
                 ),
             ],
@@ -142,6 +152,8 @@ class HealthcareDomain:
                         "I need to verify my insurance",
                         "How do I get my prescription refilled?",
                         "What specialists are available?",
+                        "Tell me about my lab work",
+                        "What did the doctor prescribe to me last April?",
                         "Yes",
                         "No",
                         "Yes please",
@@ -296,7 +308,8 @@ class HealthcareDomain:
                 name="dataset_overview",
                 description=(
                     "Returns counts for the current healthcare demo dataset, including "
-                    "locations, providers, patients, appointments, referrals, and waitlist entries."
+                    "locations, providers, patients, appointments, referrals, waitlist "
+                    "entries, lab results, and prescriptions."
                 ),
             ),
         ]
@@ -361,13 +374,17 @@ class HealthcareDomain:
         if tool_name == "get_current_time":
             return {"current_time": datetime.now(timezone.utc).isoformat()}
         if tool_name == "dataset_overview":
+            from domains.healthcare import data_generator as data
+
             return {
-                "locations": 2,
-                "providers": 5,
-                "patients": 8,
-                "appointments": 10,
-                "referrals": 6,
-                "waitlist": 4,
+                "locations": len(data.LOCATIONS),
+                "providers": len(data.PROVIDERS),
+                "patients": len(data.PATIENTS),
+                "appointments": len(data.APPOINTMENTS),
+                "referrals": len(data.REFERRALS),
+                "waitlist": len(data.WAITLIST),
+                "lab_results": len(data.LAB_RESULTS),
+                "prescriptions": len(data.PRESCRIPTIONS),
             }
         return {"error": f"Unknown tool: {tool_name}"}
 
