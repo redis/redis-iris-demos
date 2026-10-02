@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 632 817" fill="none">
+
+  <!-- ============================================= -->
+  <!-- CraftHub Right Background                     -->
+  <!-- Flat seasonal crafts: fall wreath with bow,   -->
+  <!-- velvet pumpkins, canvas on easel, scissors    -->
+  <!-- All elements x > 400, fading toward center    -->
+  <!-- ============================================= -->
+
+  <defs>
+    <linearGradient id="fadeR" x1="1" y1="0" x2="0" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="1"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0.35"/>
+    </linearGradient>
+    <mask id="maskR">
+      <rect x="0" y="0" width="632" height="817" fill="url(#fadeR)"/>
+    </mask>
+  </defs>
+
+  <g mask="url(#maskR)">
+
+    <!-- ===== TOP: Fall grapevine wreath ===== -->
+    <g transform="translate(530,170)">
+      <circle r="92" stroke="#8a6440" stroke-opacity="0.40" stroke-width="26"/>
+      <circle r="92" stroke="#6b4a33" stroke-opacity="0.25" stroke-width="2" stroke-dasharray="14 10"/>
+      <circle r="80" stroke="#6b4a33" stroke-opacity="0.18" stroke-width="2" stroke-dasharray="10 14"/>
+      <!-- Leaves -->
+      <g fill-opacity="0.50">
+        <path d="M-80 -40 q-10 -26 14 -34 q6 24 -14 34z" fill="#e0262b"/>
+        <path d="M-92 4 q-24 -10 -16 -34 q24 8 16 34z" fill="#ff9933"/>
+        <path d="M-70 52 q-26 4 -28 -22 q24 -2 28 22z" fill="#ffd166"/>
+        <path d="M60 -70 q10 -26 34 -14 q-10 22 -34 14z" fill="#ff9933"/>
+        <path d="M88 -30 q24 -10 32 14 q-24 8 -32 -14z" fill="#e0262b"/>
+        <path d="M-30 -92 q-4 -26 22 -26 q2 24 -22 26z" fill="#ffd166"/>
+        <path d="M-50 -76 q-22 -14 -8 -36 q20 14 8 36z" fill="#b81d22"/>
+      </g>
+      <!-- Berries -->
+      <circle cx="-86" cy="-18" r="5" fill="#b81d22" fill-opacity="0.55"/>
+      <circle cx="-78" cy="-8" r="4" fill="#b81d22" fill-opacity="0.55"/>
+      <circle cx="74" cy="-54" r="5" fill="#b81d22" fill-opacity="0.55"/>
+      <!-- Burlap bow -->
+      <g transform="translate(0,88)">
+        <path d="M0 0 C-30 -30 -60 -18 -52 6 C-46 26 -18 16 0 0 Z" fill="#d9b98c" fill-opacity="0.70"/>
+        <path d="M0 0 C30 -30 60 -18 52 6 C46 26 18 16 0 0 Z" fill="#d9b98c" fill-opacity="0.70"/>
+        <path d="M-6 4 L-24 54 L-10 48 L-2 60 L2 6 Z" fill="#c9a27a" fill-opacity="0.65"/>
+        <path d="M6 4 L24 54 L10 48 L2 60 L-2 6 Z" fill="#c9a27a" fill-opacity="0.60"/>
+        <circle r="10" fill="#c9a27a" fill-opacity="0.80"/>
+      </g>
+    </g>
+
+    <!-- ===== MID: Canvas on easel ===== -->
+    <g transform="translate(520,430)">
+      <line x1="-50" y1="-90" x2="-80" y2="110" stroke="#8a6440" stroke-opacity="0.45" stroke-width="6" stroke-linecap="round"/>
+      <line x1="50" y1="-90" x2="80" y2="110" stroke="#8a6440" stroke-opacity="0.45" stroke-width="6" stroke-linecap="round"/>
+      <line x1="0" y1="-110" x2="0" y2="100" stroke="#8a6440" stroke-opacity="0.35" stroke-width="5" stroke-linecap="round"/>
+      <rect x="-70" y="-90" width="140" height="110" rx="3" fill="#ffffff" fill-opacity="0.85" stroke="#c9a27a" stroke-opacity="0.50" stroke-width="3"/>
+      <!-- Painted landscape -->
+      <circle cx="30" cy="-58" r="14" fill="#ffd166" fill-opacity="0.60"/>
+      <path d="M-66 0 L-30 -40 L0 -14 L26 -36 L66 4 L66 16 L-66 16 Z" fill="#e0262b" fill-opacity="0.28"/>
+      <path d="M-66 8 C-30 -10 20 -4 66 8 L66 16 L-66 16 Z" fill="#4caf7d" fill-opacity="0.35"/>
+      <rect x="-80" y="22" width="160" height="8" rx="3" fill="#8a6440" fill-opacity="0.50"/>
+    </g>
+
+    <!-- ===== BOTTOM: Velvet pumpkins ===== -->
+    <g transform="translate(470,700)">
+      <ellipse cx="0" cy="0" rx="52" ry="40" fill="#ff9933" fill-opacity="0.40"/>
+      <ellipse cx="0" cy="0" rx="26" ry="40" stroke="#d9771f" stroke-opacity="0.35" stroke-width="2"/>
+      <ellipse cx="0" cy="0" rx="42" ry="40" stroke="#d9771f" stroke-opacity="0.25" stroke-width="2"/>
+      <path d="M0 -40 C2 -54 10 -60 16 -62" stroke="#6b4a33" stroke-opacity="0.60" stroke-width="6" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(560,720)">
+      <ellipse cx="0" cy="0" rx="40" ry="30" fill="#f3e6d3" fill-opacity="0.80"/>
+      <ellipse cx="0" cy="0" rx="20" ry="30" stroke="#c9a27a" stroke-opacity="0.40" stroke-width="2"/>
+      <path d="M0 -30 C0 -42 6 -48 12 -50" stroke="#6b4a33" stroke-opacity="0.60" stroke-width="5" stroke-linecap="round"/>
+    </g>
+    <g transform="translate(600,660)">
+      <ellipse cx="0" cy="0" rx="28" ry="22" fill="#9bb89a" fill-opacity="0.55"/>
+      <ellipse cx="0" cy="0" rx="14" ry="22" stroke="#6f9170" stroke-opacity="0.40" stroke-width="2"/>
+      <path d="M0 -22 C0 -30 4 -34 8 -36" stroke="#6b4a33" stroke-opacity="0.60" stroke-width="4" stroke-linecap="round"/>
+    </g>
+
+    <!-- Scissors -->
+    <g transform="translate(430,590) rotate(-30)">
+      <circle cx="-14" cy="34" r="12" stroke="#e0262b" stroke-opacity="0.45" stroke-width="6"/>
+      <circle cx="14" cy="34" r="12" stroke="#e0262b" stroke-opacity="0.45" stroke-width="6"/>
+      <path d="M-8 24 L6 -40 L10 -38 L0 24 Z" fill="#b8b8b8" fill-opacity="0.55"/>
+      <path d="M8 24 L-6 -40 L-10 -38 L0 24 Z" fill="#a0a0a0" fill-opacity="0.55"/>
+      <circle cx="0" cy="12" r="3" fill="#6b6b6b" fill-opacity="0.6"/>
+    </g>
+
+    <!-- Sparkles -->
+    <path d="M430 60 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4z" fill="#ffd166" fill-opacity="0.55"/>
+    <path d="M605 330 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" fill="#e0262b" fill-opacity="0.35"/>
+    <path d="M420 300 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" fill="#ff9933" fill-opacity="0.35"/>
+  </g>
+</svg>

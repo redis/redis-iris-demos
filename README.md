@@ -25,6 +25,7 @@ Every domain runs Context Retriever, Agent Memory, LangCache, and Semantic Routi
 |----------|-----|------------|
 | Food delivery | Redis Eats | <img src="docs/screenshots/Demo_Redis_Eats.png" width="300" /> |
 | Electronics Retail | ElectroHub | <img src="docs/screenshots/Demo_ElectroHub.png" width="300" /> |
+| Arts & crafts retail | CraftHub | — |
 | Financial research | ShiftIQ | <img src="docs/screenshots/Demo_ShiftIQ.png" width="300" /> |
 | Healthcare | RedHealthConnect | <img src="docs/screenshots/Demo_RedHealthConnect.png" width="300" /> |
 | Retail banking | Radish Bank | <img src="docs/screenshots/Demo_Radish_Bank.png" width="300" /> |
@@ -152,6 +153,7 @@ backend/
 domains/
   reddash/                   # Food delivery
   electrohub/                # Electronics retail
+  crafthub/                  # Arts & crafts retail (supplies, store classes, framing)
   finance-researcher/        # Financial research
   healthcare/                # Patient portal
   radish-bank/               # Retail banking
