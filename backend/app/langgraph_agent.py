@@ -14,13 +14,12 @@ import json
 import logging
 import re
 import warnings
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 from langchain_core.tools import StructuredTool
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.redis.aio import AsyncRedisSaver
 from langgraph.prebuilt import create_react_agent
-from pydantic import BaseModel, Field, create_model
 
 from backend.app.context_surface_service import ContextSurfaceService
 from backend.app.core.domain_loader import get_active_domain
@@ -223,118 +222,33 @@ def _make_internal_tools(service: InternalToolService) -> list[StructuredTool]:
 
     for defn in service.definitions:
         schema = defn.input_schema or {"type": "object", "properties": {}}
-        args_model = _pydantic_model_from_json_schema(defn.name, schema)
         tools.append(StructuredTool(
             name=defn.name,
             description=defn.description,
             func=_make_fn(defn.name),
             coroutine=_make_coro(defn.name),
-            args_schema=args_model,
+            args_schema=schema,
         ))
     return tools
 
 
-JSON_TYPE_MAP: dict[str, type] = {
-    "string": str,
-    "integer": int,
-    "number": float,
-    "boolean": bool,
-}
+def _strip_redis_key_prefixes(value: Any) -> Any:
+    """Rewrite full Redis keys to their bare id component, at any depth.
 
-
-def _resolve_json_schema_variant(schema: dict[str, Any] | None) -> tuple[dict[str, Any], bool]:
-    if not isinstance(schema, dict):
-        return {"type": "string"}, False
-
-    nullable = False
-    schema_type = schema.get("type")
-    if isinstance(schema_type, list):
-        non_null_types = [value for value in schema_type if value != "null"]
-        nullable = len(non_null_types) != len(schema_type)
-        if len(non_null_types) == 1:
-            resolved = dict(schema)
-            resolved["type"] = non_null_types[0]
-            return resolved, nullable
-
-    for key in ("anyOf", "oneOf"):
-        variants = schema.get(key)
-        if isinstance(variants, list) and variants:
-            non_null_variants = [variant for variant in variants if variant != {"type": "null"}]
-            nullable = len(non_null_variants) != len(variants)
-            if len(non_null_variants) == 1:
-                resolved_variant, variant_nullable = _resolve_json_schema_variant(non_null_variants[0])
-                return resolved_variant, nullable or variant_nullable
-
-    all_of = schema.get("allOf")
-    if isinstance(all_of, list) and all_of:
-        merged: dict[str, Any] = {}
-        required: list[str] = []
-        for variant in all_of:
-            resolved_variant, variant_nullable = _resolve_json_schema_variant(variant)
-            nullable = nullable or variant_nullable
-            if resolved_variant.get("type") and not merged.get("type"):
-                merged["type"] = resolved_variant["type"]
-            if isinstance(resolved_variant.get("properties"), dict):
-                merged.setdefault("properties", {}).update(resolved_variant["properties"])
-            if isinstance(resolved_variant.get("required"), list):
-                for field_name in resolved_variant["required"]:
-                    if field_name not in required:
-                        required.append(field_name)
-            if isinstance(resolved_variant.get("additionalProperties"), dict):
-                merged["additionalProperties"] = resolved_variant["additionalProperties"]
-            for k, v in resolved_variant.items():
-                if k not in {"type", "properties", "required", "additionalProperties"} and k not in merged:
-                    merged[k] = v
-        if required:
-            merged["required"] = required
-        if merged:
-            return merged, nullable
-
-    return schema, nullable
-
-
-def _python_type_from_json_schema(schema: dict[str, Any], name: str = "Nested") -> tuple[Any, bool]:
-    resolved_schema, nullable = _resolve_json_schema_variant(schema)
-    schema_type = resolved_schema.get("type")
-
-    if schema_type == "array":
-        items = resolved_schema.get("items")
-        if isinstance(items, dict):
-            item_type, _ = _python_type_from_json_schema(items, f"{name}Item")
-            return list[item_type], nullable
-        return list[Any], nullable
-
-    if schema_type == "object":
-        properties = resolved_schema.get("properties")
-        if isinstance(properties, dict):
-            return _pydantic_model_from_json_schema(name, resolved_schema), nullable
-        additional_properties = resolved_schema.get("additionalProperties")
-        if isinstance(additional_properties, dict):
-            value_type, _ = _python_type_from_json_schema(additional_properties, f"{name}Value")
-            return dict[str, value_type], nullable
-        return dict[str, Any], nullable
-
-    return JSON_TYPE_MAP.get(str(schema_type), Any), nullable
-
-
-def _pydantic_model_from_json_schema(name: str, schema: dict) -> type[BaseModel]:
-    """Build a Pydantic model from a JSON Schema ``properties`` dict."""
-    props = schema.get("properties", {})
-    required = set(schema.get("required", []))
-    fields: dict[str, Any] = {}
-    for prop_name, prop_def in props.items():
-        py_type, nullable = _python_type_from_json_schema(prop_def, f"{name}_{prop_name}")
-        desc = prop_def.get("description", "")
-        field_type = py_type | None if nullable or prop_name not in required else py_type
-        if prop_name in required:
-            fields[prop_name] = (field_type, Field(description=desc))
-        else:
-            default = prop_def.get("default")
-            if default is None:
-                fields[prop_name] = (field_type, Field(default=None, description=desc))
-            else:
-                fields[prop_name] = (field_type, Field(default=default, description=desc))
-    return create_model(f"Schema_{name}", **fields)
+    Tool results echo full keys (``radish_bank_account:ACC001``) and the model
+    feeds them straight back as arguments. Tag filters expect only the id
+    component, and a prefixed value matches nothing while still returning HTTP
+    200 — a silent empty result — so this has to reach values nested inside
+    condition objects, not just top-level strings.
+    """
+    if isinstance(value, str):
+        match = _REDIS_KEY_PREFIX_RE.search(value)
+        return match.group(1) if match else value
+    if isinstance(value, dict):
+        return {k: _strip_redis_key_prefixes(v) for k, v in value.items()}
+    if isinstance(value, list):
+        return [_strip_redis_key_prefixes(v) for v in value]
+    return value
 
 
 def _make_mcp_tool(
@@ -344,16 +258,17 @@ def _make_mcp_tool(
     """Wrap a single MCP tool definition as a LangChain StructuredTool."""
     name = tool_def["name"]
     description = tool_def.get("description", name)
+    # Hand the MCP schema to the model verbatim. Converting it to pydantic
+    # models turns nested objects (``tag_conditions`` items) into model
+    # instances that the MCP client cannot JSON-serialize.
     input_schema = tool_def.get("inputSchema", {"type": "object", "properties": {}})
-    args_model = _pydantic_model_from_json_schema(name, input_schema)
 
     async def fn(**kwargs: Any) -> str:
         # Strip None values — MCP server rejects null for optional numeric params
-        clean_args = {k: v for k, v in kwargs.items() if v is not None}
         # Strip Redis key prefixes the LLM sometimes adds (e.g. "reddash_order:ORD_001" → "ORD_001")
-        for k, v in clean_args.items():
-            if isinstance(v, str) and (m := _REDIS_KEY_PREFIX_RE.search(v)):
-                clean_args[k] = m.group(1)
+        clean_args = {
+            k: _strip_redis_key_prefixes(v) for k, v in kwargs.items() if v is not None
+        }
         try:
             result = await cs_service.call_tool(name, clean_args)
             return json.dumps(result or {}, default=str)
@@ -366,7 +281,7 @@ def _make_mcp_tool(
         description=description,
         func=lambda **kw: "",  # sync stub — we use coroutine
         coroutine=fn,
-        args_schema=args_model,
+        args_schema=input_schema,
         handle_validation_error=_format_tool_validation_error,
     )
 

@@ -1,9 +1,8 @@
 from __future__ import annotations
 
+import asyncio
 import json
-
-import pytest
-from pydantic import ValidationError
+from typing import Any
 
 from backend.app.context_surface_service import (
     _sanitize_property_schema,
@@ -12,8 +11,7 @@ from backend.app.context_surface_service import (
 from backend.app.langgraph_agent import (
     _format_tool_validation_error,
     _make_mcp_tool,
-    _pydantic_model_from_json_schema,
-    _resolve_json_schema_variant,
+    _strip_redis_key_prefixes,
 )
 
 
@@ -75,64 +73,62 @@ def test_sanitize_tool_definition_defaults_plain_vector_arrays() -> None:
     assert vector_schema["items"] == {"type": "number"}
 
 
-def test_resolve_json_schema_variant_handles_nullable_composed_schema() -> None:
-    resolved, nullable = _resolve_json_schema_variant(
+def test_strip_redis_key_prefixes_reaches_nested_values() -> None:
+    args = {
+        "tag_conditions": [{"field": "customer_id", "value": "radish_bank_customer:CUST001"}],
+        "limit": 5,
+    }
+
+    assert _strip_redis_key_prefixes(args) == {
+        "tag_conditions": [{"field": "customer_id", "value": "CUST001"}],
+        "limit": 5,
+    }
+
+
+class _RecordingService:
+    def __init__(self) -> None:
+        self.calls: list[tuple[str, dict[str, Any]]] = []
+
+    async def call_tool(self, name: str, args: dict[str, Any]) -> dict[str, Any]:
+        self.calls.append((name, args))
+        return {"ok": True}
+
+
+def test_mcp_tool_passes_nested_args_as_json_serializable_dicts() -> None:
+    service = _RecordingService()
+    tool = _make_mcp_tool(
         {
-            "anyOf": [
-                {"type": "array", "items": {"type": "integer"}},
-                {"type": "null"},
-            ]
-        }
-    )
-
-    assert nullable is True
-    assert resolved == {"type": "array", "items": {"type": "integer"}}
-
-
-def test_pydantic_model_from_json_schema_supports_arrays_objects_and_nullable_variants() -> None:
-    model = _pydantic_model_from_json_schema(
-        "VectorSearchArgs",
-        {
-            "type": "object",
-            "properties": {
-                "embedding": {
-                    "type": "array",
-                    "items": {"type": "number"},
-                    "description": "Embedding vector",
-                },
-                "filters": {
-                    "anyOf": [
-                        {
+            "name": "filter_account",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "tag_conditions": {
+                        "type": "array",
+                        "items": {
                             "type": "object",
                             "properties": {
-                                "ids": {
-                                    "type": ["array", "null"],
-                                    "items": {"type": "integer"},
-                                }
+                                "field": {"type": "string", "enum": ["customer_id"]},
+                                "value": {"type": "string"},
                             },
-                            "required": ["ids"],
+                            "required": ["field", "value"],
                         },
-                        {"type": "null"},
-                    ],
-                    "description": "Optional filter object",
+                    },
+                    "limit": {"type": "integer"},
                 },
             },
-            "required": ["embedding", "filters"],
         },
+        service,  # type: ignore[arg-type]
     )
 
-    instance = model(embedding=[0.1, 0.2], filters={"ids": [1, 2, 3]})
-    assert instance.embedding == [0.1, 0.2]
-    assert instance.filters.ids == [1, 2, 3]
+    result = asyncio.run(
+        tool.ainvoke({"tag_conditions": [{"field": "customer_id", "value": "CUST001"}]})
+    )
 
-    nullable_instance = model(embedding=[0.1], filters=None)
-    assert nullable_instance.filters is None
-
-    with pytest.raises(ValidationError):
-        model(embedding=["bad"], filters={"ids": [1]})
-
-    with pytest.raises(ValidationError):
-        model(embedding=[0.1])
+    assert json.loads(result) == {"ok": True}
+    name, args = service.calls[0]
+    assert name == "filter_account"
+    assert args == {"tag_conditions": [{"field": "customer_id", "value": "CUST001"}]}
+    json.dumps(args)
 
 
 def test_mcp_tool_wrapper_returns_structured_json_for_validation_errors() -> None:
