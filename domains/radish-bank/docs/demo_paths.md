@@ -1,6 +1,8 @@
 # Radish Bank — demo paths
 
-Single customer **Merv Kwok** (`CUST001`). Run these prompts **in order** to showcase **Context Retriever**, **Agent Memory**, **LangCache**, and the **semantic router** — the core Redis Iris stack.
+Flagship authenticated customer **Merv Kwok** (`CUST001`) has multiple accounts, cards, product holdings, and a realistic service-request history. The seeded source also includes background customers so MongoDB, RDI, and Redis look like a small retail banking portfolio rather than a one-row fixture.
+
+Run these prompts **in order** to showcase **Context Retriever**, **Agent Memory**, **LangCache**, and the **semantic router** — the core Redis Iris stack.
 
 ---
 
@@ -18,7 +20,21 @@ Single customer **Merv Kwok** (`CUST001`). Run these prompts **in order** to sho
 
 ---
 
-## 2. Unstructured knowledge
+## 2. Service history over richer structured data
+
+**"Show me my recent service requests."**
+
+
+| Iris component        | What happens                                                                                                                  |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **Context Retriever** | Filters service requests by `CUST001`, showing approved, pending, and rejected fixed-deposit, insurance, and card-fee history. |
+
+
+**Expect:** a concise summary of recent requests, not a fabricated account narrative.
+
+---
+
+## 3. Unstructured knowledge
 
 **"Am I eligible for fixed deposit products?"**
 
@@ -32,7 +48,21 @@ Single customer **Merv Kwok** (`CUST001`). Run these prompts **in order** to sho
 
 ---
 
-## 3. LangCache — skip the LLM
+## 4. Branch lookup with relationships
+
+**"Which Radish branches are full branches and what are their hours?"**
+
+
+| Iris component        | What happens                                                                                              |
+| --------------------- | --------------------------------------------------------------------------------------------------------- |
+| **Context Retriever** | Lists Branch rows filtered by `branch_type`, then joins to BranchHours rows through the branch relationship. |
+
+
+**Expect:** full branches only, with hours for Tampines, Raffles Place, Orchard, and Jurong East.
+
+---
+
+## 5. LangCache — skip the LLM
 
 **"What are your FD rates now?"**
 
@@ -46,7 +76,7 @@ Single customer **Merv Kwok** (`CUST001`). Run these prompts **in order** to sho
 
 ---
 
-## 4. Long-term memory + action
+## 6. Long-term memory + action
 
 **"I want to place SGD 2,000 into the 6-month fixed deposit."**
 
@@ -65,7 +95,7 @@ the Radish Bank memory-search default of `0.5`.
 
 ---
 
-## 5. Fresh context *(optional)*
+## 7. Fresh context *(optional)*
 
 **"What are my account balances and product holdings?"** *(same as step 1)*
 
@@ -79,7 +109,7 @@ the Radish Bank memory-search default of `0.5`.
 
 ---
 
-## 6. Semantic router — block off-topic
+## 8. Semantic router — block off-topic
 
 **"Tell me a joke."**
 

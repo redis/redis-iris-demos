@@ -1,5 +1,6 @@
 # Environment & secrets
 .env
+notebooks/radish_bank_mongo_rdi/.env
 env.cloud-run.yaml
 
 # AI assistant config (local only)
@@ -7,6 +8,7 @@ CLAUDE.md
 
 # Python
 __pycache__/
+.ipynb_checkpoints/
 *.pyc
 *.pyo
 *.egg-info/
@@ -26,6 +28,7 @@ frontend/vite.config.d.ts
 
 # Generated data
 output/
+notebooks/generated_rdi_pipeline/
 
 # OS files
 .DS_Store
