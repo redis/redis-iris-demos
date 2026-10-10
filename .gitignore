@@ -27,6 +27,20 @@ frontend/vite.config.d.ts
 # Generated data
 output/
 
+# Terraform / RDI runtime
+**/.terraform/
+**/.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+crash.log
+crash.*.log
+domains/meeting-intel/rdi/terraform/generated/
+domains/meeting-intel/rdi/terraform/backend.tf
+domains/meeting-intel/rdi/source-db/pgdata/
+domains/meeting-intel/rdi/source-db/pgadmin/
+
 # OS files
 .DS_Store
 Thumbs.db

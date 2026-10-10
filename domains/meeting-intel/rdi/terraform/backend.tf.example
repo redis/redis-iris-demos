@@ -1,0 +1,8 @@
+# Copy to backend.tf (gitignored) before the first apply if you want remote state.
+# terraform init -reconfigure
+terraform {
+  backend "gcs" {
+    bucket = "YOUR_TFSTATE_BUCKET"
+    prefix = "meeting-intel-rdi"
+  }
+}

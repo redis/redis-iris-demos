@@ -1,0 +1,16 @@
+{
+  "name": "Redis Iris Demos",
+  "install": "bash .cursor/install.sh",
+  "start": "bash .cursor/start.sh",
+  "terminals": [
+    {
+      "name": "backend",
+      "command": "export PATH=\"$HOME/.local/bin:$PATH\"; uv run python -m uvicorn backend.app.main:app --reload --host 127.0.0.1 --port 8040"
+    },
+    {
+      "name": "frontend",
+      "command": "cd frontend && npm run dev -- --host 0.0.0.0 --port 3040"
+    }
+  ],
+  "ports": [8040, 3040]
+}

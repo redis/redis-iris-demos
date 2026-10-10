@@ -1,0 +1,23 @@
+name: agendas
+source:
+  schema: public
+  table: agendas
+transform:
+  - uses: add_field
+    with:
+      field: generated_at
+      language: sql
+      expression: >-
+        CASE WHEN generated_at IS NULL THEN NULL
+             ELSE CAST(generated_at AS TEXT) END
+  # JSONB should arrive as nested JSON. If a collector stringifies it, keep the text
+  # so the agent can json.loads rather than storing the Python-none string "null".
+output:
+  - uses: redis.write
+    with:
+      connection: target
+      data_type: json
+      on_update: merge
+      key:
+        expression: concat(['agenda:', agenda_id])
+        language: jmespath

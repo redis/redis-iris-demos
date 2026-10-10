@@ -1,0 +1,32 @@
+name: action_items
+source:
+  schema: public
+  table: action_items
+transform:
+  - uses: add_field
+    with:
+      field: due_date
+      language: sql
+      expression: >-
+        CASE WHEN typeof(due_date) = 'integer'
+             THEN date(due_date * 86400, 'unixepoch')
+             ELSE substr(CAST(due_date AS TEXT), 1, 10) END
+  - uses: add_field
+    with:
+      field: created_at
+      language: sql
+      expression: CAST(created_at AS TEXT)
+  - uses: add_field
+    with:
+      field: updated_at
+      language: sql
+      expression: CAST(updated_at AS TEXT)
+output:
+  - uses: redis.write
+    with:
+      connection: target
+      data_type: json
+      on_update: merge
+      key:
+        expression: concat(['action:', action_id])
+        language: jmespath

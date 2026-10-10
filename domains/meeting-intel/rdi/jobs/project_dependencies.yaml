@@ -1,0 +1,22 @@
+name: project_dependencies
+source:
+  schema: public
+  table: project_dependencies
+transform:
+  # Context Surface indexes `blocking` as a TAG string ("true"/"false"), not a JSON boolean.
+  - uses: add_field
+    with:
+      field: blocking
+      language: sql
+      expression: >-
+        CASE WHEN blocking IN (1, '1', 't', 'true', 'TRUE', 'True')
+             THEN 'true' ELSE 'false' END
+output:
+  - uses: redis.write
+    with:
+      connection: target
+      data_type: json
+      on_update: merge
+      key:
+        expression: concat(['dependency:', dependency_id])
+        language: jmespath

@@ -1,0 +1,44 @@
+sources:
+  psql:
+    type: cdc
+    logging:
+      level: info
+    connection:
+      type: postgresql
+      host: ${SOURCE_DB_HOST}
+      port: ${SOURCE_DB_PORT}
+      database: ${SOURCE_DB_NAME}
+      user: ${SOURCE_DB_USERNAME}
+      password: ${SOURCE_DB_PASSWORD}
+    schemas:
+      - public
+    tables:
+      public.people: {}
+      public.projects: {}
+      public.meetings: {}
+      public.meeting_participants: {}
+      public.transcripts: {}
+      public.decisions: {}
+      public.action_items: {}
+      public.risks: {}
+      public.project_dependencies: {}
+      public.agendas: {}
+    advanced:
+      source:
+        publication.name: meeting_intel_pub
+        slot.name: meeting_intel_slot
+        snapshot.mode: initial
+
+targets:
+  target:
+    connection:
+      type: redis
+      host: ${TARGET_DB_HOST}
+      port: ${TARGET_DB_PORT}
+      user: ${TARGET_DB_USERNAME}
+      password: ${TARGET_DB_PASSWORD}
+      # Redis Cloud in this repo is typically REDIS_SSL=false. If the target
+      # requires TLS, set cacert via RDI secrets (TARGET_DB_CACERT) rather than
+      # a boolean ssl flag — see RDI pipeline-config docs.
+
+# Processor knobs are optional; job output.redis.write sets data_type/on_update.

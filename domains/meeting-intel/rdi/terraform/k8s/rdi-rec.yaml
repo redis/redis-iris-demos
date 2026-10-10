@@ -1,0 +1,11 @@
+apiVersion: "app.redislabs.com/v1"
+kind: "RedisEnterpriseCluster"
+metadata:
+  name: redis-enterprise-cluster
+  namespace: rdi
+spec:
+  nodes: 1
+  persistentSpec:
+    enabled: true
+    storageClassName: standard-rwo
+    volumeSize: 20Gi

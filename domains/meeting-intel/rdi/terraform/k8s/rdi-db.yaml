@@ -1,0 +1,9 @@
+apiVersion: app.redislabs.com/v1alpha1
+kind: RedisEnterpriseDatabase
+metadata:
+  name: rdidb
+  namespace: rdi
+spec:
+  memorySize: 250MB
+  persistence: aofEverySecond
+  evictionPolicy: noeviction
