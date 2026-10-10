@@ -14,4 +14,4 @@ class ChatRequest(BaseModel):
     messages: list[ChatMessage]
     mode: Literal["context_surfaces", "simple_rag"] = "context_surfaces"
     thread_id: str | None = None
-
+    demo_user_id: str | None = None
